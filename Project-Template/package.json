@@ -6,11 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "commit": "superclaude commit --interactive",
-    "release:prep": "superclaude changelog && superclaude readme",
-    "code:review": "superclaude review --verbose",
-    "docs:update": "superclaude docs"
+    "lint": "next lint"
   },
   "dependencies": {
     "react": "^18",

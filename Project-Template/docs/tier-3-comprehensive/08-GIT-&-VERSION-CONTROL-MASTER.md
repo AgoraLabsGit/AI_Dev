@@ -34,24 +34,18 @@ For the AI-First Development System to function at maximum capacity, it must be 
         -   `fix/header-layout-bug`
         -   `docs/update-readme`
 
-## 4. **Commit Protocol: AI-Powered Commits with SuperClaude**
+## 4. **Commit Protocol: AI-Powered by SuperClaude**
 
 **AI Developer Instructions:**
-Our project uses `superclaude` to automate the creation of high-quality, conventional commit messages. This is the **only** approved method for creating commits.
+All commits will be generated using the `SuperClaude Framework` to ensure consistency, clarity, and quality.
 
-1.  **Staging Changes**: Before committing, ensure all intended changes are staged using `git add .` or by selecting them in the source control panel.
+1.  **Staging Changes**: Ensure all intended changes for the commit are staged using `git add .` or by selecting them in the source control panel.
 
 2.  **Generating the Commit**:
-    *   Execute the command: `npm run commit`
-    *   This command runs `superclaude commit --interactive`, which will analyze your staged changes, understand their intent, and generate a perfect commit message.
-    *   It will present the message to you for approval before committing.
+    *   Execute the command: `/sc:commit`
+    *   This command analyzes your staged changes, understands their intent, and generates a perfect, Conventional Commits-compliant message.
 
-3.  **Why We Use This**:
-    *   **Consistency**: Ensures every commit follows the Conventional Commits specification perfectly.
-    *   **Clarity**: Creates meaningful, descriptive messages that tell the story of our project.
-    *   **Efficiency**: Saves significant time and mental effort, allowing you to focus on writing code.
-
-4.  **Submission**: After the commit is created, you will push the feature branch and create a Pull Request for the human Strategist to review.
+3.  **Submission**: After the commit is created, you will push the feature branch and create a Pull Request for the human Strategist to review.
 
 ---
 *This protocol ensures our project history is clean, understandable, and that we leverage the full power of AI to maintain quality and accelerate our workflow.* 

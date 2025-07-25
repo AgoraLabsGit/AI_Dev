@@ -108,21 +108,21 @@ This is the mandatory starting point for any new project or major migration. It 
 
 ### **Phase 1: Task-Driven Development (The Execution)**
 
-Once the blueprint is complete, the system transitions into the automated development workflow, driven by the Primary Developer AI and the Task Master.
+Once the blueprint is complete, the system transitions into the automated development workflow, driven by the Primary Developer AI using the **SuperClaude Framework**. The AI will use a series of specialized `/sc:` slash commands to implement features, run reviews, and generate documentation.
 
 ## 🤖 **AI WORKFLOW AND MEMORY**
 
-The Primary Developer AI drives the execution phase. It uses a dedicated memory bank to maintain context and follow the system's protocols. The review process is handled by automated tools and human verification, not a second AI.
+The Primary Developer AI drives the execution phase. Its workflow is now defined by the **SuperClaude Framework**, which provides context-aware commands for development, review, and documentation.
 
 ### **Primary AI Developer Memory Bank (`primary_ai_memory_bank.md`)**
 
-This file is the single source of truth for the AI's operational instructions.
+This file is the single source of truth for the AI's operational instructions. It now instructs the AI to use `/sc:` commands for all core development tasks.
 
 ```markdown
 # You are the Primary Developer AI in an AI-First Development System.
 
 ## CORE DIRECTIVE
-Your goal is to autonomously complete development tasks provided by the Task Master. You must follow the established 3-Tier documentation, use existing patterns whenever possible, and create new, high-quality patterns when required.
+Your goal is to autonomously complete development tasks using the SuperClaude Framework. Your entire workflow, from implementation to documentation, will be orchestrated through `/sc:` slash commands.
 
 ## WORKFLOW
 
@@ -131,49 +131,44 @@ Your goal is to autonomously complete development tasks provided by the Task Mas
 - All tasks are derived from the approved blueprint.
 
 ### STEP 1: LOAD TASK
-- Execute `task-master next` to get the current task.
-- Read the task description, dependencies, and acceptance criteria carefully.
+- Get the next task from the Task Master: `task-master next`
 
-### STEP 2: RESEARCH & PLAN
-- Load relevant **Tier-1** documents for high-level guidance.
-- Search **Tier-2** for existing patterns that match the task requirements.
-- If no patterns exist, use `task-master research "[topic]"` to find best practices.
-- Formulate a development plan.
+### STEP 2: IMPLEMENT FEATURE
+- Use the core SuperClaude command to begin implementation:
+- `/sc:implement "[task description from Task Master]"`
 
-### STEP 3: DEVELOP
-- Write code that adheres to the standards in the **Tier-3** documentation.
-- Prioritize reusing or adapting existing patterns.
-- If creating a new pattern, ensure it is robust, well-documented, and reusable.
-- Document key decisions in the development log.
+### STEP 3: REVIEW & REFINE
+- After implementation, run an AI-powered code review:
+- `/sc:review`
 
-### STEP 4: AUTOMATED REVIEW
-- Before finalizing, use integrated tools for quality checks.
-- Run linters, static analysis, and any configured automated tests.
-- Run `npm run code:review` for an AI-powered analysis of the code.
-- Address any issues identified by the automated review tools.
+### STEP 4: COMMIT & DOCUMENT
+- Stage changes (`git add .`) and use SuperClaude to commit:
+- `/sc:commit`
+- Update all project documentation automatically:
+- `/sc:readme` and `/sc:changelog`
 
-### STEP 5: COMPLETE & SUBMIT
-- Once development is complete and has passed automated checks, use `npm run commit` to generate a professional, conventional commit message.
-- After committing, use `npm run release:prep` to update the changelog and README.
-- Finally, push the branch and create a pull request for human review.
+### STEP 5: SUBMIT FOR HUMAN REVIEW
+- Push the feature branch to the remote repository.
+- Create a Pull Request for the human Strategist to approve.
 
 ## KEY COMMANDS
-- `npm run commit`: AI-generates a conventional commit message.
-- `npm run code:review`: Runs an AI-powered code quality and security review.
-- `npm run release:prep`: Updates changelog and README automatically.
-- `task-master next`: Get the next task.
-- `task-master research "[query]"`: Research best practices.
+- `/sc:implement`: The primary command for writing code and implementing features.
+- `/sc:review`: Runs an AI-powered code quality and security review.
+- `/sc:commit`: AI-generates a conventional commit message.
+- `/sc:readme`: Automatically updates the project's README file.
+- `/sc:changelog`: Generates a human-readable changelog.
+- `task-master next`: Gets the next task from the project's PRD.
 ```
 
 ---
 
 ## 🚀 **KEY INNOVATIONS**
 
-### **1. AI-Powered Git Workflow with SuperClaude** 🆕 **NEWLY ADDED**
-- **Automated Conventional Commits**: `npm run commit` analyzes changes and writes perfect, descriptive commit messages.
-- **Intelligent Changelogs**: `npm run release:prep` generates human-readable changelogs, focusing on user impact.
-- **AI Code Review**: `npm run code:review` performs deep static analysis, catching security and performance issues before human review.
-- **Self-Updating Documentation**: The system automatically updates its own README and technical docs.
+### **1. SuperClaude Framework Integration** 🆕 **NEWLY ADDED**
+- **Cognitive Development**: The AI no longer just writes code; it uses specialized commands like `/sc:implement` and `/sc:review` that are context-aware of the entire project.
+- **Automated Documentation Lifecycle**: The `/sc:readme` and `/sc:changelog` commands ensure that project documentation is never out of date.
+- **Persona-Driven Expertise**: The framework allows the AI to adopt different cognitive personas (e.g., security expert, performance optimizer) for specific tasks.
+- **Deep GitHub Integration**: The framework deeply understands Git history, allowing for intelligent changelogs and context-aware commit messages.
 
 ### **2. Task Master Integration** ✅ **PRODUCTION READY**
 - **PRD-driven development** replaces manual roadmaps
@@ -356,10 +351,10 @@ task-master update --id=[id]       # Update task progress
 ```bash
 # 1. Load memory bank: ai-system/memory-banks/primary_ai_memory_bank.md
 # 2. Get task: task-master next
-# 3. Research, Plan, Develop...
-# 4. Run AI code review: npm run code:review
-# 5. Commit with AI: npm run commit
-# 6. Update docs: npm run release:prep
+# 3. Implement feature: /sc:implement "[task description]"
+# 4. Review code: /sc:review
+# 5. Commit changes: /sc:commit
+# 6. Update docs: /sc:readme && /sc:changelog
 # 7. Push branch and create Pull Request for human approval.
 ```
 

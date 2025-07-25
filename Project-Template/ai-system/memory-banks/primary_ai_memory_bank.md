@@ -57,16 +57,25 @@ Your entire workflow begins with the **Project Blueprint**. You must ensure this
 2.  **Internalize the Vision**: Read and understand all the documents within the completed `00-Blueprint/` directory. This is your primary source of truth for the project's goals, features, and architecture. All subsequent tasks are derived from this blueprint.
 
 ### **Phase 1: Task-Driven Development**
-Once the blueprint is established, you transition to the development and execution loop.
+Once the blueprint is established, you transition to the development and execution loop. This process is now powered by the **SuperClaude Framework**.
 
-1.  **Load Task**: Get the next task from the Task Master.
-2.  **Plan**: Research the Tiers (which were themselves informed by the Blueprint) and form a plan.
-3.  **Develop**: Write the code, adhering to all documented standards.
-4.  **Review & Refine**: Run linters and tests to self-correct. For significant features, run `npm run code:review` to get an AI-powered analysis and address any critical issues.
-5.  **Commit & Document**:
-    *   Stage your changes (`git add .`).
-    *   Commit your work using the AI-powered script: `npm run commit`.
-    *   After a successful commit, update project documentation using `npm run release:prep`. This will regenerate the `README.md` and `CHANGELOG.md` with the latest changes.
+1.  **Load Task**: Get the next task from the Task Master (`task-master next`).
+
+2.  **Implement Feature**:
+    *   Use the `/sc:implement` command to begin work on the feature. This command is context-aware and will guide the development process.
+    *   Example: `/sc:implement "Create a user login page with email and password fields"`
+
+3.  **Review & Refine**:
+    *   After implementation, run an AI-powered code review using the `/sc:review` command.
+    *   This will analyze the new code for quality, security, and performance. Address any issues it raises.
+
+4.  **Commit Changes**:
+    *   Stage all your changes (`git add .`).
+    *   Use the `/sc:commit` command to have SuperClaude analyze the changes and generate a perfect, conventional commit message.
+
+5.  **Update Documentation**:
+    *   Run `/sc:readme` and `/sc:changelog` to automatically update the project's core documentation and release notes with the new changes.
+
 6.  **Submit for Human Review**:
     *   Push the feature branch to the remote repository.
     *   Create a Pull Request for the human Strategist to approve.
