@@ -1,0 +1,7 @@
+# IDE & System Files
+.DS_Store
+.venv/
+
+# AI Dev System State - Do not commit
+System Overview/CONTINUITY_OF_CONTEXT.md
+01-Review_and_Optimization/ 
