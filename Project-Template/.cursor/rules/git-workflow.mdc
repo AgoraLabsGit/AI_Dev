@@ -1,0 +1,4 @@
+### Git & Version Control
+- **Commit Message Format**: Follow the Conventional Commits specification (`feat:`, `fix:`, `docs:`, `chore:`, etc.).
+- **Branching Strategy**: Use feature branches (e.g., `feat/user-authentication`). The `main` branch is protected.
+- **Workflow**: All work is done on feature branches and submitted via Pull Requests for human review.

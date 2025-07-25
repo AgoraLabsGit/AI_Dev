@@ -1,0 +1,15 @@
+### Core Technologies
+- **Framework**: Next.js (v14+)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui (preferred)
+- **State Management**: React Context API / Zustand (as defined in Tier-3 Docs)
+- **Validation**: Zod
+
+### Project Architecture
+- **Documentation**: This project uses a 3-Tier AI-Optimized Documentation system.
+    - **Tier-1-Quick**: For high-level summaries.
+    - **Tier-2-Patterns**: Contains reusable code patterns. This should be the AI's first stop when looking for implementation examples.
+    - **Tier-3-Comprehensive**: The ultimate source of truth for all project standards.
+- **Onboarding**: The AI must always start with the `Start Here/00_START_HERE.md` file to initiate the Project Genesis Session.
+- **Task Management**: All development work is managed via the Task Master.

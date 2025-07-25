@@ -1,0 +1,23 @@
+### USER QUICK COMMANDS FOR INTERACTION WITH CURSOR
+
+        Cursor Commands:
+
+        dev → Start development workflow (load task, find patterns, show plan)
+        update → Provide user with an update of what the current development focus is
+        patterns [type] → Find reusable code in tier-2-patterns/
+        implement [name] → Build with patterns from tier-2 + tier-1 guidance
+        newFeature [desc] → Create new feature from scratch with patterns
+        newFunction [name] → Build new function/module following patterns
+        upgrade [feature] → Enhance existing feature with better patterns
+        optimize [code] → Improve performance using optimization patterns
+        validate → Check quality against tier-3 standards
+        debug → Fix issues using intelligence/learning-log
+        extract → Create new patterns from current code
+
+        Task Master (run in terminal):
+
+        task-master next → Get next task with AI suggestions
+        task-master update --id=[id] → Update progress with notes
+        task-master complete --id=[id] → Mark done & trigger learning
+        task-master research "[topic]" → Research implementation approaches
+        task-master expand --id=[id] → Break complex task into subtasks
