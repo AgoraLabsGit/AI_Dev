@@ -34,25 +34,24 @@ For the AI-First Development System to function at maximum capacity, it must be 
         -   `fix/header-layout-bug`
         -   `docs/update-readme`
 
-## 4. **Commit Protocol**
+## 4. **Commit Protocol: AI-Powered Commits with SuperClaude**
 
 **AI Developer Instructions:**
-When you have completed a logical unit of work that is ready for review, you will be asked to commit the changes.
+Our project uses `superclaude` to automate the creation of high-quality, conventional commit messages. This is the **only** approved method for creating commits.
 
-1.  **Conventional Commits**: Your commit messages **must** follow the Conventional Commits specification. This allows for automated versioning and clearer history.
-    -   **Format**: `type(scope): subject`
-    -   **Common Types**:
-        -   `feat`: A new feature
-        -   `fix`: A bug fix
-        -   `docs`: Documentation only changes
-        -   `style`: Code style changes (formatting, etc.)
-        -   `refactor`: A code change that neither fixes a bug nor adds a feature
-        -   `test`: Adding missing tests or correcting existing tests
-        -   `chore`: Changes to the build process or auxiliary tools
+1.  **Staging Changes**: Before committing, ensure all intended changes are staged using `git add .` or by selecting them in the source control panel.
 
-2.  **Commit Message Body**: The body should provide more context about the change, explaining the "what" and "why".
+2.  **Generating the Commit**:
+    *   Execute the command: `npm run commit`
+    *   This command runs `superclaude commit --interactive`, which will analyze your staged changes, understand their intent, and generate a perfect commit message.
+    *   It will present the message to you for approval before committing.
 
-3.  **Submission**: After committing, you will push the feature branch and create a Pull Request for the human Strategist to review.
+3.  **Why We Use This**:
+    *   **Consistency**: Ensures every commit follows the Conventional Commits specification perfectly.
+    *   **Clarity**: Creates meaningful, descriptive messages that tell the story of our project.
+    *   **Efficiency**: Saves significant time and mental effort, allowing you to focus on writing code.
+
+4.  **Submission**: After the commit is created, you will push the feature branch and create a Pull Request for the human Strategist to review.
 
 ---
-*This protocol ensures our project history is clean, understandable, and that we leverage GitHub's full potential for collaboration and quality control.* 
+*This protocol ensures our project history is clean, understandable, and that we leverage the full power of AI to maintain quality and accelerate our workflow.* 

@@ -61,12 +61,14 @@ Once the blueprint is established, you transition to the development and executi
 
 1.  **Load Task**: Get the next task from the Task Master.
 2.  **Plan**: Research the Tiers (which were themselves informed by the Blueprint) and form a plan.
-3.  **Develop**: Write the code.
-4.  **Review**: Run linters and tests to self-correct.
-5.  **Commit & Submit**:
-    *   Commit your work to the feature branch using the **Conventional Commits** format as defined in `08-GIT-&-VERSION-CONTROL-MASTER.md`.
-    *   Create a Pull Request for human approval.
-    *   **Update the `Project_Roadmap.md`**.
-    *   Log your technical details in `dev_log.md`.
+3.  **Develop**: Write the code, adhering to all documented standards.
+4.  **Review & Refine**: Run linters and tests to self-correct. For significant features, run `npm run code:review` to get an AI-powered analysis and address any critical issues.
+5.  **Commit & Document**:
+    *   Stage your changes (`git add .`).
+    *   Commit your work using the AI-powered script: `npm run commit`.
+    *   After a successful commit, update project documentation using `npm run release:prep`. This will regenerate the `README.md` and `CHANGELOG.md` with the latest changes.
+6.  **Submit for Human Review**:
+    *   Push the feature branch to the remote repository.
+    *   Create a Pull Request for the human Strategist to approve.
 
 By following these principles, you will be an invaluable partner in building robust, high-quality applications. 
