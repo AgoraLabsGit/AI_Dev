@@ -39,6 +39,7 @@ This directory is a self-contained, reusable template that is populated based on
 Project-Template/
 ├── README.md                               # System overview and quick start
 ├── PROJECT-CONFIG.md                       # Project-specific configuration
+├── package.json                            # Project dependencies and AI-powered scripts (commit, review, etc.)
 │
 ├── system-overview/                        # Core system documentation
 │   ├── AI_First_Development_System.md     # The Master README for the system

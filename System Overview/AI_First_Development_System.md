@@ -149,61 +149,69 @@ Your goal is to autonomously complete development tasks provided by the Task Mas
 ### STEP 4: AUTOMATED REVIEW
 - Before finalizing, use integrated tools for quality checks.
 - Run linters, static analysis, and any configured automated tests.
+- Run `npm run code:review` for an AI-powered analysis of the code.
 - Address any issues identified by the automated review tools.
 
 ### STEP 5: COMPLETE & SUBMIT
-- Once development is complete and has passed automated checks, update the task.
-- Execute `task-master update --id=[task-id] --notes="[summary of work and patterns used/created]"`
-- The system will then flag the work for human review and approval.
+- Once development is complete and has passed automated checks, use `npm run commit` to generate a professional, conventional commit message.
+- After committing, use `npm run release:prep` to update the changelog and README.
+- Finally, push the branch and create a pull request for human review.
 
 ## KEY COMMANDS
+- `npm run commit`: AI-generates a conventional commit message.
+- `npm run code:review`: Runs an AI-powered code quality and security review.
+- `npm run release:prep`: Updates changelog and README automatically.
 - `task-master next`: Get the next task.
-- `task-master show [id]`: Get details for a specific task.
 - `task-master research "[query]"`: Research best practices.
-- `task-master update --id=[id]`: Update task progress.
 ```
 
 ---
 
 ## 🚀 **KEY INNOVATIONS**
 
-### **1. Task Master Integration** ✅ **PRODUCTION READY**
+### **1. AI-Powered Git Workflow with SuperClaude** 🆕 **NEWLY ADDED**
+- **Automated Conventional Commits**: `npm run commit` analyzes changes and writes perfect, descriptive commit messages.
+- **Intelligent Changelogs**: `npm run release:prep` generates human-readable changelogs, focusing on user impact.
+- **AI Code Review**: `npm run code:review` performs deep static analysis, catching security and performance issues before human review.
+- **Self-Updating Documentation**: The system automatically updates its own README and technical docs.
+
+### **2. Task Master Integration** ✅ **PRODUCTION READY**
 - **PRD-driven development** replaces manual roadmaps
 - **Research-backed task generation** using Perplexity integration
 - **Tagged workflows** for feature branch development
 - **Natural language commands** for AI orchestration
 - **Dependency validation** and circular dependency prevention
 
-### **2. Memory Bank Automation** ✅ **PRODUCTION READY**
+### **3. Memory Bank Automation** ✅ **PRODUCTION READY**
 - **Single, unified memory bank** for the Primary Developer AI.
 - **Workflow instructions** embedded in AI memory.
 - **Context loading** optimization for AI efficiency.
 
-### **3. Pattern Intelligence System** ✅ **PRODUCTION READY**
+### **4. Pattern Intelligence System** ✅ **PRODUCTION READY**
 - **Automatic pattern extraction** from completed work
 - **Quality scoring** and reusability assessment  
 - **Living pattern library** that grows with development
 - **Cross-reference system** for pattern discovery
 - **Intelligence learning** from development patterns
 
-### **4. System Health Dashboard** 🆕 **NEWLY ADDED**
+### **5. System Health Dashboard** 🆕 **NEWLY ADDED**
 - **Automated tracking** of key development metrics (e.g., pattern reuse, velocity).
 - **Provides objective data** on the system's performance and efficiency.
 - **Guides continuous improvement** efforts.
 
-### **5. Automated Learning Loop** 🆕 **NEWLY ADDED**
+### **6. Automated Learning Loop** 🆕 **NEWLY ADDED**
 - **Automates the evolution** of the system's own standards.
 - **New patterns can trigger updates** to Tier-2 examples and Tier-1/3 documentation.
 - **Ensures the system's knowledge base** stays current and improves over time.
 
-### **6. Complete Migration System** ✅ **PRODUCTION READY**
+### **7. Complete Migration System** ✅ **PRODUCTION READY**
 - **"Assume Nothing, Rebuild Everything"** philosophy
 - **Quality auditing** of existing codebases
 - **Pattern extraction** from high-quality code
 - **PRD generation** based on actual project state
 - **Hybrid system setup** with full automation
 
-### **7. Browser Runtime Integration** ✅ **PRODUCTION READY**
+### **8. Browser Runtime Integration** ✅ **PRODUCTION READY**
 - **Browser Tools MCP** for live console access
 - **Runtime error debugging** directly in AI workflow
 - **Network request monitoring** for API debugging
@@ -347,12 +355,12 @@ task-master update --id=[id]       # Update task progress
 ### **Development Workflow**
 ```bash
 # 1. Load memory bank: ai-system/memory-banks/primary_ai_memory_bank.md
-# 2. Get task: task-master next  
-# 3. Research: task-master research "[topic]"
-# 4. Develop following tier-1 guidance and tier-2 patterns
-# 5. Run automated review tools.
-# 6. Update: task-master update --id=[id] --notes="[details]"
-# 7. Await human approval.
+# 2. Get task: task-master next
+# 3. Research, Plan, Develop...
+# 4. Run AI code review: npm run code:review
+# 5. Commit with AI: npm run commit
+# 6. Update docs: npm run release:prep
+# 7. Push branch and create Pull Request for human approval.
 ```
 
 ### **Migration Commands**
