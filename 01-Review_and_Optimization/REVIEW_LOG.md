@@ -8,3 +8,13 @@
 *   **Root Cause**: "AI Tunnel Vision." The AI did not re-evaluate its plan against the user's latest input.
 *   **Solution 1**: Updated the `primary_ai_memory_bank.md` with a new "Prime Directive" that forces the AI to always prioritize the user's most recent request over any existing plan. This enhances cognitive flexibility.
 *   [We will populate this section with our notes as we conduct the test.] 
+
+---
+### **Test Session 2: Migration Project Onboarding (Post-Fix)**
+
+**Goal**: To validate that the "Prime Directive" fix successfully corrected the AI's "tunnel vision" issue.
+
+**Observations & Findings**:
+*   **Observation 2**: **SUCCESS**. The test AI correctly identified the user's second, overriding prompt about migrating a project.
+*   **Analysis 2**: It successfully pivoted its workflow, began the migration analysis as per the instructions, and proactively audited the `Legacy Project/` directory. It correctly identified the tech stack of both the client and server.
+*   **Conclusion**: The "Prime Directive" enhancement was a complete success. The AI is now significantly more responsive and can correctly adapt to changing user instructions. The core system design is validated. 
