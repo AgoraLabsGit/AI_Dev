@@ -1,0 +1,6 @@
+() CONCISE AI FEEDBACK: I want the AI to be more concise in it's feedback. No more long sentances
+explaining improvements. We need to implement feedback that is concise
+and easy to parse. Each word should have it's own concise feedback. 
+If feedback requires full sentance context then that is ok. 
+
+()

@@ -1,21 +1,9 @@
-# [YOUR PROJECT NAME]
+# [PROJECT NAME] - A Vibe Lab Project
 
-**An AI-First Development System Project**
+This project was generated and is managed by the **Vibe Lab AI Development System**.
 
-This project is built using a revolutionary development methodology that combines AI-driven development with strategic human oversight.
+## 🚀 How to Collaborate
 
-## 🚀 Quick Start
+All development on this project is done in collaboration with the Vibe Lab AI. The complete workflow, including commands for building, testing, and iterating, is defined in the master `Human_Operating_Manual.md` located in the root of the Vibe Lab system.
 
-1.  **Configure the Project**: Fill out the details in `PROJECT-CONFIG.md`.
-2.  **Define Requirements**: Add your project's requirements to `.taskmaster/docs/prd.txt`.
-3.  **Initialize Task Master**:
-    ```bash
-    task-master parse-prd
-    ```
-4.  **Start AI Development**:
-    - Open this project in Cursor. The AI's memory is pre-configured in `.cursor-project`.
-    - Give the command: `task-master next`
-
-## 📚 System Documentation
-
-For a full overview of the development system, its components, and the philosophy behind it, please refer to the documents in the `docs/system-overview` directory (in the parent project). 
+There is no separate setup required for this project. Simply follow the instructions in the manual to begin. 

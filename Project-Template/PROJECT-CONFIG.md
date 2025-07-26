@@ -1,4 +1,4 @@
-# Project Configuration: [YOUR PROJECT NAME]
+# Vibe Lab - Project Configuration
 
 ## 📋 Project Identity
 - **Project Name**: `[Enter project name]`
@@ -17,19 +17,6 @@
 - **Critical Feature 1**: `[e.g., Flawless user authentication]`
 - **Critical Feature 2**: `[e.g., Core business logic for X]`
 - **Quality Standard**: `Maintain a 90+ automated quality score.`
-
-## 🤖 AI Collaboration Configuration
-- **Auto-continue Tasks**: `No`
-- **Automated Review Step**: `Enabled (e.g., Linters, Type-Checking)`
-- **Verbose Logging**: `Enabled`
-
-### **Human Review Thresholds**
-- **Auto-Approve Simple Tasks**: `No`
-- **Required Human Review For**: 
-  - [x] Security-related changes
-  - [x] Database schema changes
-  - [x] API endpoint modifications
-  - [x] Authentication system changes
 
 ## 📊 Project-Specific Patterns
 - **Component Naming**: `PascalCase`
