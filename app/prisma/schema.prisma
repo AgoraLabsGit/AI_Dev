@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Project Management Models
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      ProjectStatus @default(ACTIVE)
+  progress    Int      @default(0) // 0-100 percentage
+  complexity  Float    @default(0.5) // 0.0-1.0 complexity score
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastActivity DateTime @default(now())
+  
+  // Relations
+  tasks       Task[]
+  blueprints  Blueprint[]
+  chatHistory ChatMessage[]
+  
+  @@map("projects")
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  projectId   String
+  name        String
+  description String?
+  status      TaskStatus @default(PENDING)
+  priority    TaskPriority @default(MEDIUM)
+  complexity  Int        @default(1) // 1-5 scale
+  
+  // Time tracking
+  estimatedHours Int?
+  actualHours    Int?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  
+  // Task hierarchy
+  parentTaskId   String?
+  dependencies   TaskDependency[] @relation("TaskDependencies")
+  dependents     TaskDependency[] @relation("DependentTasks")
+  
+  // AI Integration
+  assignedAgent  String? // 'developer', 'auditor', 'user'
+  aiGenerated    Boolean @default(false)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parentTask  Task?   @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
+  subtasks    Task[]  @relation("TaskHierarchy")
+  
+  @@map("tasks")
+}
+
+model TaskDependency {
+  id           String @id @default(cuid())
+  taskId       String
+  dependsOnId  String
+  
+  task         Task @relation("TaskDependencies", fields: [taskId], references: [id], onDelete: Cascade)
+  dependsOn    Task @relation("DependentTasks", fields: [dependsOnId], references: [id], onDelete: Cascade)
+  
+  @@unique([taskId, dependsOnId])
+  @@map("task_dependencies")
+}
+
+model Blueprint {
+  id          String   @id @default(cuid())
+  projectId   String
+  name        String
+  content     Json     // Stores blueprint configuration
+  version     Int      @default(1)
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@unique([projectId, isActive])
+  @@map("blueprints")
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  projectId String
+  agent     ChatAgent
+  message   String
+  status    MessageStatus @default(COMPLETE)
+  
+  createdAt DateTime @default(now())
+  
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@map("chat_messages")
+}
+
+// Enums
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+  ON_HOLD
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  BLOCKED
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ChatAgent {
+  USER
+  DEVELOPER
+  AUDITOR
+}
+
+enum MessageStatus {
+  THINKING
+  COMPLETE
+  ERROR
+}

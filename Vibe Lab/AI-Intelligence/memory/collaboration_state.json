@@ -1,0 +1,14 @@
+{
+  "last_sync": null,
+  "current_sprint": null,
+  "gemini_status": "idle",
+  "claude_status": "monitoring",
+  "active_tasks": [],
+  "pending_reviews": [],
+  "collaboration_metrics": {
+    "tasks_completed_today": 0,
+    "reviews_completed_today": 0,
+    "escalations_today": 0
+  },
+  "last_updated": "2025-07-27T00:11:19.825478"
+}
