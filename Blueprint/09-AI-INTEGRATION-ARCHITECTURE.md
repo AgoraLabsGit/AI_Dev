@@ -13,9 +13,10 @@
 ## 2. System Components
 - **Next.js Frontend**: The user-facing application.
 - **SuperClaude/ClaudeCode (AI Orchestrator)**: The central backend service. It routes requests to the appropriate agent, manages multi-agent workflows, and aggregates results.
+- **Task Master (SuperClaude Task System)**: An intelligent project management component that generates enhanced task analysis with complexity scoring, dependency mapping, MCP optimization, and resource allocation strategies.
 - **Gemini 2.5 Pro (Developer Agent)**: The primary generative model for code, analysis, and conversational responses.
 - **Claude 3 Opus (Auditor Agent)**: The primary review model for code quality, security analysis, and architectural compliance.
-- **PostgreSQL Database**: Stores conversation history, project data, and review results.
+- **PostgreSQL Database**: Stores conversation history, project data, review results, and Task Master analysis.
 - **Message Queue (Redis/RabbitMQ)**: Used for managing asynchronous tasks between the orchestrator and the agents, especially for long-running generation and review jobs.
 
 ## 3. Multi-Agent Workflow Patterns
@@ -38,6 +39,13 @@ The orchestrator will employ several workflow patterns depending on the user's r
     2.  At the end of each stage, the code is passed to Claude for a checkpoint review.
     3.  Development only proceeds to the next stage if Claude approves.
 
+- **Pattern D: Task Master Integration (for Project Planning)**
+    1.  When a roadmap is approved, it is automatically sent to Task Master for analysis.
+    2.  Task Master generates comprehensive task breakdown with complexity scoring, dependency mapping, and resource allocation.
+    3.  The analysis is validated by Claude Auditor Agent for completeness and accuracy.
+    4.  Results are presented to the user with interactive task matrix and dependency visualizations.
+    5.  Task updates trigger re-analysis for dynamic project management.
+
 ## 4. API Architecture
 The API will be designed to support the orchestrator model.
 
@@ -46,17 +54,23 @@ The API will be designed to support the orchestrator model.
 - **Request Body**:
     ```json
     {
-      "workflow": "sequential_review", // or "parallel_analysis"
+      "workflow": "sequential_review", // or "parallel_analysis", "task_master_analysis"
       "projectId": "123",
       "prompt": "The user's input text",
-      "context": { ... }
+      "context": { ... },
+      "taskMasterConfig": {
+        "complexity_threshold": 0.7,
+        "wave_strategy": "systematic",
+        "mcp_optimization": true
+      }
     }
     ```
 - **Response**: The API will use `Transfer-Encoding: chunked` to stream the response back. Each chunk will be a Server-Sent Event (SSE) with a specific type:
-    - `event: text_chunk`: A piece of the AI's text response with agent identification (Developer/Auditor).
+    - `event: text_chunk`: A piece of the AI's text response with agent identification (Developer/Auditor/TaskMaster).
     - `event: tool_call`: A request for the user to confirm a tool action via the Command Palette.
-    - `event: status_update`: A change in the AI's status (e.g., "generating", "reviewing", "complete").
-    - `event: agent_switch`: Indicates transition between Developer Agent and Auditor Agent.
+    - `event: status_update`: A change in the AI's status (e.g., "generating", "reviewing", "analyzing_tasks", "complete").
+    - `event: agent_switch`: Indicates transition between Developer Agent, Auditor Agent, and Task Master.
+    - `event: task_analysis`: Task Master analysis results with complexity matrix and dependency data.
     - `event: stream_end`: Signals the end of the response.
 
 ## 5. Token Management & Cost Optimization
@@ -64,7 +78,42 @@ The API will be designed to support the orchestrator model.
 - **Context Pruning**: The integration layer will intelligently prune the `context` object in the request, sending only the most relevant parts of a document to the AI, not the entire file.
 - **Request Caching**: Identical requests made in a short period can be served from a cache instead of hitting the Gemini API.
 
-## 6. Error Handling
+## 6. Task Master Coordination
+
+### 6.1. Integration Points
+- **Roadmap Analysis**: When a roadmap is approved, it triggers automatic Task Master analysis
+- **Real-time Updates**: Task status changes update Task Master metrics and recommendations
+- **Multi-Agent Validation**: Task Master analysis is reviewed by Claude Auditor for quality assurance
+- **Dynamic Re-planning**: Changes in project scope trigger Task Master re-analysis
+
+### 6.2. Task Master API Integration
+```typescript
+// Task Master Analysis Trigger
+POST /api/v1/projects/{projectId}/tasks/analyze
+{
+  "roadmapId": "uuid",
+  "analysisType": "comprehensive", // or "quick", "update"
+  "mcpOptimization": true,
+  "waveStrategy": "systematic"
+}
+
+// Task Master Results
+GET /api/v1/projects/{projectId}/tasks/matrix
+GET /api/v1/projects/{projectId}/tasks/critical-path
+GET /api/v1/projects/{projectId}/tasks/dependencies
+GET /api/v1/projects/{projectId}/tasks/resources
+```
+
+### 6.3. Agent Coordination Workflow
+1. **User Action**: Approves roadmap or requests task analysis
+2. **Orchestrator**: Routes request to Task Master component
+3. **Task Master**: Generates comprehensive task breakdown
+4. **Claude Auditor**: Reviews analysis for completeness and accuracy
+5. **Response Stream**: Real-time updates sent to frontend with task matrix data
+6. **UI Update**: Task complexity matrix and dependency graph rendered
+
+## 7. Error Handling
 - **AI Failures**: If the Gemini API returns an error or a malformed response, the integration layer will catch it and send a proper `event: error` message to the frontend.
 - **Network Issues**: The frontend will have built-in retry logic for dropped connections during streaming.
-- **Content Moderation**: All user inputs and AI outputs will be passed through content moderation filters. 
+- **Content Moderation**: All user inputs and AI outputs will be passed through content moderation filters.
+- **Task Master Failures**: Fallback to basic task creation with manual complexity scoring if Task Master analysis fails. 

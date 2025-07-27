@@ -14,6 +14,7 @@
 | **Developer Agent**| **Gemini 2.5 Pro**        | The core AI for all generative tasks: code generation, feature implementation, and blueprint analysis. |
 | **Auditor Agent**  | **Claude 3 Opus**         | The core AI for all review tasks: code quality analysis, security audits, and architecture compliance checking. |
 | **AI Orchestrator**| **SuperClaude/ClaudeCode**| A dedicated backend service that manages the multi-agent system. It routes requests, orchestrates workflows (e.g., generation followed by review), and aggregates results from both agents. |
+| **Task Master**    | **SuperClaude Task System**| An intelligent project management component within SuperClaude that generates detailed task breakdowns with complexity scoring, dependency analysis, MCP server utilization planning, and risk assessment for development workflows. |
 | **Database**       | PostgreSQL                | A powerful and reliable database for storing user data, project configurations, and blueprint content. To be hosted on a managed provider (e.g., Neon). |
 | **Authentication** | NextAuth.js (GitHub Provider) | Securely handles user authentication via GitHub, which is essential for the developer audience and the core "Push-to-GitHub" feature. |
 | **Deployment**     | Vercel                    | Offers the most seamless deployment experience for the Next.js frontend. The AI backend will have a separate deployment strategy. |

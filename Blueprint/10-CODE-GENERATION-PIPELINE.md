@@ -17,14 +17,20 @@ The pipeline is a series of distinct, user-triggered jobs. Each phase must be co
     3. The generated roadmap (e.g., in Markdown or JSON format) is saved to the `Roadmap` model in the database.
     4. **Status Update**: The project status is updated to "Roadmap Complete".
 
-### **Phase 2: Task List Generation**
+### **Phase 2: Task List Generation (Task Master)**
 - **Trigger**: Automatic, upon successful completion of the Roadmap generation.
 - **Job Type**: `TASK_GENERATION`
 - **Steps**:
     1. The AI Orchestrator retrieves the newly generated roadmap.
-    2. It sends the roadmap to the **"Task Master" specialist function (SuperClaude)**.
-    3. The specialist's sole job is to parse the roadmap and break it down into a detailed, actionable list of tasks (e.g., individual components to build, backend services to create).
-    4. The generated task list is saved to a `Tasks` model in the database, linked to the project.
+    2. It sends the roadmap to the **Task Master (SuperClaude Task System)**.
+    3. Task Master performs comprehensive analysis:
+       - **Complexity Scoring**: Technical complexity (1-5), time estimates (hours), risk assessment
+       - **Dependency Analysis**: Task interdependencies and critical path identification
+       - **MCP Server Planning**: Optimal MCP server utilization for each task
+       - **Resource Allocation**: Parallel work stream recommendations
+       - **Wave Orchestration**: Multi-stage execution strategy
+    4. The generated enhanced task analysis is saved to the `Tasks` model with full metadata.
+    5. **Optional**: Generate visual dependency graph and project timeline.
 
 ### **Phase 3: Foundation Generation (Tier 1 Docs)**
 - **Trigger**: User reviews and approves the Roadmap & Tasks, then clicks "Generate Foundation".

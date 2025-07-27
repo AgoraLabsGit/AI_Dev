@@ -40,6 +40,19 @@
     - `created_at`: Timestamp
     - `updated_at`: Timestamp
 
+- **Tasks Model (Task Master Enhanced)**
+    - `id`: UUID (Primary Key)
+    - `project_id`: UUID (Foreign Key to Project.id, Indexed)
+    - `roadmap_id`: UUID (Foreign Key to Roadmap.id, Indexed)
+    - `task_matrix`: JSONB (Enhanced task analysis with complexity scores, dependencies, MCP assignments)
+    - `critical_path`: JSONB (Critical path analysis and timeline data)
+    - `risk_assessment`: JSONB (Risk factors, mitigation strategies, fallback plans)
+    - `resource_allocation`: JSONB (Parallel work streams and developer assignments)
+    - `wave_strategy`: JSONB (Wave orchestration plan and validation gates)
+    - `confidence_score`: Float (Task Master confidence level 0-1)
+    - `created_at`: Timestamp
+    - `updated_at`: Timestamp
+
 ---
 
 ## 2. API Architecture (MVP)
@@ -63,9 +76,13 @@
     - `GET /api/v1/projects/{projectId}/blueprint`: Get the blueprint for a project.
     - `PUT /api/v1/projects/{projectId}/blueprint`: Save/update the blueprint.
 
-- **Roadmap & Generation**
+- **Roadmap & Task Generation**
     - `POST /api/v1/projects/{projectId}/roadmap`: Triggers the AI to generate the component roadmap from the blueprint.
     - `GET /api/v1/projects/{projectId}/roadmap`: Get the generated roadmap for a project.
+    - `POST /api/v1/projects/{projectId}/tasks/analyze`: Triggers Task Master to generate enhanced task analysis from the roadmap.
+    - `GET /api/v1/projects/{projectId}/tasks`: Get the Task Master enhanced analysis with complexity scores, dependencies, and orchestration strategy.
+    - `GET /api/v1/projects/{projectId}/tasks/critical-path`: Get critical path analysis and timeline visualization.
+    - `GET /api/v1/projects/{projectId}/tasks/dependencies`: Get task dependency graph data.
     - `POST /api/v1/projects/{projectId}/generate`: The final step. Triggers the AI to generate the foundation, scaffold, and push the entire project to a new GitHub repository. This will initiate an asynchronous background job.
 
 ### 2.3. Authentication & Authorization

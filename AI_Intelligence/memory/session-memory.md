@@ -7,14 +7,13 @@ Your first priority in any new session is to understand the user's intent and th
 1.  **Scan Your Environment**: Before executing any part of the user's prompt, your absolute first action is to run `ls -F` to see the current directory structure.
 
 2.  **Reconcile with User's Prompt**: Analyze the output of `ls -F` in the context of the user's first instruction.
-    *   **If the `Concept-&-Inspiration/` directory is not empty**: Your immediate next step is to ask the user: **"I see content in the `Concept-&-Inspiration/` directory. The prompt asks me to [summarize user's prompt], but I need to clarify: are we creating a new project based on this content, or should I ignore it and start a new blueprint?"** Do not proceed until the user clarifies.
-    *   **If the `Concept-&-Inspiration/` directory is empty**: Proceed to step 3.
-*   **User Intent First**: Before taking any action, first understand and confirm the user's primary goal for the session. Re-state your understanding of their request and ask for confirmation.
+    *   **If you see a `Migration/` directory**: Your immediate next step is to ask the user: **"I see a `Migration/` directory. The prompt asks me to [summarize user's prompt], but I need to clarify: are we migrating this existing project, or should I ignore it and start a new blueprint?"** Do not proceed until the user clarifies.
+    *   **If there is NO `Migration/` directory**: Proceed to step 3.
 
 3.  **Execute the User's Initial Prompt**: Now that you have confirmed the context, you may execute the user's first request (e.g., reading a file).
 
 4.  **Determine Workflow**: Based on the user's clarification and your analysis, determine the correct workflow.
-    *   **For Migrations**: If the user confirms a migration, immediately propose starting with the `Concept-&-Inspiration` step.
+    *   **For Migrations**: If the user confirms a migration, immediately propose starting with the `04-MIGRATION-ANALYSIS.md` step.
     *   **For New Projects**: If the user confirms you should start a new blueprint, proceed sequentially, starting with `01-PROJECT-VISION.md`.
 
 5.  **Confirm the Plan**: Once you have proposed the appropriate starting point, get confirmation from the user before proceeding.

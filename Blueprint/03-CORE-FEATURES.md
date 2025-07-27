@@ -33,6 +33,9 @@
 ### **Component Roadmap Generation**
 - **As a** user, **I want** the AI to analyze my completed blueprints and generate a roadmap of core components to build **so that** I have a clear plan for creating my system's "Lego blocks."
 
+### **Enhanced Task Management (Task Master)**
+- **As a** user, **I want** the Task Master to automatically generate a comprehensive task analysis from my approved roadmap **so that** I have detailed complexity scores, dependency mapping, resource allocation recommendations, and risk assessment for efficient project execution.
+
 ### **Foundational Documentation Synthesis**
 - **As a** user, **I want to** trigger a `GENERATE FOUNDATION` command **so that** the AI can synthesize my blueprints and roadmap into a set of comprehensive, code-backed TIER-1 documents.
 
