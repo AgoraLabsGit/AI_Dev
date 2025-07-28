@@ -60,5 +60,21 @@ vibe-lab-meta/      # Meta-process (Phase 4.5)
 - Completed database schema extension
 - Initialized meta-process structure
 
+### Recent Updates
+- Added comprehensive README explaining meta-system architecture
+- Linked all key documentation files
+- Clarified three-directory structure and purpose
+- Established documentation hierarchy
+
+### Documentation Structure
+```
+README.md                 # Meta-system overview
+vibe-lab-system/
+├── COC.md               # This file - context
+├── dev_logs.md          # Progress tracking
+├── roadmap_status.md    # Task status
+└── docs/               # System documentation
+```
+
 ---
 *This document is updated at the start and end of each development session to maintain context.* 
