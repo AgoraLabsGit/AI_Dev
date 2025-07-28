@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Pre-commit hook for design system enforcement
+# Automatically runs PWA compliance checks and design system validation
+
+echo "🔍 Running Design System Compliance Checks..."
+
+# Get list of staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(tsx|jsx)$')
+
+if [ -z "$STAGED_FILES" ]; then
+    echo "✅ No React components changed"
+    exit 0
+fi
+
+echo "📁 Checking staged component files:"
+for file in $STAGED_FILES; do
+    echo "  - $file"
+done
+
+# Run PWA compliance checker
+echo -e "\n🚀 Running PWA Compliance Check..."
+node scripts/pwa-compliance-check.js
+
+# Capture exit code
+PWA_EXIT_CODE=$?
+
+# Run component architecture validation
+echo -e "\n🏗️  Running Component Architecture Validation..."
+node scripts/component-architecture-check.js
+
+# Capture exit code
+ARCH_EXIT_CODE=$?
+
+# Check for design system violations in commit message
+echo -e "\n📝 Checking commit message for design system learning..."
+COMMIT_MSG_FILE=".git/COMMIT_EDITMSG"
+
+if [ -f "$COMMIT_MSG_FILE" ]; then
+    # Look for indicators that this might be a design system issue
+    if grep -q -i "fix.*layout\|spacing\|responsive\|overlap\|alignment" "$COMMIT_MSG_FILE"; then
+        echo "⚠️  Design system change detected in commit message"
+        echo "💡 Consider updating Design-System-Learning-Log.md if this addresses a fundamental issue"
+    fi
+fi
+
+# Exit with error if any checks failed
+if [ $PWA_EXIT_CODE -ne 0 ] || [ $ARCH_EXIT_CODE -ne 0 ]; then
+    echo -e "\n❌ Pre-commit checks failed!"
+    echo "📚 See Design-System-Learning-Log.md for guidelines"
+    echo "🔧 Run 'npm run fix:design-system' to auto-fix common issues"
+    exit 1
+fi
+
+echo -e "\n✅ All design system checks passed!"
+exit 0

@@ -1,0 +1,510 @@
+{
+  "timestamp": "2025-07-28T21:54:31.152Z",
+  "result": {
+    "overallSuccess": false,
+    "totalDuration": 16517,
+    "totalCost": 2.8406999999999996,
+    "totalTokens": 55700,
+    "manualInterventionRequired": 1,
+    "stageResults": [
+      {
+        "stage": "ideation",
+        "success": true,
+        "duration": 2000,
+        "tokensUsed": 4500,
+        "cost": 0.2295,
+        "output": {
+          "blueprints": [
+            "01-PROJECT-CONFIG.md",
+            "02-PROJECT-VISION.md",
+            "03-CORE-FEATURES.md",
+            "04-UI-UX-BLUEPRINT.md",
+            "05-PAGE-ARCHITECTURE.md",
+            "06-DATA-API-ARCHITECTURE.md",
+            "07-TECH-STACK.md",
+            "08-EXTERNAL-RESOURCES.md",
+            "09-AI-INTEGRATION.md",
+            "10-CODE-GENERATION.md",
+            "11-SECURITY.md",
+            "12-PERFORMANCE.md",
+            "13-TASKMASTER.md",
+            "14-ADAPTATION.md",
+            "15-COLLABORATION.md"
+          ],
+          "feature": {
+            "functionalRequirements": [
+              "Search bar visible on dashboard header",
+              "Real-time search as user types (debounced)",
+              "Search across projects by name and description",
+              "Search across tasks by title and status",
+              "Display results in dropdown with categories",
+              "Keyboard navigation support (arrow keys + enter)",
+              "Click result to navigate to item",
+              "Show \"No results\" message when appropriate",
+              "Escape key closes results"
+            ],
+            "nonFunctionalRequirements": [
+              "Search response time < 200ms",
+              "Debounce delay of 300ms",
+              "Maximum 10 results shown",
+              "Accessible with screen readers (ARIA)",
+              "Mobile responsive design",
+              "Smooth animations"
+            ],
+            "designRequirements": [
+              "Consistent with existing UI components",
+              "Uses system color palette",
+              "Search icon on left of input",
+              "Clear/close button on right when text present",
+              "Results dropdown with subtle shadow",
+              "Category headers in results"
+            ]
+          }
+        }
+      },
+      {
+        "stage": "styling",
+        "success": true,
+        "duration": 1501,
+        "tokensUsed": 2500,
+        "cost": 0.1275,
+        "output": {
+          "styleConfig": {
+            "colors": {
+              "primary": "#3B82F6",
+              "secondary": "#8B5CF6",
+              "background": "#FFFFFF",
+              "surface": "#F9FAFB",
+              "text": "#111827"
+            },
+            "typography": {
+              "fontFamily": "Inter, system-ui, sans-serif",
+              "fontSize": {
+                "base": 16,
+                "small": 14,
+                "large": 18
+              }
+            },
+            "spacing": {
+              "unit": 4
+            },
+            "borderRadius": {
+              "default": 8,
+              "small": 4,
+              "large": 12
+            }
+          },
+          "designTokens": "design-tokens.js"
+        }
+      },
+      {
+        "stage": "page_designs",
+        "success": true,
+        "duration": 3002,
+        "tokensUsed": 12000,
+        "cost": 0.612,
+        "output": {
+          "pages": {
+            "dashboard": {
+              "layout": "grid",
+              "sections": [
+                "header",
+                "search",
+                "projects",
+                "tasks",
+                "activity"
+              ],
+              "components": [
+                "SearchBar",
+                "ProjectCard",
+                "TaskList",
+                "ActivityFeed"
+              ]
+            }
+          },
+          "searchIntegration": {
+            "position": "header-center",
+            "width": "600px",
+            "behavior": "dropdown-results"
+          }
+        }
+      },
+      {
+        "stage": "component_specs",
+        "success": true,
+        "duration": 1004,
+        "tokensUsed": 1800,
+        "cost": 0.0918,
+        "output": {
+          "components": [
+            {
+              "name": "SearchBar",
+              "type": "ui-component",
+              "atomic": "UI Components",
+              "description": "Main search bar component with dropdown results",
+              "props": {
+                "placeholder": "string",
+                "onSearch": "(query: string) => void",
+                "onResultSelect": "(result: SearchResult) => void",
+                "isLoading": "boolean"
+              },
+              "dependencies": [
+                "SearchInput",
+                "SearchResults",
+                "useSearch"
+              ]
+            },
+            {
+              "name": "SearchInput",
+              "type": "ui-component",
+              "atomic": "UI Components",
+              "description": "Input field with search icon and clear button",
+              "props": {
+                "value": "string",
+                "onChange": "(value: string) => void",
+                "onClear": "() => void",
+                "placeholder": "string"
+              },
+              "dependencies": []
+            },
+            {
+              "name": "SearchResults",
+              "type": "ui-component",
+              "atomic": "UI Components",
+              "description": "Dropdown results list with categories",
+              "props": {
+                "results": "SearchResult[]",
+                "isLoading": "boolean",
+                "onSelect": "(result: SearchResult) => void"
+              },
+              "dependencies": [
+                "SearchResultItem"
+              ]
+            },
+            {
+              "name": "useSearch",
+              "type": "logic-module",
+              "atomic": "Logic Modules",
+              "description": "Hook for search functionality with debouncing",
+              "exports": {
+                "searchQuery": "string",
+                "searchResults": "SearchResult[]",
+                "isSearching": "boolean",
+                "setSearchQuery": "(query: string) => void"
+              },
+              "dependencies": [
+                "useDebounce",
+                "searchAPI"
+              ]
+            },
+            {
+              "name": "SearchResult",
+              "type": "data-pattern",
+              "atomic": "Data Patterns",
+              "description": "Type definition for search results",
+              "schema": {
+                "id": "string",
+                "type": "'project' | 'task'",
+                "title": "string",
+                "description": "string?",
+                "url": "string",
+                "icon": "string?",
+                "metadata": "Record<string, any>?"
+              }
+            }
+          ],
+          "dependencies": {
+            "lucide-react": "^0.263.1",
+            "react-hotkeys-hook": "^4.4.1",
+            "fuse.js": "^6.6.2"
+          }
+        }
+      },
+      {
+        "stage": "code_generation",
+        "success": true,
+        "duration": 5001,
+        "tokensUsed": 25000,
+        "cost": 1.275,
+        "output": {
+          "components": {
+            "SearchBar.tsx": "\nimport React, { useState, useCallback } from 'react';\nimport { Search, X } from 'lucide-react';\nimport { useSearch } from './useSearch';\nimport { SearchResults } from './SearchResults';\n\ninterface SearchBarProps {\n  placeholder?: string;\n  onSearch: (query: string) => void;\n  onResultSelect: (result: SearchResult) => void;\n  isLoading?: boolean;\n}\n\nexport function SearchBar({\n  placeholder = \"Search projects and tasks...\",\n  onSearch,\n  onResultSelect,\n  isLoading = false\n}: SearchBarProps) {\n  const [isOpen, setIsOpen] = useState(false);\n  const { searchQuery, searchResults, isSearching, setSearchQuery } = useSearch();\n\n  const handleClear = useCallback(() => {\n    setSearchQuery('');\n    setIsOpen(false);\n  }, [setSearchQuery]);\n\n  return (\n    <div className=\"relative w-full max-w-2xl\">\n      <div className=\"relative\">\n        <Search className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5\" />\n        <input\n          type=\"text\"\n          value={searchQuery}\n          onChange={(e) => {\n            setSearchQuery(e.target.value);\n            setIsOpen(true);\n          }}\n          onFocus={() => setIsOpen(true)}\n          placeholder={placeholder}\n          className=\"w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500\"\n          aria-label=\"Search\"\n        />\n        {searchQuery && (\n          <button\n            onClick={handleClear}\n            className=\"absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600\"\n            aria-label=\"Clear search\"\n          >\n            <X className=\"w-5 h-5\" />\n          </button>\n        )}\n      </div>\n      \n      {isOpen && searchQuery && (\n        <SearchResults\n          results={searchResults}\n          isLoading={isSearching || isLoading}\n          onSelect={(result) => {\n            onResultSelect(result);\n            setIsOpen(false);\n          }}\n        />\n      )}\n    </div>\n  );\n}",
+            "SearchBar.test.tsx": "\nimport { render, screen, fireEvent, waitFor } from '@testing-library/react';\nimport { SearchBar } from './SearchBar';\n\ndescribe('SearchBar', () => {\n  const mockOnSearch = jest.fn();\n  const mockOnResultSelect = jest.fn();\n\n  beforeEach(() => {\n    jest.clearAllMocks();\n  });\n\n  it('renders with placeholder', () => {\n    render(\n      <SearchBar\n        placeholder=\"Custom placeholder\"\n        onSearch={mockOnSearch}\n        onResultSelect={mockOnResultSelect}\n      />\n    );\n    \n    expect(screen.getByPlaceholderText('Custom placeholder')).toBeInTheDocument();\n  });\n\n  it('shows clear button when text is entered', async () => {\n    render(\n      <SearchBar\n        onSearch={mockOnSearch}\n        onResultSelect={mockOnResultSelect}\n      />\n    );\n    \n    const input = screen.getByRole('textbox');\n    fireEvent.change(input, { target: { value: 'test query' } });\n    \n    await waitFor(() => {\n      expect(screen.getByLabelText('Clear search')).toBeInTheDocument();\n    });\n  });\n\n  it('clears search when clear button is clicked', async () => {\n    render(\n      <SearchBar\n        onSearch={mockOnSearch}\n        onResultSelect={mockOnResultSelect}\n      />\n    );\n    \n    const input = screen.getByRole('textbox');\n    fireEvent.change(input, { target: { value: 'test query' } });\n    \n    const clearButton = await screen.findByLabelText('Clear search');\n    fireEvent.click(clearButton);\n    \n    expect(input).toHaveValue('');\n  });\n});"
+          },
+          "totalFiles": 10,
+          "totalLines": 850
+        }
+      },
+      {
+        "stage": "verification",
+        "success": true,
+        "duration": 2002,
+        "tokensUsed": 8000,
+        "cost": 0.408,
+        "output": {
+          "qualityScore": {
+            "overall": 92.5,
+            "coverage": 93,
+            "security": 9.5,
+            "performance": 91,
+            "accessibility": 90
+          },
+          "validation": {
+            "valid": false,
+            "errors": [
+              "Unit test coverage (0%) below required 90%",
+              "Integration test coverage (0%) below required 80%",
+              "Response time (250ms) exceeds limit of 200ms"
+            ],
+            "warnings": [
+              "E2E test coverage (0%) below recommended 70%"
+            ],
+            "suggestions": [
+              "Add more unit tests to achieve 95% coverage",
+              "Implement code splitting and lazy loading to improve response time"
+            ]
+          },
+          "passed": false
+        }
+      },
+      {
+        "stage": "registry",
+        "success": true,
+        "duration": 501,
+        "tokensUsed": 400,
+        "cost": 0.0204,
+        "output": {
+          "registered": [
+            {
+              "id": "searchbar-001",
+              "name": "SearchBar",
+              "version": "1.0.0"
+            },
+            {
+              "id": "searchinput-001",
+              "name": "SearchInput",
+              "version": "1.0.0"
+            },
+            {
+              "id": "searchresults-001",
+              "name": "SearchResults",
+              "version": "1.0.0"
+            },
+            {
+              "id": "usesearch-001",
+              "name": "useSearch",
+              "version": "1.0.0"
+            }
+          ],
+          "totalComponents": 4
+        }
+      },
+      {
+        "stage": "assembly",
+        "success": true,
+        "duration": 1501,
+        "tokensUsed": 1500,
+        "cost": 0.0765,
+        "output": {
+          "application": "dashboard-with-search",
+          "buildSuccess": true,
+          "deploymentReady": true,
+          "manualSteps": [
+            "Verified search integration in dashboard"
+          ]
+        }
+      }
+    ],
+    "qualityMetrics": {
+      "coverage": 93,
+      "security": 95,
+      "performance": 91,
+      "accessibility": 90
+    },
+    "successCriteriaMet": {
+      "time": true,
+      "cost": false,
+      "quality": true,
+      "manual": true
+    }
+  },
+  "tokenMetrics": {
+    "requests": [
+      {
+        "id": "e2e-test-1753739654609",
+        "metrics": {
+          "totalUsage": {
+            "promptTokens": 22280,
+            "completionTokens": 33420,
+            "totalTokens": 55700,
+            "model": "claude-3-opus-20240229",
+            "cost": 2.8406999999999996
+          },
+          "stageBreakdown": [
+            {
+              "promptTokens": 1800,
+              "completionTokens": 2700,
+              "totalTokens": 4500,
+              "model": "claude-3-opus-20240229",
+              "cost": 0.2295,
+              "stage": "ideation",
+              "timestamp": "2025-07-28T21:54:16.610Z",
+              "duration": 2000,
+              "retries": 0
+            },
+            {
+              "promptTokens": 1000,
+              "completionTokens": 1500,
+              "totalTokens": 2500,
+              "model": "claude-3-opus-20240229",
+              "cost": 0.1275,
+              "stage": "styling",
+              "timestamp": "2025-07-28T21:54:18.113Z",
+              "duration": 1501,
+              "retries": 0
+            },
+            {
+              "promptTokens": 4800,
+              "completionTokens": 7200,
+              "totalTokens": 12000,
+              "model": "claude-3-opus-20240229",
+              "cost": 0.612,
+              "stage": "page_designs",
+              "timestamp": "2025-07-28T21:54:21.115Z",
+              "duration": 3002,
+              "retries": 0
+            },
+            {
+              "promptTokens": 720,
+              "completionTokens": 1080,
+              "totalTokens": 1800,
+              "model": "claude-3-opus-20240229",
+              "cost": 0.0918,
+              "stage": "component_specs",
+              "timestamp": "2025-07-28T21:54:22.119Z",
+              "duration": 1004,
+              "retries": 0
+            },
+            {
+              "promptTokens": 10000,
+              "completionTokens": 15000,
+              "totalTokens": 25000,
+              "model": "claude-3-opus-20240229",
+              "cost": 1.275,
+              "stage": "code_generation",
+              "timestamp": "2025-07-28T21:54:27.120Z",
+              "duration": 5001,
+              "retries": 0
+            },
+            {
+              "promptTokens": 3200,
+              "completionTokens": 4800,
+              "totalTokens": 8000,
+              "model": "claude-3-opus-20240229",
+              "cost": 0.408,
+              "stage": "verification",
+              "timestamp": "2025-07-28T21:54:29.123Z",
+              "duration": 2002,
+              "retries": 0
+            },
+            {
+              "promptTokens": 160,
+              "completionTokens": 240,
+              "totalTokens": 400,
+              "model": "claude-3-opus-20240229",
+              "cost": 0.0204,
+              "stage": "registry",
+              "timestamp": "2025-07-28T21:54:29.624Z",
+              "duration": 501,
+              "retries": 0
+            },
+            {
+              "promptTokens": 600,
+              "completionTokens": 900,
+              "totalTokens": 1500,
+              "model": "claude-3-opus-20240229",
+              "cost": 0.0765,
+              "stage": "assembly",
+              "timestamp": "2025-07-28T21:54:31.125Z",
+              "duration": 1501,
+              "retries": 0
+            }
+          ],
+          "costBreakdown": {
+            "ideation": 0.2295,
+            "styling": 0.1275,
+            "page_designs": 0.612,
+            "component_specs": 0.0918,
+            "code_generation": 1.275,
+            "verification": 0.408,
+            "registry": 0.0204,
+            "assembly": 0.0765
+          },
+          "efficiency": 55700,
+          "projectedDailyCost": 3.6072380952380954,
+          "budgetUtilization": 55.7
+        }
+      }
+    ],
+    "daily": {
+      "2025-07-28": {
+        "totalTokens": 55700,
+        "totalCost": 2.8406999999999996,
+        "requestCount": 1,
+        "averageTokensPerRequest": 55700,
+        "budgetUtilization": 5.57
+      }
+    },
+    "stageEfficiency": {
+      "ideation": {
+        "averageTokens": 4500,
+        "averageCost": 0.2295,
+        "averageDuration": 2000,
+        "retryRate": 0
+      },
+      "styling": {
+        "averageTokens": 2500,
+        "averageCost": 0.1275,
+        "averageDuration": 1501,
+        "retryRate": 0
+      },
+      "page_designs": {
+        "averageTokens": 12000,
+        "averageCost": 0.612,
+        "averageDuration": 3002,
+        "retryRate": 0
+      },
+      "component_specs": {
+        "averageTokens": 1800,
+        "averageCost": 0.0918,
+        "averageDuration": 1004,
+        "retryRate": 0
+      },
+      "code_generation": {
+        "averageTokens": 25000,
+        "averageCost": 1.275,
+        "averageDuration": 5001,
+        "retryRate": 0
+      },
+      "verification": {
+        "averageTokens": 8000,
+        "averageCost": 0.408,
+        "averageDuration": 2002,
+        "retryRate": 0
+      },
+      "registry": {
+        "averageTokens": 400,
+        "averageCost": 0.0204,
+        "averageDuration": 501,
+        "retryRate": 0
+      },
+      "assembly": {
+        "averageTokens": 1500,
+        "averageCost": 0.0765,
+        "averageDuration": 1501,
+        "retryRate": 0
+      }
+    }
+  },
+  "qualityReport": "# Quality Report for SearchBar\n\n## Overall Score: 59.3/100\n\n### Test Coverage\n- Unit Tests: 0%\n- Integration Tests: 0%\n- E2E Tests: 0%\n- Overall Coverage: 0.0%\n\n### Performance\n- Response Time: 250ms\n- Render Time: 60ms\n- Bundle Size: 0KB\n\n### Security\n- Score: 10/10\n- Vulnerabilities: 0\n- Status: PASSED\n\n### Accessibility\n- Score: 100/100\n- Level: AAA\n- Violations: 0\n\n### Code Quality\n- Complexity: 0\n- Maintainability: 100/100\n- Issues: 0"
+}

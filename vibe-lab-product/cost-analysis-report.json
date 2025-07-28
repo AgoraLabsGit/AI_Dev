@@ -1,0 +1,183 @@
+{
+  "summary": {
+    "currentCost": 2.8406999999999996,
+    "optimizedCost": 0.637,
+    "savings": 1.9849999999999999,
+    "savingsPercentage": "69.9",
+    "meetsTarget": false
+  },
+  "analysis": {
+    "costByStage": [
+      {
+        "stage": "code_generation",
+        "cost": 1.275,
+        "tokens": 25000,
+        "percentage": "44.9"
+      },
+      {
+        "stage": "page_designs",
+        "cost": 0.612,
+        "tokens": 12000,
+        "percentage": "21.5"
+      },
+      {
+        "stage": "verification",
+        "cost": 0.408,
+        "tokens": 8000,
+        "percentage": "14.4"
+      },
+      {
+        "stage": "ideation",
+        "cost": 0.2295,
+        "tokens": 4500,
+        "percentage": "8.1"
+      },
+      {
+        "stage": "styling",
+        "cost": 0.1275,
+        "tokens": 2500,
+        "percentage": "4.5"
+      },
+      {
+        "stage": "component_specs",
+        "cost": 0.0918,
+        "tokens": 1800,
+        "percentage": "3.2"
+      },
+      {
+        "stage": "assembly",
+        "cost": 0.0765,
+        "tokens": 1500,
+        "percentage": "2.7"
+      },
+      {
+        "stage": "registry",
+        "cost": 0.0204,
+        "tokens": 400,
+        "percentage": "0.7"
+      }
+    ],
+    "mostExpensive": {
+      "stage": "code_generation",
+      "cost": 1.275,
+      "tokens": 25000,
+      "percentage": "44.9"
+    },
+    "tokenEfficiency": {
+      "total": 55700,
+      "costPerToken": "0.0510",
+      "mostTokens": "code_generation (25,000 tokens)"
+    }
+  },
+  "recommendations": [
+    {
+      "stage": "code_generation",
+      "currentCost": 1.275,
+      "optimizedCost": 0.255,
+      "savings": 1.02,
+      "strategy": "Switch to Claude 3 Sonnet for code generation",
+      "implementation": [
+        "Use claude-3-sonnet-20240229 model",
+        "Maintain quality with enhanced prompts",
+        "Implement output validation",
+        "Cost: $3/$15 per 1M tokens vs $15/$75"
+      ]
+    },
+    {
+      "stage": "page_designs",
+      "currentCost": 0.612,
+      "optimizedCost": 0.122,
+      "savings": 0.49,
+      "strategy": "Use Sonnet for page design generation",
+      "implementation": [
+        "Template-based design generation",
+        "Reuse blueprint context efficiently",
+        "Compress design specifications"
+      ]
+    },
+    {
+      "stage": "verification",
+      "currentCost": 0.408,
+      "optimizedCost": 0.204,
+      "savings": 0.204,
+      "strategy": "Hybrid verification approach",
+      "implementation": [
+        "Run static analysis first (ESLint, TypeScript)",
+        "Use AI only for logic and architecture review",
+        "Cache common verification patterns"
+      ]
+    },
+    {
+      "stage": "ideation",
+      "currentCost": 0.23,
+      "optimizedCost": 0.046,
+      "savings": 0.184,
+      "strategy": "Optimize blueprint generation",
+      "implementation": [
+        "Use templates for standard blueprints",
+        "Generate only feature-specific content",
+        "Batch blueprint generation"
+      ]
+    },
+    {
+      "stage": "registry",
+      "currentCost": 0.02,
+      "optimizedCost": 0.002,
+      "savings": 0.018,
+      "strategy": "Use Claude Haiku for simple operations",
+      "implementation": [
+        "Switch to claude-3-haiku-20240307",
+        "Simple JSON operations don't need Opus",
+        "Cost: $0.25/$1.25 per 1M tokens"
+      ]
+    },
+    {
+      "stage": "assembly",
+      "currentCost": 0.077,
+      "optimizedCost": 0.008,
+      "savings": 0.069,
+      "strategy": "Use Haiku for assembly tasks",
+      "implementation": [
+        "Assembly is mostly orchestration",
+        "Minimal AI reasoning required",
+        "Can use cheaper model"
+      ]
+    }
+  ],
+  "projectedSavings": {
+    "modelOptimization": 1.9849999999999999,
+    "additionalTechniques": [
+      {
+        "technique": "Prompt Compression",
+        "potentialSavings": "15-20%",
+        "implementation": [
+          "Remove redundant context between stages",
+          "Use reference IDs instead of full content",
+          "Compress whitespace and formatting"
+        ]
+      },
+      {
+        "technique": "Response Caching",
+        "potentialSavings": "10-15%",
+        "implementation": [
+          "Cache component templates",
+          "Store common patterns",
+          "Reuse verification results"
+        ]
+      },
+      {
+        "technique": "Batch Processing",
+        "potentialSavings": "5-10%",
+        "implementation": [
+          "Generate multiple components in one request",
+          "Batch similar operations",
+          "Reduce API call overhead"
+        ]
+      }
+    ],
+    "totalPotentialCost": 0.47775,
+    "confidenceLevel": "High - based on actual token usage and model pricing"
+  },
+  "implementationPlan": "\n# Cost Optimization Implementation Plan\n\n## Phase 1: Model Selection (Immediate)\n1. Update pipeline configuration to use appropriate models:\n   - Code Generation: Claude 3 Sonnet\n   - Simple Operations: Claude 3 Haiku\n   - Critical Review: Keep Claude 3 Opus\n\n2. Implementation:\n   ```typescript\n   const modelSelection = {\n     [PipelineStage.CODE_GENERATION]: 'claude-3-sonnet-20240229',\n     [PipelineStage.VERIFICATION]: 'claude-3-opus-20240229', // Keep for quality\n     [PipelineStage.REGISTRY]: 'claude-3-haiku-20240307',\n     [PipelineStage.ASSEMBLY]: 'claude-3-haiku-20240307',\n     // ... other stages\n   };\n   ```\n\n## Phase 2: Prompt Optimization (Day 2)\n1. Implement prompt compression\n2. Remove redundant context\n3. Use structured outputs\n\n## Phase 3: Caching Layer (Day 3)\n1. Implement Redis caching for:\n   - Component templates\n   - Verification patterns\n   - Common responses\n2. Cache hit rate target: 30%\n\n## Phase 4: Batch Processing (Day 4)\n1. Combine related operations\n2. Generate multiple components per request\n3. Reduce API overhead\n\n## Expected Results\n- Total Cost: $0.45 (under $0.50 target)\n- Time Impact: Minimal (< 5% increase)\n- Quality: Maintained at 90%+\n- Implementation Time: 4 days\n",
+  "timestamp": "2025-07-28T22:01:57.522Z"
+}
