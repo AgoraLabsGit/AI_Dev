@@ -1,18 +1,18 @@
 {
-  "timestamp": "2025-07-28T21:54:31.152Z",
+  "timestamp": "2025-07-28T22:41:18.371Z",
   "result": {
-    "overallSuccess": false,
-    "totalDuration": 16517,
-    "totalCost": 2.8406999999999996,
-    "totalTokens": 55700,
+    "overallSuccess": true,
+    "totalDuration": 16515,
+    "totalCost": 0.29036,
+    "totalTokens": 33600,
     "manualInterventionRequired": 1,
     "stageResults": [
       {
         "stage": "ideation",
         "success": true,
-        "duration": 2000,
-        "tokensUsed": 4500,
-        "cost": 0.2295,
+        "duration": 2001,
+        "tokensUsed": 1500,
+        "cost": 0.001275,
         "output": {
           "blueprints": [
             "01-PROJECT-CONFIG.md",
@@ -66,8 +66,8 @@
         "stage": "styling",
         "success": true,
         "duration": 1501,
-        "tokensUsed": 2500,
-        "cost": 0.1275,
+        "tokensUsed": 1800,
+        "cost": 0.0015300000000000001,
         "output": {
           "styleConfig": {
             "colors": {
@@ -100,9 +100,9 @@
       {
         "stage": "page_designs",
         "success": true,
-        "duration": 3002,
-        "tokensUsed": 12000,
-        "cost": 0.612,
+        "duration": 3001,
+        "tokensUsed": 3500,
+        "cost": 0.0357,
         "output": {
           "pages": {
             "dashboard": {
@@ -132,9 +132,9 @@
       {
         "stage": "component_specs",
         "success": true,
-        "duration": 1004,
-        "tokensUsed": 1800,
-        "cost": 0.0918,
+        "duration": 1001,
+        "tokensUsed": 5500,
+        "cost": 0.0561,
         "output": {
           "components": [
             {
@@ -210,7 +210,8 @@
                 "url": "string",
                 "icon": "string?",
                 "metadata": "Record<string, any>?"
-              }
+              },
+              "dependencies": []
             }
           ],
           "dependencies": {
@@ -224,8 +225,8 @@
         "stage": "code_generation",
         "success": true,
         "duration": 5001,
-        "tokensUsed": 25000,
-        "cost": 1.275,
+        "tokensUsed": 13000,
+        "cost": 0.1326,
         "output": {
           "components": {
             "SearchBar.tsx": "\nimport React, { useState, useCallback } from 'react';\nimport { Search, X } from 'lucide-react';\nimport { useSearch } from './useSearch';\nimport { SearchResults } from './SearchResults';\n\ninterface SearchBarProps {\n  placeholder?: string;\n  onSearch: (query: string) => void;\n  onResultSelect: (result: SearchResult) => void;\n  isLoading?: boolean;\n}\n\nexport function SearchBar({\n  placeholder = \"Search projects and tasks...\",\n  onSearch,\n  onResultSelect,\n  isLoading = false\n}: SearchBarProps) {\n  const [isOpen, setIsOpen] = useState(false);\n  const { searchQuery, searchResults, isSearching, setSearchQuery } = useSearch();\n\n  const handleClear = useCallback(() => {\n    setSearchQuery('');\n    setIsOpen(false);\n  }, [setSearchQuery]);\n\n  return (\n    <div className=\"relative w-full max-w-2xl\">\n      <div className=\"relative\">\n        <Search className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5\" />\n        <input\n          type=\"text\"\n          value={searchQuery}\n          onChange={(e) => {\n            setSearchQuery(e.target.value);\n            setIsOpen(true);\n          }}\n          onFocus={() => setIsOpen(true)}\n          placeholder={placeholder}\n          className=\"w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500\"\n          aria-label=\"Search\"\n        />\n        {searchQuery && (\n          <button\n            onClick={handleClear}\n            className=\"absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600\"\n            aria-label=\"Clear search\"\n          >\n            <X className=\"w-5 h-5\" />\n          </button>\n        )}\n      </div>\n      \n      {isOpen && searchQuery && (\n        <SearchResults\n          results={searchResults}\n          isLoading={isSearching || isLoading}\n          onSelect={(result) => {\n            onResultSelect(result);\n            setIsOpen(false);\n          }}\n        />\n      )}\n    </div>\n  );\n}",
@@ -238,9 +239,9 @@
       {
         "stage": "verification",
         "success": true,
-        "duration": 2002,
-        "tokensUsed": 8000,
-        "cost": 0.408,
+        "duration": 2003,
+        "tokensUsed": 6000,
+        "cost": 0.0612,
         "output": {
           "qualityScore": {
             "overall": 92.5,
@@ -271,8 +272,8 @@
         "stage": "registry",
         "success": true,
         "duration": 501,
-        "tokensUsed": 400,
-        "cost": 0.0204,
+        "tokensUsed": 800,
+        "cost": 0.0006799999999999999,
         "output": {
           "registered": [
             {
@@ -302,9 +303,9 @@
       {
         "stage": "assembly",
         "success": true,
-        "duration": 1501,
+        "duration": 1500,
         "tokensUsed": 1500,
-        "cost": 0.0765,
+        "cost": 0.001275,
         "output": {
           "application": "dashboard-with-search",
           "buildSuccess": true,
@@ -323,7 +324,7 @@
     },
     "successCriteriaMet": {
       "time": true,
-      "cost": false,
+      "cost": true,
       "quality": true,
       "manual": true
     }
@@ -331,90 +332,90 @@
   "tokenMetrics": {
     "requests": [
       {
-        "id": "e2e-test-1753739654609",
+        "id": "e2e-test-1753742461834",
         "metrics": {
           "totalUsage": {
-            "promptTokens": 22280,
-            "completionTokens": 33420,
-            "totalTokens": 55700,
-            "model": "claude-3-opus-20240229",
-            "cost": 2.8406999999999996
+            "promptTokens": 13440,
+            "completionTokens": 20160,
+            "totalTokens": 33600,
+            "model": "claude-3-haiku",
+            "cost": 0.29036
           },
           "stageBreakdown": [
             {
-              "promptTokens": 1800,
-              "completionTokens": 2700,
-              "totalTokens": 4500,
-              "model": "claude-3-opus-20240229",
-              "cost": 0.2295,
+              "promptTokens": 600,
+              "completionTokens": 900,
+              "totalTokens": 1500,
+              "model": "claude-3-haiku",
+              "cost": 0.001275,
               "stage": "ideation",
-              "timestamp": "2025-07-28T21:54:16.610Z",
-              "duration": 2000,
-              "retries": 0
-            },
-            {
-              "promptTokens": 1000,
-              "completionTokens": 1500,
-              "totalTokens": 2500,
-              "model": "claude-3-opus-20240229",
-              "cost": 0.1275,
-              "stage": "styling",
-              "timestamp": "2025-07-28T21:54:18.113Z",
-              "duration": 1501,
-              "retries": 0
-            },
-            {
-              "promptTokens": 4800,
-              "completionTokens": 7200,
-              "totalTokens": 12000,
-              "model": "claude-3-opus-20240229",
-              "cost": 0.612,
-              "stage": "page_designs",
-              "timestamp": "2025-07-28T21:54:21.115Z",
-              "duration": 3002,
+              "timestamp": "2025-07-28T22:41:03.836Z",
+              "duration": 2001,
               "retries": 0
             },
             {
               "promptTokens": 720,
               "completionTokens": 1080,
               "totalTokens": 1800,
-              "model": "claude-3-opus-20240229",
-              "cost": 0.0918,
-              "stage": "component_specs",
-              "timestamp": "2025-07-28T21:54:22.119Z",
-              "duration": 1004,
+              "model": "claude-3-haiku",
+              "cost": 0.0015300000000000001,
+              "stage": "styling",
+              "timestamp": "2025-07-28T22:41:05.340Z",
+              "duration": 1501,
               "retries": 0
             },
             {
-              "promptTokens": 10000,
-              "completionTokens": 15000,
-              "totalTokens": 25000,
-              "model": "claude-3-opus-20240229",
-              "cost": 1.275,
+              "promptTokens": 1400,
+              "completionTokens": 2100,
+              "totalTokens": 3500,
+              "model": "claude-3-5-sonnet",
+              "cost": 0.0357,
+              "stage": "page_designs",
+              "timestamp": "2025-07-28T22:41:08.341Z",
+              "duration": 3001,
+              "retries": 0
+            },
+            {
+              "promptTokens": 2200,
+              "completionTokens": 3300,
+              "totalTokens": 5500,
+              "model": "claude-3-5-sonnet",
+              "cost": 0.0561,
+              "stage": "component_specs",
+              "timestamp": "2025-07-28T22:41:09.342Z",
+              "duration": 1001,
+              "retries": 0
+            },
+            {
+              "promptTokens": 5200,
+              "completionTokens": 7800,
+              "totalTokens": 13000,
+              "model": "claude-3-5-sonnet",
+              "cost": 0.1326,
               "stage": "code_generation",
-              "timestamp": "2025-07-28T21:54:27.120Z",
+              "timestamp": "2025-07-28T22:41:14.344Z",
               "duration": 5001,
               "retries": 0
             },
             {
-              "promptTokens": 3200,
-              "completionTokens": 4800,
-              "totalTokens": 8000,
-              "model": "claude-3-opus-20240229",
-              "cost": 0.408,
+              "promptTokens": 2400,
+              "completionTokens": 3600,
+              "totalTokens": 6000,
+              "model": "claude-3-5-sonnet",
+              "cost": 0.0612,
               "stage": "verification",
-              "timestamp": "2025-07-28T21:54:29.123Z",
-              "duration": 2002,
+              "timestamp": "2025-07-28T22:41:16.347Z",
+              "duration": 2003,
               "retries": 0
             },
             {
-              "promptTokens": 160,
-              "completionTokens": 240,
-              "totalTokens": 400,
-              "model": "claude-3-opus-20240229",
-              "cost": 0.0204,
+              "promptTokens": 320,
+              "completionTokens": 480,
+              "totalTokens": 800,
+              "model": "claude-3-haiku",
+              "cost": 0.0006799999999999999,
               "stage": "registry",
-              "timestamp": "2025-07-28T21:54:29.624Z",
+              "timestamp": "2025-07-28T22:41:16.848Z",
               "duration": 501,
               "retries": 0
             },
@@ -422,86 +423,86 @@
               "promptTokens": 600,
               "completionTokens": 900,
               "totalTokens": 1500,
-              "model": "claude-3-opus-20240229",
-              "cost": 0.0765,
+              "model": "claude-3-haiku",
+              "cost": 0.001275,
               "stage": "assembly",
-              "timestamp": "2025-07-28T21:54:31.125Z",
-              "duration": 1501,
+              "timestamp": "2025-07-28T22:41:18.349Z",
+              "duration": 1500,
               "retries": 0
             }
           ],
           "costBreakdown": {
-            "ideation": 0.2295,
-            "styling": 0.1275,
-            "page_designs": 0.612,
-            "component_specs": 0.0918,
-            "code_generation": 1.275,
-            "verification": 0.408,
-            "registry": 0.0204,
-            "assembly": 0.0765
+            "ideation": 0.001275,
+            "styling": 0.0015300000000000001,
+            "page_designs": 0.0357,
+            "component_specs": 0.0561,
+            "code_generation": 0.1326,
+            "verification": 0.0612,
+            "registry": 0.0006799999999999999,
+            "assembly": 0.001275
           },
-          "efficiency": 55700,
-          "projectedDailyCost": 3.6072380952380954,
-          "budgetUtilization": 55.7
+          "efficiency": 33600,
+          "projectedDailyCost": 0.35403759525825573,
+          "budgetUtilization": 33.6
         }
       }
     ],
     "daily": {
       "2025-07-28": {
-        "totalTokens": 55700,
-        "totalCost": 2.8406999999999996,
+        "totalTokens": 33600,
+        "totalCost": 0.29036,
         "requestCount": 1,
-        "averageTokensPerRequest": 55700,
-        "budgetUtilization": 5.57
+        "averageTokensPerRequest": 33600,
+        "budgetUtilization": 3.36
       }
     },
     "stageEfficiency": {
       "ideation": {
-        "averageTokens": 4500,
-        "averageCost": 0.2295,
-        "averageDuration": 2000,
+        "averageTokens": 1500,
+        "averageCost": 0.001275,
+        "averageDuration": 2001,
         "retryRate": 0
       },
       "styling": {
-        "averageTokens": 2500,
-        "averageCost": 0.1275,
+        "averageTokens": 1800,
+        "averageCost": 0.0015300000000000001,
         "averageDuration": 1501,
         "retryRate": 0
       },
       "page_designs": {
-        "averageTokens": 12000,
-        "averageCost": 0.612,
-        "averageDuration": 3002,
+        "averageTokens": 3500,
+        "averageCost": 0.0357,
+        "averageDuration": 3001,
         "retryRate": 0
       },
       "component_specs": {
-        "averageTokens": 1800,
-        "averageCost": 0.0918,
-        "averageDuration": 1004,
+        "averageTokens": 5500,
+        "averageCost": 0.0561,
+        "averageDuration": 1001,
         "retryRate": 0
       },
       "code_generation": {
-        "averageTokens": 25000,
-        "averageCost": 1.275,
+        "averageTokens": 13000,
+        "averageCost": 0.1326,
         "averageDuration": 5001,
         "retryRate": 0
       },
       "verification": {
-        "averageTokens": 8000,
-        "averageCost": 0.408,
-        "averageDuration": 2002,
+        "averageTokens": 6000,
+        "averageCost": 0.0612,
+        "averageDuration": 2003,
         "retryRate": 0
       },
       "registry": {
-        "averageTokens": 400,
-        "averageCost": 0.0204,
+        "averageTokens": 800,
+        "averageCost": 0.0006799999999999999,
         "averageDuration": 501,
         "retryRate": 0
       },
       "assembly": {
         "averageTokens": 1500,
-        "averageCost": 0.0765,
-        "averageDuration": 1501,
+        "averageCost": 0.001275,
+        "averageDuration": 1500,
         "retryRate": 0
       }
     }

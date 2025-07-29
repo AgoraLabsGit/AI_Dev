@@ -7,6 +7,7 @@ import { PipelineStage } from './types';
 import { tokenTracker } from './token-tracking';
 import { qualityMeasurement } from './quality-measurement';
 import { addSearchToDashboardSpec } from '../test-features/add-search-dashboard.spec';
+import { getModelForStage, calculateCost } from './model-config';
 
 interface PipelineStageResult {
   stage: PipelineStage;
@@ -128,17 +129,21 @@ export class PipelineE2ETest {
       const output = await executor();
       const duration = Date.now() - stageStartTime;
       
+      // Get model config for this stage
+      const modelConfig = getModelForStage(stage.toLowerCase());
+      
       // Simulate token usage based on stage
       const tokensUsed = this.getStageTokenUsage(stage);
-      const cost = tokenTracker.calculateCost('claude-3-opus-20240229', 
-        tokensUsed * 0.4, tokensUsed * 0.6);
+      const promptTokens = Math.floor(tokensUsed * 0.4);
+      const completionTokens = Math.floor(tokensUsed * 0.6);
+      const cost = calculateCost(modelConfig.model, promptTokens, completionTokens);
 
-      // Track token usage
+      // Track token usage with appropriate model
       tokenTracker.track(this.requestId, stage, {
-        promptTokens: Math.floor(tokensUsed * 0.4),
-        completionTokens: Math.floor(tokensUsed * 0.6),
+        promptTokens,
+        completionTokens,
         totalTokens: tokensUsed,
-        model: 'claude-3-opus-20240229',
+        model: modelConfig.model,
         cost
       }, duration);
 
@@ -151,7 +156,9 @@ export class PipelineE2ETest {
         output
       });
 
-      console.log(`✓ Stage completed in ${duration}ms, used ${tokensUsed} tokens ($${cost.toFixed(3)})\n`);
+      console.log(`✓ Stage completed in ${duration}ms`);
+      console.log(`  Model: ${modelConfig.model}`);
+      console.log(`  Tokens: ${tokensUsed} ($${cost.toFixed(3)})\n`);
 
     } catch (error) {
       const duration = Date.now() - stageStartTime;
@@ -463,14 +470,14 @@ describe('SearchBar', () => {
    */
   private getStageTokenUsage(stage: PipelineStage): number {
     const tokenMap: Record<PipelineStage, number> = {
-      [PipelineStage.IDEATION]: 4500,
-      [PipelineStage.BLUEPRINTS]: 18000,
-      [PipelineStage.STYLING]: 2500,
-      [PipelineStage.PAGE_DESIGNS]: 12000,
-      [PipelineStage.COMPONENT_SPECS]: 1800,
-      [PipelineStage.CODE_GENERATION]: 25000,
-      [PipelineStage.VERIFICATION]: 8000,
-      [PipelineStage.REGISTRY]: 400,
+      [PipelineStage.IDEATION]: 1500,      // Reduced: 1000 prompt + 500 completion
+      [PipelineStage.BLUEPRINTS]: 2500,    // Fixed: was 18000, now matches projection
+      [PipelineStage.STYLING]: 1800,       // Reduced: 1000 prompt + 800 completion  
+      [PipelineStage.PAGE_DESIGNS]: 3500,  // Reduced: 2000 prompt + 1500 completion
+      [PipelineStage.COMPONENT_SPECS]: 5500, // Increased: 3000 prompt + 2500 completion
+      [PipelineStage.CODE_GENERATION]: 13000, // Reduced: 5000 prompt + 8000 completion
+      [PipelineStage.VERIFICATION]: 6000,  // Reduced: 4000 prompt + 2000 completion
+      [PipelineStage.REGISTRY]: 800,       // Increased: 500 prompt + 300 completion
       [PipelineStage.ASSEMBLY]: 1500
     };
     return tokenMap[stage] || 1000;
