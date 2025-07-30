@@ -22,7 +22,14 @@ import {
   ExportDefinition,
   ImportRequirement,
   ValidationRule,
-  Constraint
+  Constraint,
+  // NEW: Component detection types
+  ComponentDetectionData,
+  UIPattern,
+  ComponentRequirement,
+  TemplateRecommendation,
+  ComponentMatch,
+  ComponentCustomization
 } from './types';
 
 export interface ParserConfig {
@@ -102,40 +109,41 @@ export class BlueprintParser extends BaseService {
     const category = this.determineCategory(raw, type);
 
     // Parse requirements
-    const requirements = {
-      functional: this.parseFunctionalRequirements(raw),
-      technical: this.parseTechnicalRequirements(raw),
-      design: this.parseDesignRequirements(raw)
-    };
+    const functionalRequirements = this.parseFunctionalRequirements(raw);
+    const technicalRequirements = this.parseTechnicalRequirements(raw);
+    const designRequirements = this.parseDesignRequirements(raw);
 
-    // Analyze dependencies
-    const dependencies = {
-      internal: this.extractInternalDependencies(raw),
-      external: this.extractExternalDependencies(raw),
-      peer: []
-    };
+    // Extract dependencies
+    const internalDependencies = this.extractInternalDependencies(raw);
+    const externalDependencies = this.extractExternalDependencies(raw);
 
     // Determine structure
-    const structure = {
-      files: this.determineFileStructure(name, type),
-      exports: this.determineExports(name, type),
-      imports: this.determineImports(type)
-    };
+    const files = this.determineFileStructure(name, type);
+    const exports = this.determineExports(name, type);
+    const imports = this.determineImports(type);
 
     // Extract validation
-    const validation = {
-      rules: this.extractValidationRules(raw),
-      constraints: this.extractConstraints(raw)
-    };
+    const validationRules = this.extractValidationRules(raw);
+    const constraints = this.extractConstraints(raw);
 
     // Calculate metadata
-    const complexity = this.calculateComplexity(requirements, dependencies);
-    const metadata = {
-      priority: this.determinePriority(requirements, category),
-      complexity,
-      estimatedTime: this.estimateTime(complexity, type),
-      tags: this.extractTags(raw, type)
-    };
+    const complexity = this.calculateComplexity(
+      { functional: functionalRequirements, technical: technicalRequirements, design: designRequirements },
+      { internal: internalDependencies, external: externalDependencies, peer: [] }
+    );
+    const priority = this.determinePriority(
+      { functional: functionalRequirements, technical: technicalRequirements, design: designRequirements },
+      category
+    );
+    const estimatedTime = this.estimateTime(complexity, type);
+    const tags = this.extractTags(raw, type);
+
+    // NEW: Component detection and analysis
+    const componentDetection = await this.detectComponentRequirements(raw, {
+      functional: functionalRequirements,
+      technical: technicalRequirements,
+      design: designRequirements
+    });
 
     return {
       id,
@@ -143,12 +151,427 @@ export class BlueprintParser extends BaseService {
       description,
       type,
       category,
-      requirements,
-      dependencies,
-      structure,
-      validation,
-      metadata
+      requirements: {
+        functional: functionalRequirements,
+        technical: technicalRequirements,
+        design: designRequirements
+      },
+      dependencies: {
+        internal: internalDependencies,
+        external: externalDependencies,
+        peer: []
+      },
+      structure: {
+        files,
+        exports,
+        imports
+      },
+      validation: {
+        rules: validationRules,
+        constraints
+      },
+      metadata: {
+        priority,
+        complexity,
+        estimatedTime,
+        tags
+      },
+      componentDetection
     };
+  }
+
+  /**
+   * NEW: Detect component requirements from blueprint
+   */
+  private async detectComponentRequirements(
+    raw: any,
+    requirements: ComponentBlueprint['requirements']
+  ): Promise<ComponentDetectionData> {
+    const startTime = Date.now();
+    
+    try {
+      // Detect UI patterns
+      const detectedPatterns = this.detectUIPatterns(raw, requirements);
+      
+      // Extract component requirements
+      const componentRequirements = this.extractComponentRequirements(raw, requirements);
+      
+      // Generate template recommendations
+      const templateRecommendations = this.generateTemplateRecommendations(detectedPatterns, componentRequirements);
+      
+      // Calculate overall confidence
+      const confidence = this.calculateDetectionConfidence(detectedPatterns, componentRequirements);
+      
+      // Generate reasoning
+      const reasoning = this.generateDetectionReasoning(detectedPatterns, componentRequirements);
+      
+      const duration = Date.now() - startTime;
+      this.log('info', `Component detection completed in ${duration}ms with ${confidence}% confidence`);
+      
+      return {
+        detectedPatterns,
+        componentRequirements,
+        templateRecommendations,
+        confidence,
+        reasoning
+      };
+      
+    } catch (error) {
+      this.log('error', `Component detection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      // Return fallback detection data
+      return {
+        detectedPatterns: [],
+        componentRequirements: [],
+        templateRecommendations: [],
+        confidence: 0,
+        reasoning: ['Component detection failed, using fallback']
+      };
+    }
+  }
+
+  /**
+   * Detect UI patterns from blueprint text and requirements
+   */
+  private detectUIPatterns(raw: any, requirements: ComponentBlueprint['requirements']): UIPattern[] {
+    const patterns: UIPattern[] = [];
+    const text = this.extractBlueprintText(raw);
+    
+    // Pattern detection keywords and rules
+    const patternRules = {
+      dashboard: ['dashboard', 'admin', 'control panel', 'metrics', 'analytics', 'charts', 'graphs'],
+      ecommerce: ['shop', 'store', 'product', 'cart', 'checkout', 'payment', 'inventory'],
+      blog: ['blog', 'article', 'post', 'content', 'editor', 'publish', 'author'],
+      landing: ['landing', 'hero', 'cta', 'conversion', 'marketing', 'signup'],
+      auth: ['login', 'register', 'signup', 'authentication', 'password', 'user'],
+      form: ['form', 'input', 'validation', 'submit', 'field', 'survey'],
+      navigation: ['nav', 'menu', 'header', 'footer', 'breadcrumb', 'sidebar'],
+      table: ['table', 'grid', 'list', 'data', 'rows', 'columns', 'sort'],
+      modal: ['modal', 'dialog', 'popup', 'overlay', 'lightbox'],
+      card: ['card', 'tile', 'widget', 'panel', 'container']
+    };
+
+    // Analyze text for patterns
+    for (const [patternType, keywords] of Object.entries(patternRules)) {
+      const matches = keywords.filter(keyword => 
+        text.toLowerCase().includes(keyword.toLowerCase())
+      );
+      
+      if (matches.length > 0) {
+        const confidence = Math.min(100, (matches.length / keywords.length) * 100);
+        patterns.push({
+          type: patternType as UIPattern['type'],
+          confidence,
+          keywords: matches,
+          description: `Detected ${patternType} pattern with ${confidence}% confidence`
+        });
+      }
+    }
+
+    // Analyze functional requirements for additional patterns
+    for (const req of requirements.functional) {
+      const reqText = req.description.toLowerCase();
+      
+      if (reqText.includes('user') && reqText.includes('profile')) {
+        patterns.push({
+          type: 'profile',
+          confidence: 85,
+          keywords: ['user', 'profile'],
+          description: 'User profile management detected'
+        });
+      }
+      
+      if (reqText.includes('chat') || reqText.includes('message')) {
+        patterns.push({
+          type: 'chat',
+          confidence: 90,
+          keywords: ['chat', 'message'],
+          description: 'Chat/messaging functionality detected'
+        });
+      }
+    }
+
+    return patterns;
+  }
+
+  /**
+   * Extract component requirements from blueprint
+   */
+  private extractComponentRequirements(
+    raw: any,
+    requirements: ComponentBlueprint['requirements']
+  ): ComponentRequirement[] {
+    const componentReqs: ComponentRequirement[] = [];
+    
+    // Analyze functional requirements for component needs
+    for (const req of requirements.functional) {
+      const reqText = req.description.toLowerCase();
+      
+      // Navigation components
+      if (reqText.includes('navigation') || reqText.includes('menu') || reqText.includes('header')) {
+        componentReqs.push({
+          category: 'navigation',
+          type: 'navigation',
+          priority: req.priority,
+          description: req.description,
+          constraints: ['responsive', 'accessible']
+        });
+      }
+      
+      // Form components
+      if (reqText.includes('form') || reqText.includes('input') || reqText.includes('submit')) {
+        componentReqs.push({
+          category: 'form',
+          type: 'form',
+          priority: req.priority,
+          description: req.description,
+          constraints: ['validation', 'accessible']
+        });
+      }
+      
+      // Display components
+      if (reqText.includes('table') || reqText.includes('list') || reqText.includes('grid')) {
+        componentReqs.push({
+          category: 'display',
+          type: 'data-display',
+          priority: req.priority,
+          description: req.description,
+          constraints: ['sortable', 'filterable']
+        });
+      }
+      
+      // Interaction components
+      if (reqText.includes('button') || reqText.includes('link') || reqText.includes('click')) {
+        componentReqs.push({
+          category: 'interaction',
+          type: 'button',
+          priority: req.priority,
+          description: req.description,
+          constraints: ['accessible', 'responsive']
+        });
+      }
+      
+      // Layout components
+      if (reqText.includes('layout') || reqText.includes('container') || reqText.includes('section')) {
+        componentReqs.push({
+          category: 'layout',
+          type: 'container',
+          priority: req.priority,
+          description: req.description,
+          constraints: ['responsive', 'flexible']
+        });
+      }
+    }
+    
+    // Analyze design requirements for component styling needs
+    for (const req of requirements.design) {
+      if (req.pattern === 'atomic' || req.pattern === 'compound') {
+        componentReqs.push({
+          category: 'content',
+          type: 'atomic-component',
+          priority: Priority.MEDIUM,
+          description: `Atomic design component with ${req.styling} styling`,
+          constraints: ['reusable', 'consistent']
+        });
+      }
+    }
+    
+    return componentReqs;
+  }
+
+  /**
+   * Generate template recommendations based on detected patterns
+   */
+  private generateTemplateRecommendations(
+    patterns: UIPattern[],
+    componentReqs: ComponentRequirement[]
+  ): TemplateRecommendation[] {
+    const recommendations: TemplateRecommendation[] = [];
+    
+    // Template matching logic based on patterns
+    const templateMatches = {
+      dashboard: ['linear', 'apple', 'corporate'],
+      ecommerce: ['spotify', 'ecommerce', 'startup'],
+      blog: ['editorial', 'minimal', 'creative'],
+      landing: ['brutalist', 'startup', 'creative'],
+      auth: ['minimal', 'corporate', 'linear'],
+      form: ['linear', 'corporate', 'minimal'],
+      navigation: ['apple', 'linear', 'corporate'],
+      table: ['corporate', 'linear', 'startup'],
+      modal: ['minimal', 'linear', 'apple'],
+      card: ['spotify', 'creative', 'startup']
+    };
+    
+    // Generate recommendations based on detected patterns
+    for (const pattern of patterns) {
+      const matchingTemplates = templateMatches[pattern.type] || ['linear'];
+      
+      for (const templateId of matchingTemplates) {
+        const existingRec = recommendations.find(r => r.templateId === templateId);
+        
+        if (existingRec) {
+          existingRec.confidence = Math.max(existingRec.confidence, pattern.confidence);
+          existingRec.reasoning.push(`Pattern "${pattern.type}" detected with ${pattern.confidence}% confidence`);
+        } else {
+          recommendations.push({
+            templateId,
+            name: this.getTemplateName(templateId),
+            confidence: pattern.confidence,
+            reasoning: [`Pattern "${pattern.type}" detected with ${pattern.confidence}% confidence`],
+            componentMatches: this.generateComponentMatches(componentReqs, templateId)
+          });
+        }
+      }
+    }
+    
+    // Sort by confidence
+    return recommendations.sort((a, b) => b.confidence - a.confidence);
+  }
+
+  /**
+   * Generate component matches for a template
+   */
+  private generateComponentMatches(
+    componentReqs: ComponentRequirement[],
+    templateId: string
+  ): ComponentMatch[] {
+    const matches: ComponentMatch[] = [];
+    
+    for (const req of componentReqs) {
+      matches.push({
+        componentId: `${templateId}-${req.category}-${req.type}`,
+        name: `${req.type} Component`,
+        category: req.category,
+        confidence: 75, // Base confidence
+        reasoning: [`Matches ${req.category} requirement: ${req.description}`],
+        customization: this.generateCustomization(req, templateId)
+      });
+    }
+    
+    return matches;
+  }
+
+  /**
+   * Generate customization options for a component
+   */
+  private generateCustomization(req: ComponentRequirement, templateId: string): ComponentCustomization {
+    return {
+      styling: {
+        colors: {
+          primary: '#3B82F6',
+          secondary: '#6B7280',
+          accent: '#10B981'
+        },
+        typography: {
+          fontFamily: 'Inter',
+          fontSize: '1rem',
+          fontWeight: '400'
+        },
+        spacing: {
+          padding: '1rem',
+          margin: '0.5rem',
+          gap: '0.5rem'
+        },
+        animation: {
+          duration: '200ms',
+          easing: 'ease-in-out',
+          intensity: 'subtle'
+        }
+      },
+      behavior: {
+        interactions: ['hover', 'focus', 'click'],
+        states: ['default', 'hover', 'active', 'disabled'],
+        events: ['onClick', 'onChange', 'onSubmit']
+      },
+      content: {
+        text: req.description,
+        icons: [],
+        data: {}
+      }
+    };
+  }
+
+  /**
+   * Calculate overall detection confidence
+   */
+  private calculateDetectionConfidence(
+    patterns: UIPattern[],
+    componentReqs: ComponentRequirement[]
+  ): number {
+    if (patterns.length === 0 && componentReqs.length === 0) {
+      return 0;
+    }
+    
+    const patternConfidence = patterns.length > 0 
+      ? patterns.reduce((sum, p) => sum + p.confidence, 0) / patterns.length 
+      : 0;
+    
+    const reqConfidence = componentReqs.length > 0 ? 80 : 0; // Base confidence for requirements
+    
+    return Math.round((patternConfidence + reqConfidence) / 2);
+  }
+
+  /**
+   * Generate reasoning for component detection
+   */
+  private generateDetectionReasoning(
+    patterns: UIPattern[],
+    componentReqs: ComponentRequirement[]
+  ): string[] {
+    const reasoning: string[] = [];
+    
+    if (patterns.length > 0) {
+      reasoning.push(`Detected ${patterns.length} UI pattern(s): ${patterns.map(p => p.type).join(', ')}`);
+    }
+    
+    if (componentReqs.length > 0) {
+      reasoning.push(`Identified ${componentReqs.length} component requirement(s): ${componentReqs.map(r => r.type).join(', ')}`);
+    }
+    
+    if (reasoning.length === 0) {
+      reasoning.push('Limited component requirements detected in blueprint');
+    }
+    
+    return reasoning;
+  }
+
+  /**
+   * Extract blueprint text for analysis
+   */
+  private extractBlueprintText(raw: any): string {
+    const textParts: string[] = [];
+    
+    if (raw.description) textParts.push(raw.description);
+    if (raw.projectContext?.description) textParts.push(raw.projectContext.description);
+    if (raw.requirements) textParts.push(JSON.stringify(raw.requirements));
+    if (raw.functionalRequirements) textParts.push(JSON.stringify(raw.functionalRequirements));
+    if (raw.technicalRequirements) textParts.push(JSON.stringify(raw.technicalRequirements));
+    if (raw.designRequirements) textParts.push(JSON.stringify(raw.designRequirements));
+    
+    return textParts.join(' ').toLowerCase();
+  }
+
+  /**
+   * Get template name by ID
+   */
+  private getTemplateName(templateId: string): string {
+    const templateNames: Record<string, string> = {
+      linear: 'Linear',
+      apple: 'Apple',
+      spotify: 'Spotify',
+      mailchimp: 'Mailchimp',
+      brutalist: 'Brutalist',
+      corporate: 'Corporate',
+      ecommerce: 'E-commerce',
+      startup: 'Startup',
+      editorial: 'Editorial',
+      gaming: 'Gaming',
+      minimal: 'Minimal',
+      creative: 'Creative',
+      bold: 'Bold',
+      elegant: 'Elegant'
+    };
+    
+    return templateNames[templateId] || templateId;
   }
 
   private extractName(raw: any): string {

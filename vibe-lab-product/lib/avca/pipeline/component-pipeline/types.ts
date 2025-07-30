@@ -37,6 +37,229 @@ export interface ComponentBlueprint {
     estimatedTime: number; // in minutes
     tags: string[];
   };
+  // NEW: Component detection and recommendation data
+  componentDetection?: ComponentDetectionData;
+}
+
+// NEW: Component detection and recommendation types
+export interface ComponentDetectionData {
+  detectedPatterns: UIPattern[];
+  componentRequirements: ComponentRequirement[];
+  templateRecommendations: TemplateRecommendation[];
+  confidence: number;
+  reasoning: string[];
+}
+
+export interface UIPattern {
+  type: 'dashboard' | 'ecommerce' | 'blog' | 'landing' | 'admin' | 'auth' | 'form' | 'gallery' | 'navigation' | 'sidebar' | 'modal' | 'table' | 'list' | 'card' | 'button' | 'input' | 'chart' | 'calendar' | 'chat' | 'profile';
+  confidence: number;
+  keywords: string[];
+  description: string;
+}
+
+export interface ComponentRequirement {
+  category: 'navigation' | 'content' | 'form' | 'display' | 'interaction' | 'layout' | 'feedback' | 'data';
+  type: string;
+  priority: Priority;
+  description: string;
+  constraints?: string[];
+  alternatives?: string[];
+}
+
+export interface TemplateRecommendation {
+  templateId: string;
+  name: string;
+  confidence: number;
+  reasoning: string[];
+  componentMatches: ComponentMatch[];
+}
+
+export interface ComponentMatch {
+  componentId: string;
+  name: string;
+  category: string;
+  confidence: number;
+  reasoning: string[];
+  customization?: ComponentCustomization;
+}
+
+export interface ComponentCustomization {
+  styling?: StyleCustomization;
+  behavior?: BehaviorCustomization;
+  content?: ContentCustomization;
+}
+
+export interface StyleCustomization {
+  colors?: ColorCustomization;
+  typography?: TypographyCustomization;
+  spacing?: SpacingCustomization;
+  animation?: AnimationCustomization;
+}
+
+export interface ColorCustomization {
+  primary?: string;
+  secondary?: string;
+  accent?: string;
+  background?: string;
+  text?: string;
+}
+
+export interface TypographyCustomization {
+  fontFamily?: string;
+  fontSize?: string;
+  fontWeight?: string;
+  lineHeight?: string;
+}
+
+export interface SpacingCustomization {
+  padding?: string;
+  margin?: string;
+  gap?: string;
+}
+
+export interface AnimationCustomization {
+  duration?: string;
+  easing?: string;
+  intensity?: 'subtle' | 'moderate' | 'energetic';
+}
+
+export interface BehaviorCustomization {
+  interactions?: string[];
+  states?: string[];
+  events?: string[];
+}
+
+export interface ContentCustomization {
+  text?: string;
+  images?: string[];
+  icons?: string[];
+  data?: any;
+}
+
+// Component metadata for the catalog system
+export interface ComponentMetadata {
+  id: string;
+  name: string;
+  category: ComponentCategory;
+  tags: string[];
+  description: string;
+  thumbnailUrl?: string;
+  dependencies: string[];
+  frameworkSupport: string[];
+  templateVariations: ComponentVariation[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ComponentVariation {
+  templateId: string;
+  templateName: string;
+  componentId: string;
+  variationId: string;
+  previewUrl?: string;
+  customizationOptions: CustomizationOption[];
+}
+
+export interface CustomizationOption {
+  type: 'color' | 'typography' | 'spacing' | 'animation' | 'behavior' | 'content';
+  name: string;
+  description: string;
+  defaultValue: any;
+  constraints?: any;
+}
+
+// Template system types
+export interface AdvancedThemeTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: 'business' | 'creative' | 'minimal' | 'bold' | 'elegant';
+  previewUrl?: string;
+  colorPalette: ColorPalette;
+  typography: TypographyConfig;
+  spacing: SpacingConfig;
+  animation: AnimationConfig;
+  components: ComponentConfig[];
+}
+
+export interface ColorPalette {
+  primary: string[];
+  secondary: string[];
+  accent: string[];
+  neutral: string[];
+  semantic: {
+    success: string;
+    warning: string;
+    error: string;
+    info: string;
+  };
+}
+
+export interface TypographyConfig {
+  fontFamily: {
+    primary: string;
+    secondary: string;
+    monospace: string;
+  };
+  fontSize: {
+    xs: string;
+    sm: string;
+    base: string;
+    lg: string;
+    xl: string;
+    '2xl': string;
+    '3xl': string;
+  };
+  fontWeight: {
+    light: number;
+    normal: number;
+    medium: number;
+    semibold: number;
+    bold: number;
+  };
+}
+
+export interface SpacingConfig {
+  scale: number[];
+  breakpoints: {
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+    '2xl': string;
+  };
+}
+
+export interface AnimationConfig {
+  duration: {
+    fast: string;
+    normal: string;
+    slow: string;
+  };
+  easing: {
+    ease: string;
+    linear: string;
+    easeIn: string;
+    easeOut: string;
+    easeInOut: string;
+  };
+  intensity: 'subtle' | 'moderate' | 'energetic';
+}
+
+export interface ComponentConfig {
+  componentId: string;
+  defaultStyling: any;
+  customizationOptions: CustomizationOption[];
+  constraints: ComponentConstraint[];
+}
+
+export interface ComponentConstraint {
+  type: 'size' | 'color' | 'typography' | 'spacing' | 'animation';
+  property: string;
+  allowedValues?: any[];
+  minValue?: number;
+  maxValue?: number;
+  required?: boolean;
 }
 
 export enum ComponentType {
