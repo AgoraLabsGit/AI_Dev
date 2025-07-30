@@ -397,11 +397,21 @@ export class BlueprintParser extends BaseService {
       dependencies.internal.length + 
       dependencies.external.length;
     
-    const score = reqCount + (depCount * 0.5);
+    // Check for complexity indicators in functional requirements
+    let complexityBonus = 0;
+    const complexKeywords = ['filter', 'sort', 'paginate', 'search', 'grid', 'multiple', 'complex'];
+    requirements.functional.forEach(req => {
+      const desc = req.description.toLowerCase();
+      if (complexKeywords.some(keyword => desc.includes(keyword))) {
+        complexityBonus += 1;
+      }
+    });
     
-    if (score < 5) return Complexity.SIMPLE;
-    if (score < 10) return Complexity.MODERATE;
-    if (score < 20) return Complexity.COMPLEX;
+    const score = reqCount + (depCount * 0.5) + complexityBonus;
+    
+    if (score < 3) return Complexity.SIMPLE;
+    if (score < 6) return Complexity.MODERATE;
+    if (score < 10) return Complexity.COMPLEX;
     return Complexity.VERY_COMPLEX;
   }
 

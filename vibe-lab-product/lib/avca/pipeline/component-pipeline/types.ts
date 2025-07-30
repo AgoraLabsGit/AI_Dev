@@ -251,11 +251,17 @@ export interface CodeExample {
 
 export interface QualityIssue {
   severity: 'error' | 'warning' | 'info';
-  type: 'lint' | 'type' | 'test' | 'performance' | 'security';
+  type: 'lint' | 'type' | 'test' | 'performance' | 'security' | 'react' | 'import' | 'style' | 'quality';
   message: string;
   file?: string;
   line?: number;
+  column?: number;
   suggestion?: string;
+  fix?: {
+    searchValue: string | RegExp;
+    replaceValue: string;
+  };
+  fixed?: boolean;
 }
 
 // Pipeline Configuration
@@ -278,5 +284,41 @@ export interface PipelineConfig {
     maxComplexity?: number;
     minCoverage?: number;
     allowedDependencies?: string[];
+  };
+}
+
+// Quality Assurance Types (Stage 4)
+export interface CodeOptimization {
+  type: 'import' | 'performance' | 'refactor' | 'bundle' | 'style';
+  description: string;
+  impact: 'major' | 'moderate' | 'minor';
+  file?: string;
+}
+
+export interface BestPractice {
+  category: 'react' | 'typescript' | 'testing' | 'performance' | 'accessibility' | 'security';
+  practice: string;
+  applied: boolean;
+  recommendation?: string;
+}
+
+export interface QualityReport {
+  lintingPassed: boolean;
+  typeCheckPassed: boolean;
+  testsPassed: boolean;
+  coverage?: number;
+  issues: QualityIssue[];
+  score?: number;
+  optimizations?: CodeOptimization[];
+  bestPractices?: BestPractice[];
+}
+
+export interface OptimizedComponent extends GeneratedComponent {
+  qualityReport: QualityReport;
+  improvements: {
+    optimizationsApplied: number;
+    issuesFixed: number;
+    codeReduced: number;
+    performanceGain: number;
   };
 }

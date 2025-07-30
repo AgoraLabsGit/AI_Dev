@@ -14,5 +14,8 @@ export * from './components/Input';
 export * from './components/Card';
 export * from './components/Badge';
 
+// Layout component exports
+export * from './components/layout';
+
 // Template exports
 export * from './templates';

@@ -8,6 +8,7 @@
 import { BlueprintParser } from '../lib/avca/pipeline/component-pipeline/blueprint-parser';
 import { ComponentPlanner } from '../lib/avca/pipeline/component-pipeline/component-planner';
 import { CodeGenerator } from '../lib/avca/pipeline/component-pipeline/code-generator';
+import { QualityAssurance } from '../lib/avca/pipeline/component-pipeline/quality-assurance';
 import { EventBus } from '../lib/avca/services/event-bus';
 
 async function runDemo() {
@@ -19,10 +20,12 @@ async function runDemo() {
   const parser = new BlueprintParser({ eventBus });
   const planner = new ComponentPlanner({ eventBus });
   const generator = new CodeGenerator({ eventBus });
+  const qa = new QualityAssurance({ eventBus });
 
   await parser.start();
   await planner.start();
   await generator.start();
+  await qa.start();
 
   // Example: Search Component with filtering
   const searchBlueprint = {
@@ -76,24 +79,35 @@ async function runDemo() {
   console.log('✅ Generated Code:');
   console.log(`- Files Created: ${generated.files.length}`);
   console.log(`- Total Lines: ${generated.files.reduce((sum, f) => sum + f.content.split('\n').length, 0)}`);
-  console.log(`- Quality Score: ${generated.qualityReport.issues.length === 0 ? 100 : 90}%`);
   console.log(`- Issues Found: ${generated.qualityReport.issues.length}`);
 
+  console.log('\n🎯 STAGE 4: Quality Assurance\n');
+  
+  const optimized = await qa.process(generated);
+  
+  console.log('✅ Optimized Code:');
+  console.log(`- Quality Score: ${optimized.qualityReport.score}%`);
+  console.log(`- Issues Fixed: ${optimized.improvements.issuesFixed}`);
+  console.log(`- Optimizations Applied: ${optimized.improvements.optimizationsApplied}`);
+  console.log(`- Performance Gain: +${optimized.improvements.performanceGain}%`);
+
   console.log('\n📁 Generated Files:');
-  for (const file of generated.files) {
+  for (const file of optimized.files.slice(0, 2)) {
     console.log(`\n--- ${file.path} (${file.content.split('\n').length} lines) ---`);
-    console.log(file.content.substring(0, 500) + (file.content.length > 500 ? '\n...' : ''));
+    console.log(file.content.substring(0, 400) + (file.content.length > 400 ? '\n...' : ''));
   }
 
   console.log('\n📚 Documentation:');
-  console.log(generated.documentation.readme.substring(0, 300) + '...');
+  console.log(optimized.documentation.readme.substring(0, 300) + '...');
 
-  console.log('\n🎯 Quality Report:');
-  for (const issue of generated.qualityReport.issues.slice(0, 5)) {
-    console.log(`- [${issue.severity}] ${issue.message}`);
-  }
+  console.log('\n🎯 Final Quality Report:');
+  console.log(`- Linting: ${optimized.qualityReport.lintingPassed ? '✅' : '❌'}`);
+  console.log(`- Type Checking: ${optimized.qualityReport.typeCheckPassed ? '✅' : '❌'}`);
+  console.log(`- Best Practices Applied: ${optimized.qualityReport.bestPractices?.filter(p => p.applied).length || 0}`);
+  console.log(`- Remaining Issues: ${optimized.qualityReport.issues.filter(i => !i.fixed).length}`);
 
   // Clean up
+  await qa.stop();
   await generator.stop();
   await planner.stop();
   await parser.stop();

@@ -35,7 +35,8 @@ import {
   Flame,
   Leaf,
   Star,
-  Cpu
+  Cpu,
+  Sliders
 } from 'lucide-react';
 import { themeTemplates, type ThemeTemplate } from '@/lib/design-system/templates';
 
@@ -84,6 +85,13 @@ export default function ProjectStyling({ params }: ProjectStylingProps) {
           </div>
           
           <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => window.location.href = `/project/${projectId}/design/styling/advanced`}
+              leftIcon={<Sliders className="w-4 h-4" />}
+            >
+              Advanced
+            </Button>
             <Button
               variant="secondary"
               onClick={toggleTheme}

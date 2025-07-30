@@ -371,3 +371,6 @@ export const themeTemplates: ThemeTemplate[] = [
     }
   }
 ];
+
+// Re-export advanced templates
+export * from './advanced-templates';
