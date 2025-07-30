@@ -18,7 +18,9 @@
     "test:microservices": "tsx scripts/test-microservices.ts",
     "test:rate-limit-retry": "tsx scripts/test-rate-limit-retry.ts",
     "test:cost-optimization": "tsx scripts/test-cost-optimization.ts",
-    "test:context-manager": "tsx scripts/test-context-manager.ts"
+    "test:context-manager": "tsx scripts/test-context-manager.ts",
+    "test:dias-events": "tsx scripts/test-dias-events.ts",
+    "test:integration": "tsx scripts/test-integration.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.57.0",
