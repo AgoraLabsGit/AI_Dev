@@ -6,6 +6,7 @@ import DualClaudeChat from './DualClaudeChat';
 import HorizontalNav from './HorizontalNav';
 import MainSidebar from './navigation/MainSidebar';
 import EnhancedHorizontalNav from './navigation/EnhancedHorizontalNav';
+import ResponsiveNavigation from './navigation/ResponsiveNavigation';
 import { 
   FolderOpen, 
   GitBranch, 
@@ -258,9 +259,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
     }
   };
 
+  // Determine if we're in project context
+  const isProjectContext = pathname.startsWith('/project/');
+  const projectIdMatch = pathname.match(/\/project\/([^\/]+)/);
+  const projectId = projectIdMatch ? projectIdMatch[1] : undefined;
+
   return (
     <>
       <CommandPalette />
+      <ResponsiveNavigation 
+        isProjectContext={isProjectContext}
+        projectId={projectId}
+      />
       <div className="flex h-screen bg-[#0D0D0D] text-white">
         {/* Column 1: Enhanced Main Navigation */}
         <MainSidebar 

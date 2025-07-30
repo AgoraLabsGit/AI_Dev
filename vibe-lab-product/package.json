@@ -25,7 +25,8 @@
     "test:load": "tsx scripts/test-load.ts",
     "test:benchmark": "tsx scripts/benchmark-performance.ts",
     "test:blueprint-parser": "tsx scripts/test-blueprint-parser.ts",
-    "test:all": "npm run test:microservices && npm run test:ai-client && npm run test:rate-limit-retry && npm run test:cost-optimization && npm run test:context-manager && npm run test:dias-events && npm run test:blueprint-parser",
+    "test:component-planner": "tsx scripts/test-component-planner.ts",
+    "test:all": "npm run test:microservices && npm run test:ai-client && npm run test:rate-limit-retry && npm run test:cost-optimization && npm run test:context-manager && npm run test:dias-events && npm run test:blueprint-parser && npm run test:component-planner",
     "test:watch": "tsx --watch scripts/test-*.ts",
     "test:ci": "npm run test:all -- --reporter json > test-results.json"
   },

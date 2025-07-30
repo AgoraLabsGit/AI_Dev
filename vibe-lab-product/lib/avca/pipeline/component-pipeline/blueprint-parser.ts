@@ -239,6 +239,16 @@ export class BlueprintParser extends BaseService {
           mandatory: true
         });
       }
+      
+      // Add performance requirements from technicalRequirements
+      if (tech.performance) {
+        reqs.push({
+          id: 'tech_performance',
+          category: 'PERFORMANCE',
+          specification: tech.performance,
+          mandatory: true
+        });
+      }
     }
 
     if (raw.performanceTargets) {
