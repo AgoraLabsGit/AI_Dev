@@ -107,7 +107,7 @@ interface SubNavigation {
   // Page-specific tabs
   home: ['Overview', 'Analytics', 'Team', 'Settings'],
   dashboard: ['Overview', 'DIAS Intelligence', 'Activity'],
-  design: ['Blueprints', 'Styling', 'Pages', 'Components'],
+  design: ['Import', 'Blueprints', 'Styling', 'Pages', 'Components'],
   build: ['Generate', 'Quality', 'Registry', 'Preview', 'Deploy']
 }
 ```
@@ -273,17 +273,21 @@ function ProjectDashboard() {
 - `OptimizationApprovalButton` - Approve/reject suggestions
 
 ### **Design Workspace** 🎨
-*Visual creation and planning workspace (AVCA Stages 1-4)*
+*Visual creation and planning workspace (AVCA Stages 1-4) with migration support*
 
 ```tsx
 function DesignWorkspace() {
   const { project } = useProject();
-  const { currentStage } = useAVCAPipeline();
+  const { currentStage, projectType } = useAVCAPipeline();
   
   return (
     <div className="design-workspace">
-      {/* Stage navigation */}
+      {/* Project type indicator */}
+      <ProjectTypeIndicator type={projectType} />
+      
+      {/* Stage navigation with migration context */}
       <DesignStageNav>
+        <StageTab stage="import" active={currentStage === 0} />
         <StageTab stage="blueprints" active={currentStage === 1} />
         <StageTab stage="styling" active={currentStage === 2} />
         <StageTab stage="pages" active={currentStage === 3} />
@@ -292,14 +296,18 @@ function DesignWorkspace() {
       
       {/* Main design canvas */}
       <DesignCanvas>
+        {currentStage === 0 && <ImportWorkspace />}
         {currentStage === 1 && <BlueprintEditor />}
         {currentStage === 2 && <StylingWorkspace />}
         {currentStage === 3 && <PageLayoutBuilder />}
         {currentStage === 4 && <ComponentSpecEditor />}
       </DesignCanvas>
       
-      {/* Pipeline status */}
+      {/* Pipeline status with migration tracking */}
       <PipelineStatusPanel />
+      
+      {/* Migration assistant */}
+      {projectType === 'migration' && <MigrationAssistant />}
     </div>
   );
 }
@@ -629,30 +637,30 @@ Project Page:
 ## Component Count Summary
 
 ### **By Category:**
-- **Passive Components**: 87 total
+- **Passive Components**: 93 total
   - Home: 15 components
   - Dashboard: 18 components  
-  - Design: 22 components
+  - Design: 28 components (enhanced with import/migration)
   - Build: 25 components
   - Chat: 12 components
   - Global: 15 components
 
-- **Active Components**: 93 total
+- **Active Components**: 99 total
   - Home: 12 components
   - Dashboard: 8 components
-  - Design: 21 components
+  - Design: 27 components (enhanced with import/migration)
   - Build: 24 components
   - Chat: 13 components
   - Global: 15 components
 
-### **Total UI Components: 180**
+### **Total UI Components: 192**
 
 ### **Navigation Components:**
 - Main Sidebar: 9 components (5 passive, 4 active)
 - Code Directory: 8 components (4 passive, 4 active)  
 - Sub-navigation: 6 components (3 passive, 3 active)
 
-### **Grand Total: 203 UI Components**
+### **Grand Total: 215 UI Components**
 
 ## Benefits of This Navigation System
 
@@ -691,19 +699,22 @@ Project Page:
 - Smart AI chat interface  
 - Basic DIAS intelligence
 
-### **Phase 3: Design Workspace (43 components)**
-- All 4 design stages
-- Visual design tools
+### **Phase 3: Design Workspace (55 components)**
+- Import/migration tools (Stage 0)
+- All 4 design stages with migration support
+- Website analysis and styling extraction
 - AVCA pipeline integration
+- GitHub repository integration
 
 ### **Phase 4: Build Workspace (49 components)**
 - All 5 build stages
 - Quality gates and testing
 - Deployment pipeline
 
-### **Phase 5: Advanced Features (46 components)**
+### **Phase 5: Advanced Features (58 components)**
 - Advanced analytics
 - Team collaboration
 - Enterprise features
+- Complete migration workflows
 
 This navigation system reduces complexity while maintaining all functionality, creates a clear user mental model, optimizes AI costs by 75%, includes innovative menu switching, and scales beautifully as you add features!

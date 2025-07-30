@@ -4,6 +4,8 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import CommandPalette from './CommandPalette';
 import DualClaudeChat from './DualClaudeChat';
 import HorizontalNav from './HorizontalNav';
+import MainSidebar from './navigation/MainSidebar';
+import EnhancedHorizontalNav from './navigation/EnhancedHorizontalNav';
 import { 
   FolderOpen, 
   GitBranch, 
@@ -260,120 +262,20 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <>
       <CommandPalette />
       <div className="flex h-screen bg-[#0D0D0D] text-white">
-        {/* Column 1: Resizable Main Navigation (Fixed) */}
-        <aside 
-          className={`relative flex-shrink-0 bg-[#161618] border-r border-[#2A2A2E] flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'w-12' : 'w-64'}`}
-          style={sidebarWidth ? { width: isSidebarCollapsed ? '48px' : `${sidebarWidth}px` } : {}}
-        >
-           {/* Collapse/Expand Button */}
-           <div className={`absolute top-2 z-10 ${isSidebarCollapsed ? 'left-1/2 -translate-x-1/2' : 'right-2'}`}>
-            <button 
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="p-1.5 rounded-md hover:bg-gray-700/50 text-gray-400 hover:text-white transition-colors"
-              title={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-            >
-              {isSidebarCollapsed ? <PanelRightClose className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
-            </button>
-          </div>
-
-          {!isSidebarCollapsed && (
-            <>
-              {/* Resizer Handle */}
-              <div 
-                className="w-1.5 cursor-col-resize absolute top-0 right-0 h-full bg-transparent hover:bg-blue-500/50 transition-colors duration-200"
-                onMouseDown={handleSidebarMouseDown}
-              />
-              
-              {/* Header */}
-              <div className="p-4 border-b border-[#2A2A2E] mt-10">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                    <span className="text-sm font-bold">VL</span>
-                  </div>
-                  <span className="font-semibold text-lg">Vibe Lab</span>
-                </div>
-                
-                {/* Project Selector */}
-                <div className="flex justify-between items-center mb-1">
-                  <div className="text-sm text-gray-400">Current Project</div>
-                  <a href="/projects" className="text-sm text-blue-400 hover:underline">All Projects</a>
-                </div>
-                <div className="flex items-center gap-2 p-2 rounded-md bg-[#1C1C1E] border border-[#2A2A2E] hover:border-[#404040] transition-colors cursor-pointer">
-                  <FolderOpen className="w-5 h-5 text-blue-400" />
-                  <span className="text-sm font-medium truncate">{selectedProject}</span>
-                </div>
-              </div>
-
-              {/* Navigation */}
-              <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-                {navConfig.map((group) => {
-                  const isActive = activeCategory === group.category;
-                  
-                  return (
-                    <div key={group.category}>
-                      <a
-                        href={group.href}
-                        className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-md hover:bg-[#1C1C1E] transition-colors group ${isActive ? 'bg-[#1C1C1E] text-white' : 'text-gray-400 hover:text-white'}`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <group.icon className={`w-5 h-5 ${isActive ? 'text-blue-400' : 'text-gray-500 group-hover:text-gray-300'}`} />
-                          <span className="font-medium">{group.category}</span>
-                        </div>
-                      </a>
-                    </div>
-                  );
-                })}
-              </nav>
-
-              {/* Agent Status Panel */}
-              <div className="p-4 border-t border-[#2A2A2E]">
-                <div className="text-xs text-gray-400 mb-3 font-medium">AI AGENTS</div>
-                <div className="space-y-3">
-                  {agentStatus.map((agent) => (
-                    <div key={agent.id} className="flex items-start gap-3">
-                      <div className={`flex items-center justify-center w-6 h-6 rounded-full ${getStatusColor(agent.status)}`}>
-                        {getStatusIcon(agent.status)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <Bot className="w-3 h-3 text-gray-400" />
-                          <span className="text-xs font-medium text-gray-200">{agent.name}</span>
-                        </div>
-                        <div className="text-xs text-gray-400 truncate mt-1">
-                          {agent.currentTask}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {agent.lastActivity}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* User Profile */}
-              <div className="p-4 border-t border-[#2A2A2E]">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">Developer</div>
-                    <div className="text-xs text-gray-400">Free Plan</div>
-                  </div>
-                  <Settings className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-                </div>
-              </div>
-            </>
-          )}
-        </aside>
+        {/* Column 1: Enhanced Main Navigation */}
+        <MainSidebar 
+          isCollapsed={isSidebarCollapsed}
+          onCollapse={setIsSidebarCollapsed}
+          width={sidebarWidth || undefined}
+          onWidthChange={setSidebarWidth}
+        />
 
         {/* Main Content and Chat Panel */}
         <div className="flex flex-1 overflow-hidden">
           {/* Column 2: Main Content */}
           <main className="flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto p-8">
-                <HorizontalNav activeGroup={activeGroup} />
+                <EnhancedHorizontalNav projectId="proj_001" />
                 {children}
             </div>
           </main>
