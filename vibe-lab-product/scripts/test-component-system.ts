@@ -17,6 +17,9 @@ async function testComponentSystem() {
   const componentCatalog = new ComponentCatalogService({ eventBus });
 
   try {
+    // Initialize the component catalog service
+    await componentCatalog.start();
+
     // Test 1: Blueprint parsing with component detection
     console.log('📋 Test 1: Blueprint parsing with component detection');
     

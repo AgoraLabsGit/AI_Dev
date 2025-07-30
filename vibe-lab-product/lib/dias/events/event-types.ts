@@ -55,15 +55,20 @@ export interface ComponentEvent extends DIASEvent {
 
 // Pipeline Events
 export enum PipelineEventType {
-  STARTED = 'pipeline.started',
-  STAGE_STARTED = 'pipeline.stage.started',
-  STAGE_COMPLETED = 'pipeline.stage.completed',
-  STAGE_FAILED = 'pipeline.stage.failed',
-  PAUSED = 'pipeline.paused',
-  RESUMED = 'pipeline.resumed',
-  COMPLETED = 'pipeline.completed',
-  FAILED = 'pipeline.failed',
-  CANCELLED = 'pipeline.cancelled'
+  STAGE_STARTED = 'STAGE_STARTED',
+  STAGE_COMPLETED = 'STAGE_COMPLETED',
+  STAGE_FAILED = 'STAGE_FAILED',
+  PIPELINE_STARTED = 'PIPELINE_STARTED',
+  PIPELINE_COMPLETED = 'PIPELINE_COMPLETED',
+  PIPELINE_FAILED = 'PIPELINE_FAILED',
+  // Component system events
+  COMPONENT_SEARCH = 'COMPONENT_SEARCH',
+  COMPONENT_SEARCH_COMPLETED = 'COMPONENT_SEARCH_COMPLETED',
+  COMPONENT_SEARCH_FAILED = 'COMPONENT_SEARCH_FAILED',
+  COMPONENT_RECOMMENDATION = 'COMPONENT_RECOMMENDATION',
+  COMPONENT_RECOMMENDATION_COMPLETED = 'COMPONENT_RECOMMENDATION_COMPLETED',
+  COMPONENT_RECOMMENDATION_FAILED = 'COMPONENT_RECOMMENDATION_FAILED',
+  COMPONENT_VIEWED = 'COMPONENT_VIEWED'
 }
 
 export interface PipelineEvent extends DIASEvent {

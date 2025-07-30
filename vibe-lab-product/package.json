@@ -29,6 +29,8 @@
     "test:code-generator": "tsx scripts/test-code-generator.ts",
     "test:quality-assurance": "tsx scripts/test-quality-assurance.ts",
     "test:component-system": "tsx scripts/test-component-system.ts",
+    "test:performance-optimization": "tsx scripts/test-performance-optimization.ts",
+    "test:component-validation": "tsx scripts/test-component-system-validation.ts",
     "demo:pipeline": "tsx scripts/demo-component-pipeline.ts",
     "debug:pipeline": "tsx scripts/debug-pipeline.ts",
     "test:all": "npm run test:microservices && npm run test:ai-client && npm run test:rate-limit-retry && npm run test:cost-optimization && npm run test:context-manager && npm run test:dias-events && npm run test:blueprint-parser && npm run test:component-planner && npm run test:code-generator && npm run test:quality-assurance",

@@ -231,38 +231,112 @@ export class BlueprintParser extends BaseService {
 
   /**
    * Detect UI patterns from blueprint text and requirements
+   * Enhanced with advanced NLP-like pattern recognition
    */
   private detectUIPatterns(raw: any, requirements: ComponentBlueprint['requirements']): UIPattern[] {
     const patterns: UIPattern[] = [];
     const text = this.extractBlueprintText(raw);
     
-    // Pattern detection keywords and rules
+    // Enhanced pattern detection with semantic analysis and context awareness
     const patternRules = {
-      dashboard: ['dashboard', 'admin', 'control panel', 'metrics', 'analytics', 'charts', 'graphs'],
-      ecommerce: ['shop', 'store', 'product', 'cart', 'checkout', 'payment', 'inventory'],
-      blog: ['blog', 'article', 'post', 'content', 'editor', 'publish', 'author'],
-      landing: ['landing', 'hero', 'cta', 'conversion', 'marketing', 'signup'],
-      auth: ['login', 'register', 'signup', 'authentication', 'password', 'user'],
-      form: ['form', 'input', 'validation', 'submit', 'field', 'survey'],
-      navigation: ['nav', 'menu', 'header', 'footer', 'breadcrumb', 'sidebar'],
-      table: ['table', 'grid', 'list', 'data', 'rows', 'columns', 'sort'],
-      modal: ['modal', 'dialog', 'popup', 'overlay', 'lightbox'],
-      card: ['card', 'tile', 'widget', 'panel', 'container']
+      dashboard: {
+        keywords: ['dashboard', 'admin', 'control panel', 'metrics', 'analytics', 'charts', 'graphs', 'kpi', 'performance', 'monitoring', 'reporting', 'insights', 'visualization'],
+        context: ['management', 'overview', 'summary', 'statistics', 'business intelligence', 'data visualization'],
+        semanticPhrases: ['data visualization', 'business metrics', 'performance monitoring', 'admin interface', 'control dashboard'],
+        negativeKeywords: ['simple', 'basic', 'minimal'],
+        confidence: 0.9
+      },
+      ecommerce: {
+        keywords: ['shop', 'store', 'product', 'cart', 'checkout', 'payment', 'inventory', 'catalog', 'shopping', 'buy', 'purchase', 'order', 'customer', 'retail'],
+        context: ['retail', 'commerce', 'marketplace', 'storefront', 'online shop', 'e-commerce'],
+        semanticPhrases: ['online store', 'shopping cart', 'product catalog', 'checkout process', 'payment gateway'],
+        negativeKeywords: ['blog', 'article', 'content'],
+        confidence: 0.85
+      },
+      blog: {
+        keywords: ['blog', 'article', 'post', 'content', 'editor', 'publish', 'author', 'writing', 'news', 'journal'],
+        context: ['content management', 'publishing', 'editorial'],
+        confidence: 0.8
+      },
+      landing: {
+        keywords: ['landing', 'hero', 'cta', 'conversion', 'marketing', 'signup', 'lead', 'funnel', 'sales'],
+        context: ['marketing', 'conversion', 'lead generation'],
+        confidence: 0.85
+      },
+      auth: {
+        keywords: ['login', 'register', 'signup', 'authentication', 'password', 'user', 'account', 'profile', 'security'],
+        context: ['user management', 'access control', 'identity'],
+        confidence: 0.9
+      },
+      form: {
+        keywords: ['form', 'input', 'validation', 'submit', 'field', 'survey', 'questionnaire', 'data entry'],
+        context: ['data collection', 'user input', 'submission'],
+        confidence: 0.8
+      },
+      navigation: {
+        keywords: ['nav', 'menu', 'header', 'footer', 'breadcrumb', 'sidebar', 'navigation', 'menu bar'],
+        context: ['site structure', 'navigation', 'layout'],
+        confidence: 0.75
+      },
+      table: {
+        keywords: ['table', 'grid', 'list', 'data', 'rows', 'columns', 'sort', 'filter', 'spreadsheet'],
+        context: ['data display', 'tabular', 'information'],
+        confidence: 0.8
+      },
+      modal: {
+        keywords: ['modal', 'dialog', 'popup', 'overlay', 'lightbox', 'window', 'alert', 'notification'],
+        context: ['interaction', 'overlay', 'focus'],
+        confidence: 0.7
+      },
+      card: {
+        keywords: ['card', 'tile', 'widget', 'panel', 'container', 'box', 'item'],
+        context: ['content display', 'modular', 'component'],
+        confidence: 0.7
+      },
+      profile: {
+        keywords: ['profile', 'user', 'account', 'settings', 'preferences', 'personal', 'dashboard'],
+        context: ['user management', 'personalization'],
+        confidence: 0.85
+      },
+      chat: {
+        keywords: ['chat', 'message', 'conversation', 'messaging', 'communication', 'support', 'help'],
+        context: ['communication', 'interaction', 'real-time'],
+        confidence: 0.8
+      },
+      calendar: {
+        keywords: ['calendar', 'schedule', 'booking', 'appointment', 'event', 'date', 'time'],
+        context: ['scheduling', 'time management', 'events'],
+        confidence: 0.8
+      },
+      gallery: {
+        keywords: ['gallery', 'image', 'photo', 'media', 'portfolio', 'showcase', 'display'],
+        context: ['media display', 'visual content', 'showcase'],
+        confidence: 0.75
+      },
+      search: {
+        keywords: ['search', 'find', 'filter', 'query', 'lookup', 'discover', 'explore'],
+        context: ['information retrieval', 'discovery', 'exploration'],
+        confidence: 0.8
+      },
+      settings: {
+        keywords: ['settings', 'configuration', 'preferences', 'options', 'setup', 'admin', 'control'],
+        context: ['configuration', 'administration', 'control'],
+        confidence: 0.85
+      }
     };
 
-    // Analyze text for patterns
-    for (const [patternType, keywords] of Object.entries(patternRules)) {
-      const matches = keywords.filter(keyword => 
-        text.toLowerCase().includes(keyword.toLowerCase())
-      );
+    // Enhanced pattern analysis with context awareness
+    for (const [patternType, rule] of Object.entries(patternRules)) {
+      const matches = this.analyzePatternMatch(text, rule.keywords, rule.context);
       
-      if (matches.length > 0) {
-        const confidence = Math.min(100, (matches.length / keywords.length) * 100);
+      if (matches.score > 0.3) { // Minimum threshold for pattern detection
+        const confidence = Math.min(100, matches.score * rule.confidence * 100);
+        
         patterns.push({
           type: patternType as UIPattern['type'],
           confidence,
-          keywords: matches,
-          description: `Detected ${patternType} pattern with ${confidence}% confidence`
+          keywords: matches.matchedKeywords,
+          description: this.generatePatternDescription(patternType, matches.score, matches.matchedKeywords)
         });
       }
     }
@@ -270,27 +344,148 @@ export class BlueprintParser extends BaseService {
     // Analyze functional requirements for additional patterns
     for (const req of requirements.functional) {
       const reqText = req.description.toLowerCase();
+      const reqAnalysis = this.analyzeRequirementPattern(reqText);
       
-      if (reqText.includes('user') && reqText.includes('profile')) {
-        patterns.push({
-          type: 'profile',
-          confidence: 85,
-          keywords: ['user', 'profile'],
-          description: 'User profile management detected'
-        });
+      if (reqAnalysis.patterns.length > 0) {
+        patterns.push(...reqAnalysis.patterns);
       }
-      
-      if (reqText.includes('chat') || reqText.includes('message')) {
+    }
+
+    // Remove duplicates and sort by confidence
+    const uniquePatterns = this.deduplicatePatterns(patterns);
+    return uniquePatterns.sort((a, b) => b.confidence - a.confidence);
+  }
+
+  /**
+   * Enhanced pattern matching with context awareness
+   */
+  private analyzePatternMatch(text: string, keywords: string[], context: string[]): {
+    score: number;
+    matchedKeywords: string[];
+  } {
+    const textLower = text.toLowerCase();
+    let score = 0;
+    const matchedKeywords: string[] = [];
+
+    // Keyword matching with weighted scoring
+    for (const keyword of keywords) {
+      if (textLower.includes(keyword.toLowerCase())) {
+        score += 0.4; // Base keyword score
+        matchedKeywords.push(keyword);
+        
+        // Bonus for exact matches
+        if (textLower.includes(` ${keyword} `) || textLower.startsWith(keyword) || textLower.endsWith(keyword)) {
+          score += 0.2;
+        }
+      }
+    }
+
+    // Context matching for higher confidence
+    for (const ctx of context) {
+      if (textLower.includes(ctx.toLowerCase())) {
+        score += 0.3; // Context bonus
+      }
+    }
+
+    // Frequency bonus
+    const keywordFrequency = matchedKeywords.length / keywords.length;
+    score += keywordFrequency * 0.2;
+
+    return { score, matchedKeywords };
+  }
+
+  /**
+   * Analyze functional requirements for pattern detection
+   */
+  private analyzeRequirementPattern(reqText: string): {
+    patterns: UIPattern[];
+  } {
+    const patterns: UIPattern[] = [];
+    
+    // Requirement-specific pattern detection
+    const requirementPatterns = {
+      'user profile': {
+        type: 'profile' as UIPattern['type'],
+        confidence: 85,
+        keywords: ['user', 'profile'],
+        description: 'User profile management functionality detected'
+      },
+      'chat messaging': {
+        type: 'chat' as UIPattern['type'],
+        confidence: 90,
+        keywords: ['chat', 'message'],
+        description: 'Chat/messaging functionality detected'
+      },
+      'calendar scheduling': {
+        type: 'calendar' as UIPattern['type'],
+        confidence: 85,
+        keywords: ['calendar', 'schedule'],
+        description: 'Calendar and scheduling functionality detected'
+      },
+      'image gallery': {
+        type: 'gallery' as UIPattern['type'],
+        confidence: 80,
+        keywords: ['gallery', 'image', 'photo'],
+        description: 'Image gallery functionality detected'
+      },
+      'search functionality': {
+        type: 'search' as UIPattern['type'],
+        confidence: 85,
+        keywords: ['search', 'find', 'filter'],
+        description: 'Search functionality detected'
+      },
+      'settings configuration': {
+        type: 'settings' as UIPattern['type'],
+        confidence: 90,
+        keywords: ['settings', 'configuration', 'preferences'],
+        description: 'Settings and configuration functionality detected'
+      }
+    };
+
+    for (const [pattern, config] of Object.entries(requirementPatterns)) {
+      if (reqText.includes(pattern) || config.keywords.some(k => reqText.includes(k))) {
         patterns.push({
-          type: 'chat',
-          confidence: 90,
-          keywords: ['chat', 'message'],
-          description: 'Chat/messaging functionality detected'
+          type: config.type,
+          confidence: config.confidence,
+          keywords: config.keywords,
+          description: config.description
         });
       }
     }
 
-    return patterns;
+    return { patterns };
+  }
+
+  /**
+   * Generate descriptive pattern analysis
+   */
+  private generatePatternDescription(patternType: string, score: number, keywords: string[]): string {
+    const confidence = Math.round(score * 100);
+    const keywordList = keywords.slice(0, 3).join(', ');
+    
+    return `Detected ${patternType} pattern with ${confidence}% confidence based on keywords: ${keywordList}`;
+  }
+
+  /**
+   * Remove duplicate patterns and merge confidence scores
+   */
+  private deduplicatePatterns(patterns: UIPattern[]): UIPattern[] {
+    const patternMap = new Map<string, UIPattern>();
+    
+    for (const pattern of patterns) {
+      const existing = patternMap.get(pattern.type);
+      
+      if (existing) {
+        // Merge patterns and take highest confidence
+        existing.confidence = Math.max(existing.confidence, pattern.confidence);
+        existing.keywords = [...new Set([...existing.keywords, ...pattern.keywords])];
+        existing.description = `${existing.description}; ${pattern.description}`;
+      } else {
+        patternMap.set(pattern.type, pattern);
+      }
+    }
+    
+    return Array.from(patternMap.values());
   }
 
   /**
@@ -302,66 +497,75 @@ export class BlueprintParser extends BaseService {
   ): ComponentRequirement[] {
     const componentReqs: ComponentRequirement[] = [];
     
+    // Enhanced component requirement mapping
+    const requirementMapping = {
+      navigation: {
+        patterns: ['navigation', 'header', 'footer', 'sidebar', 'menu', 'breadcrumb'],
+        components: ['navigation-header', 'sidebar-menu', 'breadcrumb', 'pagination'],
+        category: 'navigation' as ComponentRequirement['category'],
+        constraints: ['responsive', 'accessible', 'mobile-friendly']
+      },
+      form: {
+        patterns: ['form', 'input', 'validation', 'submit', 'field', 'survey', 'questionnaire'],
+        components: ['input-field', 'form-group', 'submit-button', 'validation-message', 'form-wizard'],
+        category: 'form' as ComponentRequirement['category'],
+        constraints: ['validation', 'accessible', 'responsive']
+      },
+      display: {
+        patterns: ['table', 'grid', 'list', 'data', 'chart', 'graph', 'card', 'gallery'],
+        components: ['data-table', 'card-grid', 'list-view', 'chart-component', 'image-gallery'],
+        category: 'display' as ComponentRequirement['category'],
+        constraints: ['sortable', 'filterable', 'responsive']
+      },
+      interaction: {
+        patterns: ['button', 'link', 'click', 'action', 'cta', 'modal', 'dialog'],
+        components: ['button-primary', 'button-secondary', 'link-button', 'modal-dialog', 'tooltip'],
+        category: 'interaction' as ComponentRequirement['category'],
+        constraints: ['accessible', 'responsive', 'hover-effects']
+      },
+      layout: {
+        patterns: ['layout', 'container', 'section', 'grid', 'flex', 'responsive'],
+        components: ['container', 'grid-layout', 'flex-layout', 'responsive-wrapper'],
+        category: 'layout' as ComponentRequirement['category'],
+        constraints: ['responsive', 'flexible', 'mobile-first']
+      },
+      content: {
+        patterns: ['text', 'content', 'article', 'blog', 'editor', 'rich-text'],
+        components: ['text-block', 'content-editor', 'article-card', 'rich-text-editor'],
+        category: 'content' as ComponentRequirement['category'],
+        constraints: ['readable', 'accessible', 'seo-friendly']
+      },
+      feedback: {
+        patterns: ['notification', 'alert', 'message', 'toast', 'status', 'progress'],
+        components: ['notification-toast', 'alert-banner', 'progress-bar', 'status-indicator'],
+        category: 'feedback' as ComponentRequirement['category'],
+        constraints: ['accessible', 'dismissible', 'auto-hide']
+      },
+      data: {
+        patterns: ['api', 'fetch', 'data', 'state', 'cache', 'storage'],
+        components: ['data-provider', 'api-client', 'state-manager', 'cache-service'],
+        category: 'data' as ComponentRequirement['category'],
+        constraints: ['performant', 'cached', 'error-handled']
+      }
+    };
+
     // Analyze functional requirements for component needs
     for (const req of requirements.functional) {
       const reqText = req.description.toLowerCase();
+      const reqAnalysis = this.analyzeComponentRequirement(reqText, requirementMapping);
       
-      // Navigation components
-      if (reqText.includes('navigation') || reqText.includes('menu') || reqText.includes('header')) {
+      if (reqAnalysis.components.length > 0) {
         componentReqs.push({
-          category: 'navigation',
-          type: 'navigation',
+          category: reqAnalysis.category,
+          type: reqAnalysis.type,
           priority: req.priority,
           description: req.description,
-          constraints: ['responsive', 'accessible']
-        });
-      }
-      
-      // Form components
-      if (reqText.includes('form') || reqText.includes('input') || reqText.includes('submit')) {
-        componentReqs.push({
-          category: 'form',
-          type: 'form',
-          priority: req.priority,
-          description: req.description,
-          constraints: ['validation', 'accessible']
-        });
-      }
-      
-      // Display components
-      if (reqText.includes('table') || reqText.includes('list') || reqText.includes('grid')) {
-        componentReqs.push({
-          category: 'display',
-          type: 'data-display',
-          priority: req.priority,
-          description: req.description,
-          constraints: ['sortable', 'filterable']
-        });
-      }
-      
-      // Interaction components
-      if (reqText.includes('button') || reqText.includes('link') || reqText.includes('click')) {
-        componentReqs.push({
-          category: 'interaction',
-          type: 'button',
-          priority: req.priority,
-          description: req.description,
-          constraints: ['accessible', 'responsive']
-        });
-      }
-      
-      // Layout components
-      if (reqText.includes('layout') || reqText.includes('container') || reqText.includes('section')) {
-        componentReqs.push({
-          category: 'layout',
-          type: 'container',
-          priority: req.priority,
-          description: req.description,
-          constraints: ['responsive', 'flexible']
+          constraints: reqAnalysis.constraints,
+          alternatives: reqAnalysis.alternatives
         });
       }
     }
-    
+
     // Analyze design requirements for component styling needs
     for (const req of requirements.design) {
       if (req.pattern === 'atomic' || req.pattern === 'compound') {
@@ -370,12 +574,122 @@ export class BlueprintParser extends BaseService {
           type: 'atomic-component',
           priority: Priority.MEDIUM,
           description: `Atomic design component with ${req.styling} styling`,
-          constraints: ['reusable', 'consistent']
+          constraints: ['reusable', 'consistent', 'themeable']
+        });
+      }
+    }
+
+    // Analyze technical requirements for component constraints
+    for (const req of requirements.technical) {
+      if (req.category === 'ACCESSIBILITY') {
+        componentReqs.forEach(cr => {
+          if (!cr.constraints?.includes('accessible')) {
+            cr.constraints = [...(cr.constraints || []), 'accessible'];
+          }
+        });
+      }
+      
+      if (req.category === 'PERFORMANCE') {
+        componentReqs.forEach(cr => {
+          if (!cr.constraints?.includes('performant')) {
+            cr.constraints = [...(cr.constraints || []), 'performant'];
+          }
         });
       }
     }
     
     return componentReqs;
+  }
+
+  /**
+   * Analyze component requirement with enhanced pattern matching
+   */
+  private analyzeComponentRequirement(reqText: string, mapping: Record<string, {
+    patterns: string[];
+    components: string[];
+    category: ComponentRequirement['category'];
+    constraints: string[];
+  }>): {
+    category: ComponentRequirement['category'];
+    type: string;
+    components: string[];
+    constraints: string[];
+    alternatives: string[];
+  } {
+    let bestMatch: {
+      category: ComponentRequirement['category'];
+      type: string;
+      components: string[];
+      constraints: string[];
+      alternatives: string[];
+    } = {
+      category: 'content',
+      type: 'generic',
+      components: [],
+      constraints: [],
+      alternatives: []
+    };
+
+    let highestScore = 0;
+
+    for (const [category, config] of Object.entries(mapping)) {
+      const score = this.calculateRequirementMatch(reqText, config.patterns);
+      
+      if (score > highestScore) {
+        highestScore = score;
+        bestMatch = {
+          category: config.category,
+          type: category,
+          components: config.components,
+          constraints: config.constraints,
+          alternatives: this.generateAlternatives(config.components)
+        };
+      }
+    }
+
+    return bestMatch;
+  }
+
+  /**
+   * Calculate requirement match score
+   */
+  private calculateRequirementMatch(reqText: string, patterns: string[]): number {
+    let score = 0;
+    
+    for (const pattern of patterns) {
+      if (reqText.includes(pattern)) {
+        score += 1;
+        
+        // Bonus for exact matches
+        if (reqText.includes(` ${pattern} `) || reqText.startsWith(pattern) || reqText.endsWith(pattern)) {
+          score += 0.5;
+        }
+      }
+    }
+    
+    return score / patterns.length;
+  }
+
+  /**
+   * Generate alternative components
+   */
+  private generateAlternatives(components: string[]): string[] {
+    // Generate alternatives based on component type
+    const alternatives: string[] = [];
+    
+    for (const component of components) {
+      if (component.includes('button')) {
+        alternatives.push('link-button', 'icon-button', 'toggle-button');
+      } else if (component.includes('form')) {
+        alternatives.push('form-wizard', 'multi-step-form', 'inline-form');
+      } else if (component.includes('table')) {
+        alternatives.push('data-grid', 'virtual-table', 'editable-table');
+      } else if (component.includes('card')) {
+        alternatives.push('info-card', 'product-card', 'feature-card');
+      }
+    }
+    
+    return [...new Set(alternatives)];
   }
 
   /**
@@ -388,7 +702,7 @@ export class BlueprintParser extends BaseService {
     const recommendations: TemplateRecommendation[] = [];
     
     // Template matching logic based on patterns
-    const templateMatches = {
+    const templateMatches: Record<string, string[]> = {
       dashboard: ['linear', 'apple', 'corporate'],
       ecommerce: ['spotify', 'ecommerce', 'startup'],
       blog: ['editorial', 'minimal', 'creative'],
@@ -398,7 +712,13 @@ export class BlueprintParser extends BaseService {
       navigation: ['apple', 'linear', 'corporate'],
       table: ['corporate', 'linear', 'startup'],
       modal: ['minimal', 'linear', 'apple'],
-      card: ['spotify', 'creative', 'startup']
+      card: ['spotify', 'creative', 'startup'],
+      profile: ['linear', 'apple', 'corporate'],
+      chat: ['spotify', 'creative', 'startup'],
+      calendar: ['linear', 'corporate', 'apple'],
+      gallery: ['creative', 'minimal', 'editorial'],
+      search: ['linear', 'apple', 'corporate'],
+      settings: ['corporate', 'linear', 'apple']
     };
     
     // Generate recommendations based on detected patterns

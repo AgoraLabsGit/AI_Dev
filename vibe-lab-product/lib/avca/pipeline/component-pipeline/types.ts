@@ -51,10 +51,11 @@ export interface ComponentDetectionData {
 }
 
 export interface UIPattern {
-  type: 'dashboard' | 'ecommerce' | 'blog' | 'landing' | 'admin' | 'auth' | 'form' | 'gallery' | 'navigation' | 'sidebar' | 'modal' | 'table' | 'list' | 'card' | 'button' | 'input' | 'chart' | 'calendar' | 'chat' | 'profile';
+  type: 'dashboard' | 'ecommerce' | 'blog' | 'landing' | 'admin' | 'auth' | 'form' | 'gallery' | 'navigation' | 'sidebar' | 'modal' | 'table' | 'list' | 'card' | 'button' | 'input' | 'chart' | 'calendar' | 'chat' | 'profile' | 'search' | 'settings';
   confidence: number;
   keywords: string[];
   description: string;
+  context?: string; // Optional context for enhanced pattern matching
 }
 
 export interface ComponentRequirement {
