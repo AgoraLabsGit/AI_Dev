@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -13,13 +13,20 @@
     "fix:design-system": "npm run check:design-system && echo '📚 See Design-System-Learning-Log.md for manual fixes'",
     "hooks:install": "git config core.hooksPath .githooks && echo '✅ Git hooks installed'",
     "hooks:test": ".githooks/pre-commit",
-    "capture:learning": "node scripts/capture-learning.js"
+    "capture:learning": "node scripts/capture-learning.js",
+    "test:ai-client": "tsx scripts/test-ai-client.ts",
+    "test:microservices": "tsx scripts/test-microservices.ts",
+    "test:rate-limit-retry": "tsx scripts/test-rate-limit-retry.ts",
+    "test:cost-optimization": "tsx scripts/test-cost-optimization.ts",
+    "test:context-manager": "tsx scripts/test-context-manager.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.57.0",
+    "@dqbd/tiktoken": "^1.0.21",
     "@prisma/client": "^6.12.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.1",
     "lucide-react": "^0.526.0",
     "next": "15.4.4",
     "next-auth": "^4.24.11",
@@ -39,6 +46,7 @@
     "eslint-config-next": "15.4.4",
     "prisma": "^6.12.0",
     "tailwindcss": "^4",
+    "tsx": "^4.20.3",
     "tw-animate-css": "^1.3.6",
     "typescript": "^5"
   }
