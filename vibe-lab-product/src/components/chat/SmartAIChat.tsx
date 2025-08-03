@@ -65,7 +65,7 @@ interface SmartAIChatProps {
 }
 
 export default function SmartAIChat({ isCollapsed, onToggleCollapse, width }: SmartAIChatProps) {
-  const [messages, setMessages] = useState<Message[]>(mockChatMessages);
+  const [messages, setMessages] = useState<Message[]>(mockChatMessages as Message[]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [activeAgent, setActiveAgent] = useState<'developer' | 'auditor'>('developer');

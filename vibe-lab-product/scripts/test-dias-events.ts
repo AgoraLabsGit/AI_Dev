@@ -102,7 +102,7 @@ async function testDIASEvents() {
     
     // Start pipeline
     await dias.emitPipelineEvent(
-      PipelineEventType.STARTED,
+      PipelineEventType.PIPELINE_STARTED,
       'test-project-001',
       {
         pipelineId,

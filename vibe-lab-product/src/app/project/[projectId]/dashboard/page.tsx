@@ -11,9 +11,9 @@ import {
 } from 'lucide-react';
 
 interface ProjectDashboardProps {
-  params: {
+  params: Promise<{
     projectId: string;
-  };
+  }>;
 }
 
 // Mock project data - will be fetched from API
@@ -37,8 +37,8 @@ const mockProjectData = {
   ]
 };
 
-export default function ProjectDashboard({ params }: ProjectDashboardProps) {
-  const { projectId } = params;
+export default async function ProjectDashboard({ params }: ProjectDashboardProps) {
+  const { projectId } = await params;
 
   return (
     <div className="space-y-6">

@@ -14,9 +14,9 @@ import {
 } from 'lucide-react';
 
 interface ProjectBuildProps {
-  params: {
+  params: Promise<{
     projectId: string;
-  };
+  }>;
 }
 
 // Mock AVCA Stages 5-8 data
@@ -71,8 +71,8 @@ const mockBuildMetrics = {
   bundleSize: '234 KB'
 };
 
-export default function ProjectBuild({ params }: ProjectBuildProps) {
-  const { projectId } = params;
+export default async function ProjectBuild({ params }: ProjectBuildProps) {
+  const { projectId } = await params;
 
   const getStatusIcon = (status: string) => {
     switch (status) {

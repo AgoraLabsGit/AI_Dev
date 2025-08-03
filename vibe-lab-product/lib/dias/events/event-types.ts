@@ -11,7 +11,9 @@ export enum EventCategory {
   QUALITY = 'quality',
   USER = 'user',
   SYSTEM = 'system',
-  INTEGRATION = 'integration'
+  INTEGRATION = 'integration',
+  ANALYSIS = 'analysis',
+  MIGRATION = 'migration'
 }
 
 // Base Event Interface
@@ -233,8 +235,6 @@ export class EventFactory {
   static createEvent<T extends DIASEvent>(
     category: EventCategory,
     type: string,
-    source: string,
-    projectId: string,
     data: any,
     metadata?: Record<string, any>
   ): T {
@@ -243,8 +243,8 @@ export class EventFactory {
       category,
       type,
       timestamp: new Date(),
-      source,
-      projectId,
+      source: 'onboarding-system',
+      projectId: metadata?.projectId || 'unknown',
       data,
       metadata
     } as T;

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Circular background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563EB;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E5E7EB;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#bgGradient)" stroke="none"/>
+  
+  <!-- Vibe Lab text -->
+  <text x="100" y="85" font-family="Arial, sans-serif" font-size="24" font-weight="bold" 
+        text-anchor="middle" fill="url(#textGradient)">VIBE</text>
+  <text x="100" y="115" font-family="Arial, sans-serif" font-size="24" font-weight="bold" 
+        text-anchor="middle" fill="url(#textGradient)">LAB</text>
+  
+  <!-- Science flask icon -->
+  <g transform="translate(100, 130)">
+    <path d="M-8,-5 L-8,-15 L-4,-15 L-4,-20 L4,-20 L4,-15 L8,-15 L8,-5 L12,10 L-12,10 Z" 
+          fill="rgba(255,255,255,0.8)" stroke="rgba(255,255,255,0.9)" stroke-width="1"/>
+    <circle cx="0" cy="0" r="2" fill="rgba(255,255,255,0.9)"/>
+    <circle cx="-4" cy="-8" r="1" fill="rgba(255,255,255,0.7)"/>
+    <circle cx="3" cy="-6" r="1" fill="rgba(255,255,255,0.7)"/>
+  </g>
+</svg>

@@ -1,210 +1,136 @@
 /**
- * Font Loading Utility
- * Dynamically loads Google Fonts and provides font availability checking
+ * Font Loader Utility
+ * Handles dynamic font loading for templates
  */
 
-interface FontConfig {
-  family: string;
-  weights: number[];
-  fallback: string;
+interface FontLoaderOptions {
+  display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional';
+  preload?: boolean;
 }
 
 class FontLoader {
   private loadedFonts = new Set<string>();
-  private loadingPromises = new Map<string, Promise<void>>();
 
   /**
-   * Load a Google Font dynamically
+   * Load a Google Font with specified weights
    */
-  async loadGoogleFont(family: string, weights: number[] = [400]): Promise<void> {
-    const fontKey = `${family}-${weights.join(',')}`;
+  async loadGoogleFont(
+    family: string,
+    weights: number[] = [400, 500, 600, 700],
+    options: FontLoaderOptions = {}
+  ): Promise<void> {
+    const { display = 'swap', preload = true } = options;
     
+    // Skip if already loaded
+    const fontKey = `${family}-${weights.join(',')}`;
     if (this.loadedFonts.has(fontKey)) {
       return;
     }
 
-    if (this.loadingPromises.has(fontKey)) {
-      return this.loadingPromises.get(fontKey);
-    }
-
-    const loadPromise = this.loadFontFromGoogle(family, weights);
-    this.loadingPromises.set(fontKey, loadPromise);
-    
     try {
-      await loadPromise;
-      this.loadedFonts.add(fontKey);
-    } catch (error) {
-      console.warn(`Failed to load font ${family}:`, error);
-      this.loadingPromises.delete(fontKey);
-    }
-  }
+      // Construct Google Fonts URL
+      const familyParam = family.replace(/\s+/g, '+');
+      const weightsParam = weights.join(';');
+      const url = `https://fonts.googleapis.com/css2?family=${familyParam}:wght@${weightsParam}&display=${display}`;
 
-  private async loadFontFromGoogle(family: string, weights: number[]): Promise<void> {
-    return new Promise((resolve, reject) => {
-      // Create Google Fonts URL
-      const weightsStr = weights.join(',');
-      const fontUrl = `https://fonts.googleapis.com/css2?family=${family.replace(/\s/g, '+')}:wght@${weightsStr}&display=swap`;
-      
-      // Check if already loaded
-      const existingLink = document.querySelector(`link[href*="${family}"]`);
-      if (existingLink) {
-        resolve();
-        return;
+      if (preload) {
+        // Add preload link
+        const preloadLink = document.createElement('link');
+        preloadLink.rel = 'preload';
+        preloadLink.as = 'style';
+        preloadLink.href = url;
+        document.head.appendChild(preloadLink);
       }
 
-      // Create link element
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = fontUrl;
-      
-      link.onload = () => {
-        // Wait for font to be ready
-        if ('fonts' in document) {
-          Promise.all(
-            weights.map(weight => 
-              (document as any).fonts.load(`${weight} 16px "${family}"`)
-            )
-          ).then(() => resolve()).catch(reject);
-        } else {
-          // Fallback for browsers without Font Loading API
-          setTimeout(resolve, 100);
-        }
-      };
-      
-      link.onerror = () => reject(new Error(`Failed to load font: ${family}`));
-      
-      document.head.appendChild(link);
-    });
+      // Add stylesheet link
+      const styleLink = document.createElement('link');
+      styleLink.rel = 'stylesheet';
+      styleLink.href = url;
+      document.head.appendChild(styleLink);
+
+      // Wait for font to load
+      await document.fonts.ready;
+
+      // Mark as loaded
+      this.loadedFonts.add(fontKey);
+
+      // Update Tailwind config if needed
+      this.updateTailwindConfig(family);
+
+    } catch (error) {
+      console.warn(`Failed to load font family "${family}":`, error);
+    }
   }
 
   /**
-   * Check if a font is available in the system
+   * Load a local font file
    */
-  isFontAvailable(fontFamily: string): boolean {
-    if (this.loadedFonts.has(fontFamily)) return true;
-    
-    // Use canvas-based detection
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    if (!context) return false;
+  async loadLocalFont(
+    family: string,
+    sources: { url: string; format: string }[],
+    options: FontLoaderOptions = {}
+  ): Promise<void> {
+    const { display = 'swap' } = options;
 
-    const testString = 'mmmmmmmmmmlli';
-    const testSize = '72px';
-    const baselineFont = 'monospace';
+    // Skip if already loaded
+    const fontKey = `${family}-local`;
+    if (this.loadedFonts.has(fontKey)) {
+      return;
+    }
 
-    context.font = testSize + ' ' + baselineFont;
-    const baselineWidth = context.measureText(testString).width;
+    try {
+      // Create @font-face rule
+      const fontFace = new FontFace(
+        family,
+        `local("${family}"), ${sources.map(s => `url(${s.url}) format("${s.format}")`).join(', ')}`,
+        { display }
+      );
 
-    context.font = testSize + ' ' + fontFamily + ', ' + baselineFont;
-    const testWidth = context.measureText(testString).width;
+      // Load the font
+      const loadedFace = await fontFace.load();
+      document.fonts.add(loadedFace);
 
-    return testWidth !== baselineWidth;
+      // Mark as loaded
+      this.loadedFonts.add(fontKey);
+
+      // Update Tailwind config if needed
+      this.updateTailwindConfig(family);
+
+    } catch (error) {
+      console.warn(`Failed to load local font "${family}":`, error);
+    }
   }
 
   /**
-   * Get safe font stack with fallbacks
+   * Check if a font family is loaded
    */
-  getSafeFontStack(config: FontConfig): string {
-    const { family, fallback } = config;
-    return `"${family}", ${fallback}`;
+  isFontLoaded(family: string): boolean {
+    return this.loadedFonts.has(family) || document.fonts.check(`12px "${family}"`);
   }
 
   /**
-   * Preload commonly used fonts
+   * Get all loaded font families
    */
-  async preloadCommonFonts(): Promise<void> {
-    const commonFonts = [
-      { family: 'Inter', weights: [400, 500, 600, 700] },
-      { family: 'Space Grotesk', weights: [400, 600, 700] },
-      { family: 'Roboto', weights: [400, 500, 700] },
-      { family: 'Open Sans', weights: [400, 600] },
-      { family: 'Playfair Display', weights: [400, 600, 700] }
-    ];
-
-    await Promise.all(
-      commonFonts.map(({ family, weights }) => 
-        this.loadGoogleFont(family, weights)
-      )
-    );
+  getLoadedFonts(): string[] {
+    return Array.from(this.loadedFonts);
   }
 
   /**
-   * Get loading status of a font
+   * Clear loaded fonts cache
    */
-  getFontLoadingStatus(family: string): 'loaded' | 'loading' | 'not-loaded' {
-    const fontKey = family;
-    if (this.loadedFonts.has(fontKey)) return 'loaded';
-    if (this.loadingPromises.has(fontKey)) return 'loading';
-    return 'not-loaded';
+  clearLoadedFonts(): void {
+    this.loadedFonts.clear();
+  }
+
+  /**
+   * Update Tailwind config with new font
+   */
+  private updateTailwindConfig(family: string): void {
+    // In a full implementation, this would update the Tailwind config
+    // For now, we assume fonts are already in the config
+    console.log(`Font "${family}" loaded and ready for Tailwind usage`);
   }
 }
 
+// Export singleton instance
 export const fontLoader = new FontLoader();
-
-export const AVAILABLE_FONTS: FontConfig[] = [
-  {
-    family: 'Inter',
-    weights: [300, 400, 500, 600, 700],
-    fallback: 'system-ui, sans-serif'
-  },
-  {
-    family: 'Space Grotesk',
-    weights: [400, 500, 600, 700],
-    fallback: 'system-ui, sans-serif'
-  },
-  {
-    family: 'Roboto',
-    weights: [300, 400, 500, 700],
-    fallback: 'system-ui, sans-serif'
-  },
-  {
-    family: 'Open Sans',
-    weights: [400, 600, 700],
-    fallback: 'system-ui, sans-serif'
-  },
-  {
-    family: 'Nunito',
-    weights: [400, 600, 700],
-    fallback: 'system-ui, sans-serif'
-  },
-  {
-    family: 'Crimson Text',
-    weights: [400, 600, 700],
-    fallback: 'Georgia, serif'
-  },
-  {
-    family: 'Playfair Display',
-    weights: [400, 500, 600, 700, 900],
-    fallback: 'Georgia, serif'
-  },
-  {
-    family: 'Comfortaa',
-    weights: [400, 600, 700],
-    fallback: 'system-ui, sans-serif'
-  },
-  {
-    family: 'Orbitron',
-    weights: [400, 700, 900],
-    fallback: 'system-ui, sans-serif'
-  },
-  {
-    family: 'Krona One',
-    weights: [400],
-    fallback: 'system-ui, sans-serif'
-  },
-  {
-    family: 'JetBrains Mono',
-    weights: [400, 500, 700],
-    fallback: 'monospace'
-  },
-  {
-    family: 'Fira Code',
-    weights: [400, 500, 700],
-    fallback: 'monospace'
-  },
-  {
-    family: 'Source Code Pro',
-    weights: [400, 600, 700],
-    fallback: 'monospace'
-  }
-];

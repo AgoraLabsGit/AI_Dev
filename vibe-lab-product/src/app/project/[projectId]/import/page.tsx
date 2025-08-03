@@ -11,9 +11,9 @@ import {
 } from 'lucide-react';
 
 interface ProjectImportProps {
-  params: {
+  params: Promise<{
     projectId: string;
-  };
+  }>;
 }
 
 // Mock Stage 0 analysis data
@@ -44,8 +44,8 @@ const mockAnalysisResults = {
   ]
 };
 
-export default function ProjectImport({ params }: ProjectImportProps) {
-  const { projectId } = params;
+export default async function ProjectImport({ params }: ProjectImportProps) {
+  const { projectId } = await params;
 
   return (
     <div className="space-y-6">

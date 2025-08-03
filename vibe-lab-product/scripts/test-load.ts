@@ -154,7 +154,7 @@ async function simulateUser(
             `user-${userId}`,
             EventFactory.createEvent(
               EventCategory.PIPELINE,
-              PipelineEventType.STARTED,
+              PipelineEventType.PIPELINE_STARTED,
               `user-${userId}`,
               userProjectId,
               { pipelineId: `pipe-${Date.now()}` }

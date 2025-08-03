@@ -156,7 +156,7 @@ async function benchmarkEventPublishing(services: any): Promise<number[]> {
   
   const event = EventFactory.createEvent(
     EventCategory.PIPELINE,
-    PipelineEventType.STARTED,
+    PipelineEventType.PIPELINE_STARTED,
     'benchmark',
     'bench-project',
     { pipelineId: 'bench-pipe' }

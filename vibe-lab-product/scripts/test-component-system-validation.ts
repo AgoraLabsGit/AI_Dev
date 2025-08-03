@@ -74,7 +74,7 @@ async function runUnitTests() {
       totalTests++;
       const parsed = await blueprintParser.process(blueprint);
       
-      if (parsed.componentDetection?.detectedPatterns?.length > 0) {
+      if ((parsed.componentDetection?.detectedPatterns?.length ?? 0) > 0) {
         console.log(`✅ ${blueprint.name}: ${parsed.componentDetection?.detectedPatterns?.length || 0} patterns detected`);
         passedTests++;
       } else {

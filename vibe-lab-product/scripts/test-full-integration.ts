@@ -159,7 +159,7 @@ async function testBlueprintToComponent(services: any): Promise<boolean> {
       'test',
       EventFactory.createEvent(
         EventCategory.PIPELINE,
-        PipelineEventType.STARTED,
+        PipelineEventType.PIPELINE_STARTED,
         'test',
         projectId,
         { pipelineId: 'pipe-001', blueprint }
@@ -359,7 +359,7 @@ async function testConcurrentOperations(services: any): Promise<boolean> {
           'test',
           EventFactory.createEvent(
             EventCategory.PIPELINE,
-            PipelineEventType.STARTED,
+            PipelineEventType.PIPELINE_STARTED,
             'test',
             projectId,
             { pipelineId: `pipe-${i}` }

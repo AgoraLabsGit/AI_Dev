@@ -375,7 +375,7 @@ export const mockGlobalStats = {
   monthlyCost: 23.45,
   teamMembers: 3,
   overallQuality: 94.2,
-  avgProjectProgress: Math.round(mockProjects.reduce((acc, p) => acc + p.progress, 0) / mockProjects.length)
+  avgProjectProgress: Math.round(mockProjects.reduce((acc, p) => acc + (p.progress || 0), 0) / mockProjects.length)
 };
 
 // Mock Stage 0 Analysis Results

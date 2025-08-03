@@ -1,22 +1,28 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
+import { getComponentClasses } from '@/utils/template-utils';
+import { type TailwindTemplate } from '@/services/styling-service';
 
 interface ActionButtonProps {
   onClick: () => void;
   disabled?: boolean;
   title?: string;
   children: ReactNode;
-  variant?: 'default' | 'primary' | 'danger';
+  variant?: 'default' | 'primary' | 'secondary' | 'ghost' | 'destructive';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  template?: TailwindTemplate;
+  isLoading?: boolean;
 }
 
 /**
- * PWA-compliant action button
+ * PWA-compliant action button with template support
  * - Minimum 44px touch target (size='md')
  * - Clear focus states
- * - Consistent styling
+ * - Template-aware styling
+ * - Consistent accessibility
  */
 export default function ActionButton({
   onClick,
@@ -25,36 +31,53 @@ export default function ActionButton({
   children,
   variant = 'default',
   size = 'md',
-  className = ''
+  className,
+  template,
+  isLoading = false
 }: ActionButtonProps) {
-  const baseClasses = "rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#161618] disabled:opacity-50 disabled:cursor-not-allowed";
-  
-  const sizeClasses = {
-    sm: "p-1.5 min-w-[36px] min-h-[36px]", // Below PWA standards, use sparingly
-    md: "p-2.5 min-w-[44px] min-h-[44px]", // PWA standard minimum
-    lg: "p-3 min-w-[48px] min-h-[48px]"
-  };
-
-  const variantClasses = {
-    default: "bg-transparent hover:bg-[#1C1C1E] text-gray-400 hover:text-white focus:ring-blue-500",
-    primary: "bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500",
-    danger: "bg-red-500 hover:bg-red-600 text-white focus:ring-red-500"
-  };
-
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       title={title}
-      className={`
-        ${baseClasses}
-        ${sizeClasses[size]}
-        ${variantClasses[variant]}
-        ${className}
-      `}
+      className={cn(
+        // If template is provided, use template classes
+        template && getComponentClasses('button', {
+          template,
+          variant,
+          size,
+          state: {
+            isDisabled: disabled,
+            isLoading
+          }
+        }),
+        // Fallback to default Tailwind classes if no template
+        !template && cn(
+          // Base styles
+          'inline-flex items-center justify-center rounded-md font-medium transition-colors',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'disabled:opacity-50 disabled:pointer-events-none',
+          // Size variations
+          size === 'sm' && 'h-9 px-3 text-sm',
+          size === 'md' && 'h-10 px-4 py-2',
+          size === 'lg' && 'h-11 px-8 text-lg',
+          // Variant styles
+          variant === 'default' && 'bg-primary text-primary-foreground hover:bg-primary/90',
+          variant === 'secondary' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          variant === 'ghost' && 'hover:bg-accent hover:text-accent-foreground',
+          variant === 'destructive' && 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+        ),
+        // Additional classes
+        className
+      )}
       type="button"
     >
-      {children}
+      {isLoading ? (
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span>Loading...</span>
+        </div>
+      ) : children}
     </button>
   );
 }

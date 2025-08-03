@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "predev": "node scripts/ensure-port-3000.js",
+    "dev": "next dev -p 3000",
+    "dev:monitor": "node scripts/ensure-port-3000.js && tsx scripts/dev-with-monitoring.ts && next dev -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -28,9 +30,14 @@
     "test:component-planner": "tsx scripts/test-component-planner.ts",
     "test:code-generator": "tsx scripts/test-code-generator.ts",
     "test:quality-assurance": "tsx scripts/test-quality-assurance.ts",
+    "test:logic-monitor": "tsx scripts/test-logic-monitor.ts",
+    "test:vibe-lab-monitor": "tsx scripts/test-vibe-lab-monitoring.ts",
     "test:component-system": "tsx scripts/test-component-system.ts",
     "test:performance-optimization": "tsx scripts/test-performance-optimization.ts",
     "test:component-validation": "tsx scripts/test-component-system-validation.ts",
+    "test:e2e-enhanced": "tsx scripts/test-e2e-enhanced.ts",
+    "test:load-infrastructure": "tsx scripts/test-load-infrastructure.ts",
+    "test:load-demo": "tsx scripts/test-load-demo.ts",
     "demo:pipeline": "tsx scripts/demo-component-pipeline.ts",
     "debug:pipeline": "tsx scripts/debug-pipeline.ts",
     "test:all": "npm run test:microservices && npm run test:ai-client && npm run test:rate-limit-retry && npm run test:cost-optimization && npm run test:context-manager && npm run test:dias-events && npm run test:blueprint-parser && npm run test:component-planner && npm run test:code-generator && npm run test:quality-assurance",
@@ -40,7 +47,9 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.57.0",
     "@dqbd/tiktoken": "^1.0.21",
+    "@playwright/test": "^1.54.2",
     "@prisma/client": "^6.12.0",
+    "@tailwindcss/typography": "^0.5.16",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.1",
@@ -50,21 +59,23 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
     "task-master-ai": "^0.22.0",
-    "vis-network": "^10.0.1"
+    "vis-network": "^10.0.1",
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.14",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
+    "postcss": "^8.4.31",
     "prisma": "^6.12.0",
-    "tailwindcss": "^4",
+    "tailwindcss": "^3.3.0",
     "tsx": "^4.20.3",
-    "tw-animate-css": "^1.3.6",
     "typescript": "^5"
   }
 }
