@@ -2,6 +2,13 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { 
+  Sparkles, 
+  GitBranch, 
+  Upload, 
+  FileText,
+  LucideIcon
+} from 'lucide-react';
 
 export interface QuickAction {
   id: string;
@@ -36,6 +43,17 @@ interface QuickActionButtonProps {
   onClick?: (action: QuickAction) => void;
   multiSelect?: boolean;
 }
+
+// Icon mapping function
+const getIconComponent = (iconName: string): LucideIcon | null => {
+  const iconMap: Record<string, LucideIcon> = {
+    'Sparkles': Sparkles,
+    'GitBranch': GitBranch,
+    'Upload': Upload,
+    'FileText': FileText,
+  };
+  return iconMap[iconName] || null;
+};
 
 export function QuickActionButton({ 
   action, 
@@ -124,9 +142,12 @@ export function QuickActionButton({
       title={action.metadata?.description}
     >
       {/* Icon */}
-      {action.metadata?.icon && (
-        <span className="quick-action-icon">{action.metadata.icon}</span>
-      )}
+      {action.metadata?.icon && (() => {
+        const IconComponent = getIconComponent(action.metadata.icon);
+        return IconComponent ? (
+          <IconComponent className="w-4 h-4" />
+        ) : null;
+      })()}
       
       {/* Label */}
       <span className="quick-action-label">{action.label}</span>

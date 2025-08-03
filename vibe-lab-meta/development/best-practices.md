@@ -320,6 +320,77 @@ export function withErrorBoundary<T extends object>(
 }
 ```
 
+### **Issue #4: 🚨 CRITICAL - Static Assets Blocked by Middleware** ⭐ **PERMANENT PREVENTION**
+**Problem**: NextAuth middleware blocks ALL requests including static assets like logos, causing broken images.
+
+**Root Cause**:
+```typescript
+// ❌ BAD: Middleware blocks everything, including static assets
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  //                                                   ^^^ Missing 'assets'
+};
+```
+
+**Solution**:
+```typescript
+// ✅ CORRECT: Always exclude 'assets' directory from authentication
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|assets).*)'],
+  //                                                   ^^^^^^^^^^^^ INCLUDE ASSETS
+};
+```
+
+**Prevention Checklist**:
+1. ✅ **ALWAYS use VibeLabLogo component** instead of hardcoded paths
+2. ✅ **NEVER hardcode asset paths** in JSX (use components)
+3. ✅ **ALWAYS check middleware matcher** includes `assets` exclusion
+4. ✅ **DOCUMENT this pattern** every time we encounter it
+
+**Files to Check When Logo Issues Occur**:
+- `src/middleware.ts` - Ensure `assets` is excluded
+- `src/components/ui/vibe-lab-logo.tsx` - Use this component everywhere
+- Search for hardcoded `/assets/brand/` paths in codebase
+
+**🎯 LESSON**: This middleware issue has occurred MULTIPLE TIMES. Always check these files first when static assets don't load.
+
+### **Issue #5: 🚨 QuickAction Buttons Showing Icon Names Instead of Icons**
+**Problem**: QuickAction buttons displaying text like "Sparkles New Project" instead of showing actual icons with clean labels.
+
+**Root Cause**: QuickActionButton component was rendering icon names as text instead of importing and using actual Lucide icon components.
+
+**Solution**:
+```typescript
+// ✅ CORRECT: Import Lucide icons and create mapping function
+import { Sparkles, GitBranch, Upload, FileText, LucideIcon } from 'lucide-react';
+
+const getIconComponent = (iconName: string): LucideIcon | null => {
+  const iconMap: Record<string, LucideIcon> = {
+    'Sparkles': Sparkles,
+    'GitBranch': GitBranch,
+    'Upload': Upload,
+    'FileText': FileText,
+  };
+  return iconMap[iconName] || null;
+};
+
+// ✅ CORRECT: Render actual icon component
+{action.metadata?.icon && (() => {
+  const IconComponent = getIconComponent(action.metadata.icon);
+  return IconComponent ? (
+    <IconComponent className="w-4 h-4" />
+  ) : null;
+})()}
+```
+
+**Prevention**:
+1. ✅ **ALWAYS import icon components** when using Lucide icons
+2. ✅ **NEVER render icon names as text** in UI components  
+3. ✅ **Use proper icon mapping** for dynamic icon selection
+4. ✅ **Test icon rendering** visually before marking complete
+
+**🎯 LESSON**: Icon names in metadata should map to actual icon components, not be displayed as text.
+
 ---
 
 ## 📋 **Implementation Guidelines**

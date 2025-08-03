@@ -1,7 +1,7 @@
 export function VibeLabLogo({ size = 40 }: { size?: number }) {
   return (
     <img 
-      src="/assets/brand/vibeLab.svg" 
+      src="/assets/brand/VibeLabLogo.svg" 
       alt="Vibe Lab" 
       width={size}
       height={size}

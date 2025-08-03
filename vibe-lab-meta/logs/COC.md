@@ -3,7 +3,34 @@
 ## Overview
 This document maintains continuity of critical insights, decisions, and learnings across the AVCA-DIAS system development and hardening process.
 
-## Latest Update: January 30, 2025 - Staged Initialization System Implementation 🚀
+## Latest Update: August 3, 2025 - Critical Bug Fixes & UI Improvements 🚀
+
+### Major Fixes - Frontend Critical Issues Resolved
+- **✅ Static Asset Middleware Fix**: PERMANENTLY resolved middleware blocking static assets (logos, images)
+  - **Issue**: NextAuth middleware was blocking `/assets/*` requests, causing broken logos
+  - **Solution**: Updated middleware matcher to exclude `assets` directory: `['/((?!api|_next/static|_next/image|favicon.ico|assets).*)']`
+  - **Prevention**: Documented in best-practices.md as Issue #4 with permanent prevention checklist
+  - **Files Fixed**: `src/middleware.ts`, replaced hardcoded logo paths with `<VibeLabLogo />` component
+
+- **✅ QuickAction Button Icon Fix**: Fixed buttons showing "Sparkles New Project" instead of proper icons
+  - **Issue**: QuickActionButton component was rendering icon names as text instead of actual Lucide icons
+  - **Solution**: Added proper icon mapping with Lucide imports and component rendering
+  - **Prevention**: Documented in best-practices.md as Issue #5 with icon mapping pattern
+  - **Files Fixed**: `src/components/chat/QuickActionButton.tsx` with proper icon component system
+
+- **✅ Directory Structure Cleanup**: Cleaned up Next.js app router structure
+  - **Removed**: Unnecessary route groups `(auth)`, `(onboarding)`, `(app)` causing confusion
+  - **Fixed**: Duplicate routing conflicts and double-nested directories
+  - **Result**: Clean, straightforward app router structure without redundant nesting
+
+### Current System Status
+- **✅ Logo Loading**: All logos now display correctly across application (sign-in, onboarding)
+- **✅ QuickActions**: Buttons display proper icons with clean labels (no double text)
+- **✅ Middleware**: Static assets properly excluded from authentication 
+- **✅ TypeScript**: All compilation errors resolved
+- **✅ Development Server**: Running successfully on port 3000
+
+## Previous Update: January 30, 2025 - Staged Initialization System Implementation 🚀
 
 ### Major Achievement - PERMANENT API PERFORMANCE SOLUTION
 - **✅ Staged Initialization System**: Solved API hanging issue permanently while preserving intelligence

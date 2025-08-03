@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bot, ArrowRight, Sparkles, GitBranch, Upload, FileText, Beaker, FlaskConical, LogOut } from 'lucide-react';
+import { Bot, ArrowRight, Beaker, FlaskConical, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { QuickActionBar, QuickAction } from '@/components/chat/QuickActionButton';
@@ -34,57 +34,6 @@ export default function EnhancedOnboardingPage() {
     expandDocumentSection,
   } = useOnboardingStore();
 
-  // Initialize quick actions after component mounts
-  useEffect(() => {
-    setMessages(prev => prev.map(msg => 
-      msg.id === '1' ? {
-        ...msg,
-        quickActions: [
-                  {
-          id: 'fresh-start',
-          label: 'New Project',
-          type: 'primary' as const,
-          action: () => handleQuickAction({ id: 'fresh-start', label: 'New Project' }),
-          metadata: {
-            icon: <Sparkles className="w-4 h-4" />,
-            description: 'Start from scratch with AI guidance'
-          }
-        },
-        {
-          id: 'github-import',
-          label: 'GitHub Import',
-          type: 'secondary' as const,
-          action: () => handleQuickAction({ id: 'github-import', label: 'GitHub Import' }),
-          metadata: {
-            icon: <GitBranch className="w-4 h-4" />,
-            description: 'Import existing repository'
-          }
-        },
-        {
-          id: 'code-upload',
-          label: 'Upload Code',
-          type: 'secondary' as const,
-          action: () => handleQuickAction({ id: 'code-upload', label: 'Upload Code' }),
-          metadata: {
-            icon: <Upload className="w-4 h-4" />,
-            description: 'Upload local codebase'
-          }
-        },
-        {
-          id: 'docs-import',
-          label: 'Import Docs',
-          type: 'secondary' as const,
-          action: () => handleQuickAction({ id: 'docs-import', label: 'Import Docs' }),
-          metadata: {
-            icon: <FileText className="w-4 h-4" />,
-            description: 'Import from documentation'
-          }
-        }
-        ]
-      } : msg
-    ));
-  }, []);
-  
   type MessageType = {
     id: string;
     content: string;
@@ -102,6 +51,57 @@ export default function EnhancedOnboardingPage() {
       quickActions: [] // Will be populated after component initialization
     }
   ]);
+
+  // Initialize quick actions after component mounts
+  useEffect(() => {
+    setMessages(prev => prev.map(msg => 
+      msg.id === '1' ? {
+        ...msg,
+        quickActions: [
+                  {
+          id: 'fresh-start',
+          label: 'New Project',
+          type: 'primary' as const,
+          action: () => handleQuickAction({ id: 'fresh-start', label: 'New Project' }),
+          metadata: {
+            icon: 'Sparkles',
+            description: 'Start from scratch with AI guidance'
+          }
+        },
+        {
+          id: 'github-import',
+          label: 'GitHub Import',
+          type: 'secondary' as const,
+          action: () => handleQuickAction({ id: 'github-import', label: 'GitHub Import' }),
+          metadata: {
+            icon: 'GitBranch',
+            description: 'Import existing repository'
+          }
+        },
+        {
+          id: 'code-upload',
+          label: 'Upload Code',
+          type: 'secondary' as const,
+          action: () => handleQuickAction({ id: 'code-upload', label: 'Upload Code' }),
+          metadata: {
+            icon: 'Upload',
+            description: 'Upload local codebase'
+          }
+        },
+        {
+          id: 'docs-import',
+          label: 'Import Docs',
+          type: 'secondary' as const,
+          action: () => handleQuickAction({ id: 'docs-import', label: 'Import Docs' }),
+          metadata: {
+            icon: 'FileText',
+            description: 'Import from documentation'
+          }
+        }
+        ]
+      } : msg
+    ));
+  }, []);
 
   const handleQuickAction = async (action: any) => {
     console.log('Quick action clicked:', action);
@@ -253,11 +253,7 @@ export default function EnhancedOnboardingPage() {
           <div className="flex items-center justify-between px-6 py-4">
             {/* Left: Logo */}
             <div className="flex-shrink-0">
-              <img 
-                src="/assets/brand/vibeLab.svg" 
-                alt="Vibe Lab" 
-                className="w-9 h-9"
-              />
+              <VibeLabLogo size={36} />
             </div>
             
             {/* Right: User Controls */}

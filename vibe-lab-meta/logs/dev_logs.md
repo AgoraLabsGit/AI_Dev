@@ -2,7 +2,91 @@
 
 ## Development Session Log
 
-### Session: Staged Initialization System - PERMANENT API PERFORMANCE FIX (January 30, 2025)
+### Session: Critical Frontend Bug Fixes & UI Polish (August 3, 2025)
+**Duration**: 2h  
+**Focus**: Fixing broken logo display and QuickAction button rendering issues  
+**Status**: ✅ COMPLETE - Critical UI issues resolved
+
+#### **Issues Addressed**:
+
+##### **1. 🚨 CRITICAL: Static Assets Blocked by Middleware**
+- **Problem**: Logo not displaying on sign-in page, middleware blocking `/assets/*` requests
+- **Root Cause**: NextAuth middleware matcher excluded `assets` directory
+- **Solution**: Updated `src/middleware.ts` matcher to include assets exclusion
+- **Files Modified**: 
+  - `src/middleware.ts` - Added `assets` to matcher exclusions  
+  - `src/app/onboarding/page.tsx` - Replaced hardcoded logo path with `<VibeLabLogo />` component
+- **Prevention**: Documented as Issue #4 in best-practices.md with permanent checklist
+
+##### **2. 🚨 QuickAction Buttons Showing Icon Names as Text**
+- **Problem**: Buttons displaying "Sparkles New Project" instead of proper icons with clean labels
+- **Root Cause**: QuickActionButton component rendering icon names as text instead of Lucide icon components
+- **Solution**: Added proper icon mapping system with Lucide imports
+- **Files Modified**:
+  - `src/components/chat/QuickActionButton.tsx` - Added icon mapping function and proper component rendering
+- **Prevention**: Documented as Issue #5 in best-practices.md with icon mapping pattern
+
+##### **3. Directory Structure Cleanup**
+- **Problem**: Confusing Next.js route groups causing duplicate routing
+- **Solution**: Removed unnecessary `(auth)`, `(onboarding)`, `(app)` route groups
+- **Result**: Clean app router structure without redundant nesting
+
+#### **Technical Implementation Details**:
+
+##### **Middleware Fix**:
+```typescript
+// BEFORE (broken)
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+};
+
+// AFTER (fixed)
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|assets).*)'],
+};
+```
+
+##### **Icon Mapping System**:
+```typescript
+// Added proper Lucide icon mapping
+import { Sparkles, GitBranch, Upload, FileText, LucideIcon } from 'lucide-react';
+
+const getIconComponent = (iconName: string): LucideIcon | null => {
+  const iconMap: Record<string, LucideIcon> = {
+    'Sparkles': Sparkles,
+    'GitBranch': GitBranch,
+    'Upload': Upload,
+    'FileText': FileText,
+  };
+  return iconMap[iconName] || null;
+};
+
+// Render actual icon component instead of text
+{action.metadata?.icon && (() => {
+  const IconComponent = getIconComponent(action.metadata.icon);
+  return IconComponent ? <IconComponent className="w-4 h-4" /> : null;
+})()}
+```
+
+#### **Quality Assurance**:
+- ✅ **Logo Display**: Verified working on sign-in and onboarding pages
+- ✅ **QuickAction Buttons**: Clean labels with proper icons (no double text)
+- ✅ **TypeScript**: All compilation errors resolved
+- ✅ **Development Server**: Running successfully on port 3000
+- ✅ **Documentation**: Issues documented in best-practices.md for prevention
+
+#### **Documentation Updates**:
+- ✅ Updated `vibe-lab-meta/development/best-practices.md` with Issues #4 and #5
+- ✅ Created `CLAUDE.md` for session-persistent memory of critical patterns
+- ✅ Added prevention checklists and permanent solutions
+
+#### **Impact Assessment**:
+- **🎯 USER EXPERIENCE**: Logo now displays correctly, professional appearance restored
+- **🔧 DEVELOPER EXPERIENCE**: Clean QuickAction buttons, no confusion from double text
+- **📚 KNOWLEDGE TRANSFER**: Patterns documented to prevent recurring issues
+- **🛡️ PREVENTION**: Middleware and icon issues permanently solved
+
+### Previous Session: Staged Initialization System - PERMANENT API PERFORMANCE FIX (January 30, 2025)
 **Duration**: 3h implementation  
 **Focus**: Solving API hanging issue while preserving system intelligence  
 **Status**: ✅ COMPLETE - PERMANENT SOLUTION IMPLEMENTED
