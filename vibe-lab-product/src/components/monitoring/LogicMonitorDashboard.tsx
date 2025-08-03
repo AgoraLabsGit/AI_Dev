@@ -28,9 +28,15 @@ export function LogicMonitorDashboard() {
         setActiveFlows(data.flows || []);
         setModuleStats(data.stats || []);
         setLastUpdate(data.timestamp);
+      } else {
+        console.error('Server monitoring data fetch failed:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch server monitoring data:', error);
+      // Don't fail silently - show user there's an issue
+      setEvents([]);
+      setActiveFlows([]);
+      setModuleStats([]);
     }
   }, []);
 

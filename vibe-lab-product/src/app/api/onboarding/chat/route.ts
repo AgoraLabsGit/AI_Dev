@@ -3,7 +3,7 @@ import { AIClientService, AIRole, EntryPathType, AnalysisRequest } from '../../.
 import { EventBus } from '../../../../../lib/avca/services/event-bus';
 import { EventHandlingSystem } from '../../../../../lib/dias/events/event-handlers';
 import { EventFactory, EventCategory } from '../../../../../lib/dias/events/event-types';
-import { logicMonitor, AVCA_MODULES, DIAS_MODULES, INTEGRATION_MODULES } from '../../../../../lib/monitoring/logic-monitor';
+import { logicMonitor, AVCA_MODULES, DIAS_MODULES, INTEGRATION_MODULES } from '@/lib/monitoring/logic-monitor';
 import { safeToISOString } from '../../../../../src/utils/date';
 
 interface OnboardingChatRequest {

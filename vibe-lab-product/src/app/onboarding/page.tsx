@@ -181,7 +181,7 @@ export default function EnhancedOnboardingPage() {
     setMessages(prev => [...prev, typingMessage]);
 
     try {
-      const response = await fetch('/api/onboarding/chat', {
+      const response = await fetch('/api/onboarding/chat-basic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

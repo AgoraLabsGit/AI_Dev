@@ -66,7 +66,7 @@ export class LogicMonitor extends EventEmitter {
     this.flows.set(flowId, {
       id: flowId,
       startTime,
-      modules: [],
+      modules: [event as LogicModuleEvent], // Store the initial event
       status: 'active'
     });
 
@@ -102,7 +102,8 @@ export class LogicMonitor extends EventEmitter {
       metadata
     } as LogicModuleEvent;
 
-    flow.modules.push(completeEvent);
+    // Replace the last (incomplete) event with the complete one
+    flow.modules[flow.modules.length - 1] = completeEvent;
     this.updateModuleStats(completeEvent.module, duration);
 
     // Store in recent events

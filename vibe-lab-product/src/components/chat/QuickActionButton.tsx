@@ -7,6 +7,10 @@ import {
   GitBranch, 
   Upload, 
   FileText,
+  Globe,
+  Smartphone,
+  Zap,
+  Lightbulb,
   LucideIcon
 } from 'lucide-react';
 
@@ -51,6 +55,10 @@ const getIconComponent = (iconName: string): LucideIcon | null => {
     'GitBranch': GitBranch,
     'Upload': Upload,
     'FileText': FileText,
+    'Globe': Globe,
+    'Smartphone': Smartphone,
+    'Zap': Zap,
+    'Lightbulb': Lightbulb,
   };
   return iconMap[iconName] || null;
 };
