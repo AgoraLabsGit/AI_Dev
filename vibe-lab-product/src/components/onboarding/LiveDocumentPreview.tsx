@@ -302,7 +302,11 @@ export default function LiveDocumentPreview({
                   <div className="flex items-center justify-between text-xs text-[#6B7280]">
                     <span>✓ Section complete</span>
                     {section.lastUpdated && (
-                      <span>Updated {section.lastUpdated.toLocaleTimeString()}</span>
+                      <span>Updated {
+                        section.lastUpdated instanceof Date 
+                          ? section.lastUpdated.toLocaleTimeString()
+                          : new Date(section.lastUpdated).toLocaleTimeString()
+                      }</span>
                     )}
                   </div>
                 )}
