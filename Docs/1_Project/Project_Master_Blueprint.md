@@ -6,7 +6,7 @@
 ## 1. Project Vision & Goals
 
 ### Vision
-Transform software development through an intelligent, Strike-inspired multi-agent platform that guides developers through a strategic, AI-powered lifecycle: **Import → Design → Build → Deploy**.
+Transform software development through an intelligent, Strike-inspired multi-agent platform that guides developers through a strategic, AI-powered lifecycle: **Design → Build → Iterate**.
 
 The platform serves as an AI co-pilot that transforms high-level concepts into production-ready codebases through AVCA (AI-guided Visual Component Architecture) and DIAS (Development Intelligence Analysis System).
 
@@ -22,59 +22,113 @@ The platform serves as an AI co-pilot that transforms high-level concepts into p
 - **<5 second** response time for AI-powered features
 - **8.5/10+ user satisfaction** with AI assistance quality
 
-## 2. Target Audience
+---
+
+## 2. The Core Outputs: Overview & Specifications
+
+The "Design" phase of the Vibe Lab lifecycle produces two distinct and critical documents:
+
+*   **Project Overview**: A high-level, human-centric document that captures the project's vision, goals, and user stories. This is generated through the initial conversational AI process in the `/onboarding` flow.
+*   **Build Specifications**: A detailed, technical document that defines the project's tech stack, component architecture, and the foundational rules for the AVCA pipeline. This is created and managed in the `/plan` flow, using the Blueprint Editor.
+
+These two documents form the complete "blueprint" for the project and are the foundation for the "Build" and "Iterate" phases.
+
+---
+
+## 3. Target Audience
 
 ### Primary Users
 - **Solo Developers**: Building personal projects and startups
 - **Small Development Teams**: 2-5 person teams needing structure
 - **Technical Founders**: Non-developers who need to communicate with developers
 
-### Secondary Users  
+### Secondary Users
 - **Enterprise Development Teams**: Looking for standardized architecture
 - **Agencies**: Building multiple client projects with consistent quality
 - **Educators**: Teaching software architecture and best practices
 
-## 3. Core Features & Requirements
+---
 
-### Must-Have Features (Current Implementation)
-1. **Multi-Project Management**: Dashboard with project overview and metrics
-2. **Stage 0 - Import & Analysis**: GitHub repository analysis and migration planning
-3. **Stage 1 - Blueprints**: Project requirements and user story definition
-4. **Stage 2 - Styling**: Strike-inspired theme and design system management
-5. **Stage 3 - Pages**: Page layouts and user flow definition
-6. **Stage 4 - Components**: 224-component library with template variations
-7. **AVCA Pipeline**: Stages 5-8 for code generation and quality assurance
-8. **DIAS Intelligence**: AI insights, pattern recognition, and recommendations
-9. **Multi-Agent System**: Developer + Auditor AI coordination
-10. **Pure Tailwind Architecture**: Zero custom CSS, component-local styling
+## 4. Core Features & Requirements
 
-### Architecture Requirements
-- **Strike Bitcoin Aesthetic**: Ultra-dark theme (#0A0A0B) with clean hierarchy
-- **Cursor/Linear Layout**: Efficient navigation with keyboard shortcuts
-- **Project Context Routing**: `/project/[id]/...` for multi-project support
-- **Real-time Updates**: Live progress tracking and AI status indicators
-- **AVCA/DIAS Integration**: AI-powered architecture compliance and generation
+### 4.1. Multi-Project Management System
+- **Dashboard**: A central dashboard to view and manage all projects.
+- **Project Creation**: Instant project setup with AVCA pipeline initialization.
+- **Project Import**: GitHub repository analysis and migration planning.
+- **Status Tracking**: Real-time progress monitoring across all projects.
 
-## 4. Technology & Business Constraints
+### 4.2. Stage 0 - Import & Analysis System
+- **GitHub Integration**: OAuth connection and repository access.
+- **Codebase Scanning**: Automated file structure and dependency analysis.
+- **Technology Detection**: Framework, language, and pattern recognition.
+- **Migration Planning**: Step-by-step conversion recommendations.
+
+### 4.3. Stage 1 - Blueprint Management
+- **Interactive Editor**: Real-time markdown editing with AI assistance.
+- **Template Library**: Pre-built blueprint templates for common project types.
+- **AI Consultation**: DIAS provides architectural suggestions and validation.
+- **Version Control**: Track blueprint changes and evolution.
+
+### 4.4. Stage 2 - Styling & Theme System
+- **Theme Editor**: Visual interface for customizing colors, typography, and spacing.
+- **Template Variations**: Pre-built style templates (Apple, Linear, Spotify, etc.).
+- **Live Preview**: Real-time preview of styling changes.
+- **Tailwind Generator**: Automatic Tailwind class generation from themes.
+
+### 4.5. Stage 3 - Page Architecture
+- **Visual Page Builder**: Drag-and-drop interface for page construction.
+- **Layout Templates**: Pre-built page layouts (dashboard, landing, etc.).
+- **User Flow Mapping**: Define navigation and interaction patterns.
+- **Responsive Design**: Configure behavior across device sizes.
+
+### 4.6. Stage 4 - Component Library System
+- **224-Component Architecture**: A comprehensive library of pre-built components.
+- **Visual Browsing**: A component grid for easy visual selection.
+- **Customization Tools**: Modify props, styling, and behavior.
+- **Code Generation**: Generate Tailwind-compliant component code.
+
+### 4.7. AVCA Build Pipeline (Stages 5-8)
+- **Automated Generation**: Convert specifications to production code.
+- **Real-time Progress**: Visual progress tracking with detailed logs.
+- **Quality Gates**: Automated testing and validation at each stage.
+- **Registry Management**: Organize and version generated components.
+
+### 4.8. DIAS Intelligence System
+- **Pattern Recognition**: Identify architectural and design patterns.
+- **Real-time Insights**: Continuous analysis and recommendations.
+- **Quality Scoring**: Automated quality assessment (security, performance, maintainability).
+- **Predictive Analytics**: Project timeline and resource predictions.
+
+### 4.9. Multi-Agent Coordination
+- **Developer & Auditor Agents**: A two-agent system for development and quality assurance.
+- **Task Coordination**: Intelligent workflow management between agents.
+- **Result Aggregation**: Combine outputs from multiple agents.
+- **Performance Monitoring**: Track agent effectiveness and response times.
+
+### 4.10. Integration & Deployment
+- **One-Click Deployment**: Seamless deployment to Vercel and other platforms.
+- **Repository Management**: Create, update, and manage GitHub repositories.
+- **CI/CD Integration**: Continuous integration and deployment pipelines.
+- **Monitoring & Analytics**: Track deployment success and performance.
+
+---
+
+## 5. Technology & Business Constraints
 
 ### Technical Constraints
 - **Pure Tailwind Only**: No custom CSS files, modules, or design systems allowed
 - **Next.js/TypeScript**: Frontend framework requirements
 - **PostgreSQL/Prisma**: Database requirements for project persistence
 - **GitHub Integration**: Core workflow requirement for deployment
-- **Sub-second Response**: AI interactions must be highly responsive
 
 ### Business Constraints
-- **Bootstrap Phase**: Limited initial budget, focus on MVP features
-- **Solo Development**: Single developer building system initially
-- **Self-Validation**: Must use own system to build itself (eat our own dog food)
+- **Bootstrap Phase**: Limited initial budget, focus on MVP features.
+- **Solo Development**: Single developer building system initially.
+- **Self-Validation**: Must use own system to build itself.
 
-### Compliance Requirements
-- **Architecture Validation**: All code must pass DIAS compliance checks
-- **Security Standards**: Claude Auditor must approve all generated code
-- **Performance Targets**: <5s page loads, <100ms UI interactions
+---
 
-## 5. Development Roadmap
+## 6. Development Roadmap
 
 ### Phase 1: Foundation (Current - 35% Complete)
 - ✅ AVCA/DIAS core architecture
@@ -91,31 +145,26 @@ The platform serves as an AI co-pilot that transforms high-level concepts into p
 - Performance optimization
 
 ### Phase 3: Advanced Features
-- Local agent integration (Model B)
+- Local agent integration
 - Team collaboration tools
 - Advanced deployment options
-- Enterprise features
 
 ### Phase 4: Scale & Polish
-- Full web IDE capabilities (Model C)
+- Full web IDE capabilities
 - Advanced AI features
 - Marketplace integration
-- Global availability
 
 ---
 
-## 6. Revolutionary Development Philosophy
+## 7. Revolutionary Development Philosophy
 
 **Core Principle**: "Use the system to build the system"
 
 **Key Characteristics**:
-- **Blueprint-Driven**: Every feature starts with proper blueprints
-- **AI-Augmented**: AVCA/DIAS guide all development decisions
-- **Architecture-First**: Pure Tailwind, component isolation, zero conflicts
-- **Self-Validating**: System validates its own development process
-
-**Success Validation**: 
-If Vibe Lab can successfully build and maintain itself using its own blueprint and AI systems, it proves the platform's effectiveness for all users.
+- **Blueprint-Driven**: Every feature starts with proper blueprints.
+- **AI-Augmented**: AVCA/DIAS guide all development decisions.
+- **Architecture-First**: Pure Tailwind, component isolation, zero conflicts.
+- **Self-Validating**: System validates its own development process.
 
 ---
 

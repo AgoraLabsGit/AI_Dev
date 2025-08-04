@@ -22,15 +22,14 @@ This directory contains all the technical documentation for the project. It defi
 ### `3_Process/`
 This directory contains documentation for our development processes and protocols.
 
-*   **`Protocols.md`**: Defines the mandatory 5-step development cycle and our core coding standards.
-*   **`Development_Methodology.md`**: (To be created) Outlines our overall approach to development.
+*   **`Development_Process.md`**: Outlines our overall approach to development, including the mandatory 5-step development cycle and our core coding standards.
 
 ### `4_Logs/`
 This directory contains running logs that track the progress and context of the project.
 
 *   **`Development_Log.md`**: A log of major development activities and milestones.
 *   **`Continuity_of_Context.md`**: A snapshot of the current development context to ensure seamless handover between work sessions.
-*   **`Learning_Log.md`**: (To be created) A log of key learnings and insights discovered during development.
+
 
 ### `5_UI_UX/`
 This directory contains all documentation related to the application's User Interface and User Experience.

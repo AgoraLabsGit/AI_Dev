@@ -1,178 +1,106 @@
 # AVCA (AI-Verified Component Architecture)
 
+**Document Type**: Technical Standard
+**Status**: Authoritative
+**Purpose**: This document provides a comprehensive overview of the AVCA system, the structured, AI-powered pipeline that transforms project requirements into high-quality, production-ready code.
+
+---
+
 ## 1. Overview
 
-AVCA is the structured, AI-powered pipeline that transforms project requirements into high-quality, production-ready code. It is a repeatable and verifiable process that ensures every component of an application is built to the same high standard. The entire system is designed around a core philosophy of "everything is a component," from a UI button to a piece of infrastructure.
+AVCA is a repeatable and verifiable process that ensures every component of an application is built to the same high standard. The entire system is designed around a core philosophy of "everything is a component," from a UI button to a piece of infrastructure.
 
-## 2. The AVCA-DIAS Interaction
-
-AVCA and DIAS are deeply intertwined. While AVCA is the **pipeline for building components**, DIAS is the **intelligence layer that observes and enhances** that pipeline.
-
+### The AVCA-DIAS Interaction
+AVCA and DIAS are deeply intertwined.
 *   **AVCA emits events**: As components move through the pipeline (e.g., `component.generated`, `quality.passed`), it emits events.
 *   **DIAS consumes events**: DIAS listens to these events to learn patterns, detect anomalies, and provide real-time feedback.
 *   **DIAS triggers AVCA**: Based on its analysis, DIAS can request actions from AVCA, such as regenerating a component that has a newly discovered security flaw.
 
-## 3. The Onboarding Blueprint: The Key to AVCA
+---
 
-The entire AVCA pipeline is driven by a comprehensive set of specifications gathered during the user onboarding flow. This is the critical human-in-the-loop step that provides the AI with the necessary context to build the application. This process results in two key outputs:
+## 2. Core Sub-System: The Component Pipeline
 
-*   **Project Overview**: A high-level document outlining the project's goals, user stories, and key features.
-*   **Build Specifications**: A detailed technical document that specifies the pages, components, data models, and styling for the application.
+The Component Pipeline is the engine of AVCA, responsible for the end-to-end process of transforming a high-level component idea into production-ready code.
 
-## 4. Component Atomic Types
+### Stage 1: Blueprint Parser
+*   **Input**: Raw, high-level blueprint data.
+*   **Process**: Parses the raw data into a structured format, analyzes requirements, identifies dependencies, and plans the file structure.
+*   **Output**: A `Structured Blueprint` object.
 
-AVCA classifies all parts of an application into eight "atomic" component types. This granular classification allows for a highly structured and predictable development process.
+### Stage 2: Component Planner
+*   **Input**: The `Structured Blueprint`.
+*   **Process**: Creates a detailed implementation plan, including architectural patterns, TypeScript interfaces, and a test plan. This stage includes an **Advanced Component Configuration** wizard for defining data bindings, API integrations, and business logic.
+*   **Output**: A `Detailed Plan` object.
 
-*   **UI Components**: The visual elements of the application (e.g., `Button`, `Card`).
-*   **Logic Modules**: Reusable business logic (e.g., `useAuth`, `apiClient`).
-*   **Data Patterns**: Database models and validation schemas (e.g., `UserModel`, `ProjectSchema`).
-*   **Infrastructure**: Configuration files and deployment scripts (e.g., `next.config.js`, `Dockerfile`).
-*   **Integration Patterns**: Connectors to external services (e.g., `StripePayments`, `AuthProvider`).
-*   **Workflow Patterns**: Multi-step processes (e.g., `OnboardingSequence`, `PaymentFlow`).
-*   **Cross-Cutting Patterns**: System-wide concerns (e.g., `ErrorBoundary`, `Logger`).
-*   **Capability Providers**: Libraries and frameworks that provide specific functionality (e.g., `date-fns`, `zustand`).
+### Stage 3: Code Generator
+*   **Input**: The `Detailed Plan`.
+*   **Process**: Generates the actual code files (`.tsx`, `.test.tsx`, `.stories.tsx`) with skeleton code and `TODOs`, focusing on establishing the correct architecture. This stage uses a "Magic Component Pipeline" (MCP) automation strategy to generate component variations at scale.
+*   **Output**: A set of `Working Code` files.
 
-<details>
-<summary>View Technical Interfaces</summary>
+### Stage 4: Quality Assurance
+*   **Input**: The `Working Code` files.
+*   **Process**: Validates, optimizes, and enhances the generated code by running TypeScript validation, removing unused imports, applying performance optimizations, and calculating a final quality score.
+*   **Output**: `Production-Ready Code`.
 
-```typescript
-// 1. UI Components
-interface UIComponent {
-  name: string;
-  props: TypedProps;
-  render: () => JSX.Element;
-  styles: TailwindClasses;
-  accessibility: A11yRequirements;
-}
+---
 
-// 2. Logic Modules
-interface LogicModule {
-  name: string;
-  dependencies: string[];
-  exports: Function | Object;
-  sideEffects: boolean;
-}
+## 3. Core Sub-System: Staged Initialization
 
-// 3. Data Patterns
-interface DataPattern {
-  model: PrismaModel;
-  schema: ZodSchema;
-  migrations: Migration[];
-  seeds?: SeedData;
-}
+To ensure the Vibe Lab API is always fast and responsive, AVCA uses a staged initialization system that loads services progressively.
 
-// 4. Infrastructure
-interface Infrastructure {
-  config: EnvironmentConfig;
-  scripts: DeploymentScript[];
-  monitoring: HealthCheck[];
-}
+*   **`ServiceManager`**: Manages the lifecycle of all services with circuit breaker protection and a 5-second timeout to prevent API hanging.
+*   **`HealthAwareRouter`**: Intelligently routes requests to the best available primary or fallback service, ensuring graceful degradation.
+*   **Service Loading Stages**:
+    1.  **Stage 1: Immediate (0-1s)**: Loads the EventBus for basic connectivity.
+    2.  **Stage 2: Fast Enhancement (1-5s)**: Loads the AI Client and Blueprint Service for core AVCA functionality.
+    3.  **Stage 3: Background Intelligence (5-30s)**: Loads the full DIAS intelligence engines.
 
-// 5. Integration Patterns
-interface IntegrationPattern {
-  service: ExternalService;
-  wrapper: AbstractionLayer;
-  fallback: ErrorStrategy;
-  testing: MockStrategy;
-}
+---
 
-// 6. Workflow Patterns
-interface WorkflowPattern {
-  steps: WorkflowStep[];
-  transitions: StateTransition[];
-  rollback: RollbackStrategy;
-}
+## 4. Core Sub-System: Integration Layer
 
-// 7. Cross-Cutting Patterns
-interface CrossCuttingPattern {
-  targets: ComponentType[];
-  implementation: Middleware | HOC | Hook;
-  configuration: Config;
-}
+The Integration Layer defines the patterns and contracts that allow the AVCA and DIAS systems to communicate and work together effectively.
 
-// 8. Capability Providers
-interface CapabilityProvider {
-  need: string;
-  preferred: Library;
-  alternatives: Library[];
-  selectionCriteria: Criteria;
-}
-```
-</details>
+### Worker Architecture
+The system utilizes a combination of AI-driven, script-based, and hybrid workers to execute tasks.
+*   **AI Workers**: For tasks requiring complex reasoning, like code generation.
+*   **Script Workers**: For deterministic tasks, like running linters.
+*   **Hybrid Workers**: For multi-step tasks that combine script and AI workers.
 
-## 5. The AVCA Pipeline Stages
+### Data Flow & API Contracts
+*   **Pipeline Data Flow**: A central `PipelineData` object is passed through all stages of the AVCA pipeline.
+*   **Event Flow**: A bidirectional event system allows AVCA and DIAS to communicate in real-time.
+*   **API Contracts**: A formalized set of API contracts for the Component Registry and the DIAS Intelligence APIs.
 
-The AVCA pipeline is a series of nine distinct stages that take a project from concept to completion. The process is orchestrated by the AI system, with different agents and models being used at different stages to balance quality and cost.
+### Resilience & Performance
+*   **Graceful Degradation**: If a pipeline stage fails, the system attempts to recover using fallback mechanisms or escalates to DIAS.
+*   **Error Recovery**: Configurable strategies including retries, fallbacks, and rollbacks.
+*   **Performance Patterns**: An intelligent caching strategy and parallel processing of tasks ensure a responsive system.
 
-1.  **Ideation → Blueprints**: The user's input is transformed into the Project Overview and Build Specifications.
-2.  **Blueprints → Styling**: The visual identity of the application is established.
-3.  **Styling → Page Designs**: The overall layout and structure of each page are designed.
-4.  **Page Designs → Navigation Design**: The application's navigation system, menus, and user flows are defined.
-5.  **Navigation Design → Component Specs**: The required components for each page and the navigation systems are identified and specified.
-6.  **Component Specs → Code Generation**: The Developer AI generates the code for each component.
-7.  **Code → Verification**: The Auditor AI reviews the generated code against quality gates.
-8.  **Verification → Registry**: The verified component is published to a central registry for reuse.
-9.  **Registry → Assembly**: All the generated components are assembled into a complete, running application.
+---
 
-<details>
-<summary>View Stage Details & AI Integration</summary>
+## 5. Component & Pipeline Architecture
 
-| Stage | Input | Output | Worker / AI Model | Duration |
-| :--- | :--- | :--- | :--- | :--- |
-| **1. Blueprints** | User Chat | 15 Blueprint Docs | **Developer AI (Opus)** | 5-10 min |
-| **2. Styling** | Blueprints | style-config.json | **Developer AI (Sonnet)** | 2-3 min |
-| **3. Page Designs** | Style Config | Page Layouts | **Developer AI (Sonnet)** | 10-15 min |
-| **4. Navigation** | Page Designs | Navigation Map | **Developer AI (Sonnet)** | 2-3 min |
-| **5. Component Specs**| Page Designs | component_reqs.json | **Developer AI (Haiku)**| 1-2 min |
-| **6. Code Generation**| Component Specs | Component Code | **Developer AI (Sonnet)** | 30s / comp |
-| **7. Verification**| Generated Code | Quality Report | **Auditor AI (Opus)**| 1-2 min / comp |
-| **8. Registry** | Verified Code | Registry Entry | **System (Haiku)** | 10s |
-| **9. Assembly** | All Components| Complete App | **Developer AI (Haiku)** | 2-5 min |
+### The Onboarding Blueprint
+The entire AVCA pipeline is driven by a comprehensive set of specifications gathered during user onboarding, resulting in a **Project Overview** and **Build Specifications**.
 
-*Note: The AI model is dynamically selected based on the complexity of the stage. This is a key cost-optimization strategy, reducing the overall pipeline cost by over 80% by using less expensive models for less complex tasks.*
+### Component Atomic Types
+AVCA classifies all parts of an application into eight "atomic" types, such as `UI Components`, `Logic Modules`, `Data Patterns`, and `Infrastructure`.
 
-</details>
+### The AVCA Pipeline Stages
+The pipeline is a series of nine distinct stages that take a project from concept to completion:
+1.  Ideation → Blueprints
+2.  Blueprints → Styling
+3.  Styling → Page Designs
+4.  Page Designs → Navigation Design
+5.  Navigation Design → Component Specs
+6.  Component Specs → Code Generation
+7.  Code → Verification
+8.  Verification → Registry
+9.  Registry → Assembly
 
-## 6. The Component Registry
+### The Component Registry
+At the heart of AVCA is a database that stores every version of every component, enabling versioning, reuse, and dependency tracking.
 
-At the heart of AVCA is a component registry. This is a database that stores every version of every component generated by the pipeline, enabling versioning, reuse, and dependency tracking.
-
-<details>
-<summary>View Registry SQL Schema</summary>
-
-```sql
-CREATE TABLE component_registry (
-  id UUID PRIMARY KEY,
-  name VARCHAR(255) UNIQUE NOT NULL,
-  type VARCHAR(50) NOT NULL, -- atomic unit type
-  version VARCHAR(20) NOT NULL,
-  props_schema JSONB NOT NULL,
-  dependencies JSONB DEFAULT '[]',
-  quality_scores JSONB NOT NULL,
-  usage_count INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE INDEX idx_component_type ON component_registry(type);
-CREATE INDEX idx_quality_scores ON component_registry((quality_scores->>'overall'));
-```
-</details>
-
-## 7. Quality Gates
-
-At Stage 7 (Verification), every component is automatically checked against a set of quality gates. The build will fail if these minimums are not met.
-
-<details>
-<summary>View Quality Gate Configuration</summary>
-
-```typescript
-interface QualityGate {
-  coverage: { min: 80 }; // Minimum 80% test coverage
-  security: { min: 9.0 }; // Minimum 9/10 security score
-  performance: { min: 90 }; // Minimum 90/100 performance score
-  accessibility: { standard: 'WCAG_AA' }; // Must meet WCAG AA standard
-  typing: { strict: true }; // Must pass TypeScript strict mode
-}
-```
-</details>
+### Quality Gates
+At the Verification stage, every component is automatically checked against a set of quality gates, including test coverage, security score, performance score, accessibility, and TypeScript strictness. The build will fail if these minimums are not met.
