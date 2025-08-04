@@ -5,7 +5,7 @@
 
 import { logicMonitor } from './logic-monitor';
 import { AVCADIASMonitor } from './avca-dias-monitor';
-import { MetricsCollector, ServiceMetrics } from '../integration/monitoring/metrics-collector';
+import { MetricsCollector } from '../integration/monitoring/metrics-collector';
 import { LogManager, LogLevel } from '../integration/logging/log-manager';
 import { EventBus } from '../avca/services/event-bus';
 
@@ -217,13 +217,13 @@ export class UnifiedMonitor {
    * Get comprehensive system status
    */
   getSystemStatus(): {
-    logic: any;
-    metrics: any;
-    logs: any;
+    logic: Record<string, unknown>;
+    metrics: Record<string, unknown>;
+    logs: Record<string, unknown>;
     health: string;
   } {
     const logicStats = logicMonitor.getModuleStats();
-    const missing = this.logicMonitor?.getMissingModules();
+    const _missing = this.logicMonitor?.getMissingModules();
     
     return {
       logic: {
@@ -243,13 +243,13 @@ export class UnifiedMonitor {
         format: 'json',
         active: !!this.logManager
       },
-      health: this.calculateOverallHealth(logicStats, missing)
+      health: this.calculateOverallHealth(logicStats, _missing)
     };
   }
 
   private calculateOverallHealth(
-    logicStats: any[], 
-    missing?: { avca: string[], dias: string[], integration: string[] }
+    logicStats: Record<string, unknown>[], 
+    _missing?: { avca: string[], dias: string[], integration: string[] }
   ): string {
     const totalModules = 17; // Expected total from AVCA + DIAS + Integration
     const activeModules = logicStats.length;

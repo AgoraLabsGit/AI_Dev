@@ -9,7 +9,6 @@ export async function GET() {
     const router = vibeLabServices.getRouter();
     
     // Check route readiness
-    const routeStatuses = router.getAllRouteStatuses();
     
     // Calculate overall health
     const totalServices = systemStatus.services.length;
@@ -81,7 +80,17 @@ export async function GET() {
   }
 }
 
-function generateRecommendations(systemStatus: any, healthScore: number): string[] {
+interface SystemService {
+  status: string;
+}
+
+interface SystemStatus {
+  basicReady: boolean;
+  enhancedReady: boolean;
+  services: SystemService[];
+}
+
+function generateRecommendations(systemStatus: SystemStatus, healthScore: number): string[] {
   const recommendations: string[] = [];
   
   if (healthScore < 50) {
@@ -104,12 +113,12 @@ function generateRecommendations(systemStatus: any, healthScore: number): string
     recommendations.push('Enhanced intelligence features are initializing in the background');
   }
   
-  const failedServices = systemStatus.services.filter((s: any) => s.status === 'failed');
+  const failedServices = systemStatus.services.filter((s: SystemService) => s.status === 'failed');
   if (failedServices.length > 0) {
     recommendations.push(`${failedServices.length} service(s) failed to initialize - some features may be unavailable`);
   }
   
-  const initializingServices = systemStatus.services.filter((s: any) => s.status === 'initializing');
+  const initializingServices = systemStatus.services.filter((s: SystemService) => s.status === 'initializing');
   if (initializingServices.length > 0) {
     recommendations.push(`${initializingServices.length} service(s) are still starting up - check back in a moment`);
   }

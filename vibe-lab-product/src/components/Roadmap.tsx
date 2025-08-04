@@ -195,7 +195,7 @@ export default function Roadmap() {
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Vibe Lab SaaS - Project Roadmap (MVP)</h1>
-        <p className="text-gray-400">Plan → Build → Test → Visualize Framework</p>
+        <p className="text-gray-400">Design → Build → Iterate Framework</p>
       </div>
 
       <div className="space-y-6">

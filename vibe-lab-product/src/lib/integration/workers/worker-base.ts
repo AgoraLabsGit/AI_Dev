@@ -4,7 +4,7 @@
  * Provides abstraction for AI, Script, and Hybrid workers
  */
 
-import { BaseService } from '../../avca/services/base-service';
+import { BaseService } from '@/lib/avca/services/base-service';
 import { EventBus } from '../../avca/services/event-bus';
 import { DIAS } from '../../dias';
 import { VibeLabAI } from '../../avca/services/vibe-lab-ai';

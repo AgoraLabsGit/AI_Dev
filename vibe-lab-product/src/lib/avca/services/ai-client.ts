@@ -1,7 +1,7 @@
-import { BaseService, ServiceConfig } from './base-service';
+import { BaseService } from './base-service';
 import { EventBus } from './event-bus';
 import { tokenTracker } from '../token-tracking';
-import { getModelForStage, calculateCost, ModelType } from '../model-config';
+import { calculateCost, ModelType } from '../model-config';
 import { RateLimiter } from './rate-limiter';
 import { RetryHandler, RetryResult } from './retry-handler';
 import { MonitorAVCA } from '../../monitoring/logic-monitor-integration';
@@ -37,7 +37,7 @@ export interface AnalysisRequest extends AIRequest {
 export interface AIRequest {
   role: AIRole;
   prompt: string;
-  context?: string;
+  context?: string | undefined;
   temperature?: number;
   maxTokens?: number;
   metadata?: Record<string, any>;
@@ -303,7 +303,7 @@ export class AIClientService extends BaseService {
       const aiRequest: AIRequest = {
         role: AIRole.ANALYZER,
         prompt: analysisPrompt,
-        context: request.source ? JSON.stringify(request.source) : undefined,
+        ...(request.source ? { context: JSON.stringify(request.source) } : {}),
         maxTokens: Math.min(pathSettings.contextLimit, ROLE_SETTINGS[AIRole.ANALYZER].maxTokens)
       };
 
@@ -407,7 +407,6 @@ export class AIClientService extends BaseService {
       
       if (!canProceed) {
         // Queue the request
-        const status = this.rateLimiter.getStatus(settings.model);
         this.log('warn', `Rate limited for ${settings.model}, queueing request`);
         
         // Create a promise that resolves when rate limit allows
@@ -715,7 +714,7 @@ Response Format:
   /**
    * Generate suggestions for blueprint implementation
    */
-  private generateBlueprintSuggestions(blueprint: any, request: BlueprintGenerationRequest): string[] {
+  private generateBlueprintSuggestions(blueprint: any, _request: BlueprintGenerationRequest): string[] {
     const suggestions: string[] = [];
 
     // Add template-specific suggestions
@@ -735,4 +734,7 @@ Response Format:
 
     return suggestions;
   }
-} 
+}
+
+// Type alias for backward compatibility
+export type AIClient = AIClientService;

@@ -7,9 +7,9 @@
  * - Event validation
  */
 
-import { BaseService } from '../../avca/services/base-service';
+import { BaseService } from '@/lib/avca/services/base-service';
 import { EventBus } from '../../avca/services/event-bus';
-import { EventFactory, EventCategory, DIASEvent } from './event-types';
+import { EventCategory, DIASEvent } from './event-types';
 
 export interface EventHandlerConfig {
   name?: string;
@@ -23,7 +23,7 @@ export interface EventProcessingResult {
   success: boolean;
   eventId: string;
   processingTime: number;
-  error?: string;
+  error?: string | undefined;
   metadata: {
     retries: number;
     handler: string;
@@ -155,7 +155,7 @@ export class EventHandlingSystem extends BaseService {
       success: false,
       eventId: event.id,
       processingTime: Date.now() - startTime,
-      error: lastError,
+      error: lastError || undefined,
       metadata: {
         retries,
         handler: 'failed',
@@ -218,7 +218,7 @@ export class EventHandlingSystem extends BaseService {
     if (this.eventBus) {
       // Subscribe to all event categories
       Object.values(EventCategory).forEach(category => {
-        this.eventBus!.subscribe(category, async (event: DIASEvent) => {
+        this.eventBus!.subscribe(category, 'event-handling-system', async (event: DIASEvent) => {
           await this.processEvent(event);
         });
       });

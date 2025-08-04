@@ -1,0 +1,17 @@
+# Vibe Lab Commit Template
+# 
+# Format: <type>(<scope>): <description>
+#
+# Types:
+#   feat: New feature
+#   fix: Bug fix  
+#   docs: Documentation
+#   style: Formatting
+#   refactor: Code restructure
+#   test: Adding tests
+#   chore: Maintenance
+#
+# Example: feat(auth): add user authentication system
+#
+# Quality checks will run automatically before commit.
+# Ensure all checks pass before committing.

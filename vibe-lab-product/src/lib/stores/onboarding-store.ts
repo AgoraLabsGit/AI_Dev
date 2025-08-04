@@ -1,9 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { DocumentSection } from '@/components/onboarding/LiveDocumentPreview';
-import { DocumentGenerator } from '@/lib/avca/services/document-generator';
-import { AIClient } from '@/lib/avca/services/ai-client';
-import { SourceAnalyzer } from '@/lib/avca/services/source-analyzer';
 
 // Types for onboarding data structures
 export type OnboardingStep = 'entry';
@@ -332,7 +329,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
             generatedOverview: mockOverview,
             isGenerating: false,
           });
-        } catch (error) {
+        } catch {
           set({
             lastError: error instanceof Error ? error.message : 'Failed to generate overview',
             isGenerating: false,
@@ -353,7 +350,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
             generatedSpecs: mockSpecs,
             isGenerating: false,
           });
-        } catch (error) {
+        } catch {
           set({
             lastError: error instanceof Error ? error.message : 'Failed to generate specifications',
             isGenerating: false,
@@ -390,7 +387,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
           });
           
           return blueprint;
-        } catch (error) {
+        } catch {
           set({
             lastError: error instanceof Error ? error.message : 'Failed to generate blueprint',
             isGenerating: false,
@@ -484,7 +481,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
               currentGeneratingDocument: null
             });
           }
-        } catch (error) {
+        } catch {
           // Revert section status on error
           const errorSections = [...(get()[document === 'overview' ? 'overviewSections' : 'specsSections'])];
           const errorIndex = errorSections.findIndex(s => s.id === sectionId);
@@ -537,7 +534,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
         });
       },
 
-      regenerateDocumentSection: async (document: 'overview' | 'specs', sectionId: string, feedback?: string) => {
+      regenerateDocumentSection: async (document: 'overview' | 'specs', sectionId: string, _feedback?: string) => {
         // Use the same logic as generateDocumentSection but with feedback context
         await get().generateDocumentSection(document, sectionId);
       },
@@ -560,7 +557,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
               lastSavedAt: new Date(),
             },
           }));
-        } catch (error) {
+        } catch {
           set({ lastError: 'Failed to save progress' });
         }
       },
@@ -569,7 +566,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
         try {
           // TODO: Implement backend loading
           console.log('Loading progress:', sessionId);
-        } catch (error) {
+        } catch {
           set({ lastError: 'Failed to load progress' });
         }
       },

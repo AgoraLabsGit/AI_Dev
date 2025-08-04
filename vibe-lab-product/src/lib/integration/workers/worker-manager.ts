@@ -4,7 +4,7 @@
  * Orchestrates pools of workers and distributes tasks
  */
 
-import { BaseService } from '../../avca/services/base-service';
+import { BaseService } from '@/lib/avca/services/base-service';
 import { EventBus } from '../../avca/services/event-bus';
 import { BaseWorker, WorkerInput, WorkerOutput, WorkerContext } from './worker-base';
 

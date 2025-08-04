@@ -1,0 +1,87 @@
+name: Vibe Lab Quality Assurance
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: TypeScript type checking
+      run: npm run type-check
+      
+    - name: ESLint analysis  
+      run: npm run lint
+      
+    - name: Security audit
+      run: npm run security:check
+      
+    - name: Architecture analysis
+      run: npm run arch:analyze
+      
+    - name: Run tests with coverage
+      run: npm run test:ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Generate quality report
+      run: npm run quality:report
+      
+    - name: Upload quality reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: quality-reports-${{ matrix.node-version }}
+        path: reports/quality/
+        
+    - name: Comment PR with quality report
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('reports/quality/latest.json', 'utf8'));
+          
+          const comment = `## 📊 Quality Report
+          
+**Overall Score:** ${report.score}/100 (${report.status.toUpperCase()})
+
+**Metrics:**
+- 🔧 TypeScript Errors: ${report.metrics.typeErrors}
+- ⚠️ ESLint Errors: ${report.metrics.lintErrors}  
+- 🧪 Test Coverage: ${report.metrics.testCoverage}%
+- 🏗️ Build: ${report.metrics.buildSuccess ? '✅ Success' : '❌ Failed'}
+- 🔒 Vulnerabilities: ${report.metrics.dependencyVulnerabilities}
+
+${report.recommendations.length > 0 ? `
+**Top Recommendations:**
+${report.recommendations.slice(0, 3).map(r => `- [${r.priority.toUpperCase()}] ${r.message}`).join('\n')}
+` : '✅ No issues found!'}
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

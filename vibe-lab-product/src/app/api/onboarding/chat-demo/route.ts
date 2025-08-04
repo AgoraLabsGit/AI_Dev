@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { logicMonitor, AVCA_MODULES, DIAS_MODULES, INTEGRATION_MODULES } from '../../../../../lib/monitoring/logic-monitor';
+import { logicMonitor, AVCA_MODULES, DIAS_MODULES, INTEGRATION_MODULES } from '@/lib/monitoring/logic-monitor';
 
 interface OnboardingChatRequest {
   message: string;
@@ -11,7 +11,7 @@ interface OnboardingChatRequest {
   }>;
   context?: {
     stage: 'initial' | 'requirements' | 'features' | 'architecture';
-    extractedInfo?: Record<string, any>;
+    extractedInfo?: Record<string, unknown>;
   };
 }
 
@@ -30,9 +30,9 @@ interface OnboardingChatResponse {
       requiresConfirm?: boolean;
     };
   }>;
-  extractedInfo?: Record<string, any>;
-  projectOverview?: any;
-  buildSpecifications?: any;
+  extractedInfo?: Record<string, unknown>;
+  projectOverview?: Record<string, unknown>;
+  buildSpecifications?: Record<string, unknown>;
   error?: string;
 }
 
@@ -206,7 +206,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function determineConversationStage(history: any[], context: any): string {
+function determineConversationStage(history: unknown[], _context: unknown): string {
   const messageCount = history.length;
   
   if (messageCount <= 2) return 'initial';

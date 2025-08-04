@@ -13,7 +13,7 @@ interface OnboardingChatRequest {
   }>;
   context?: {
     stage: 'initial' | 'requirements' | 'features' | 'architecture';
-    extractedInfo?: Record<string, any>;
+    extractedInfo?: Record<string, unknown>;
   };
 }
 
@@ -32,9 +32,9 @@ interface OnboardingChatResponse {
       requiresConfirm?: boolean;
     };
   }>;
-  extractedInfo?: Record<string, any>;
-  projectOverview?: any;
-  buildSpecifications?: any;
+  extractedInfo?: Record<string, unknown>;
+  projectOverview?: Record<string, unknown>;
+  buildSpecifications?: Record<string, unknown>;
   error?: string;
 }
 
@@ -140,11 +140,11 @@ export async function POST(request: NextRequest) {
  * Process with enhanced DIAS capabilities
  */
 async function processWithDIAS(
-  dias: any, 
+  dias: unknown, 
   message: string, 
   projectName: string, 
-  conversationHistory: any[], 
-  context: any
+  conversationHistory: unknown[], 
+  context: unknown
 ): Promise<OnboardingChatResponse> {
   console.log('🧠 Using enhanced DIAS processing');
   
@@ -178,11 +178,11 @@ async function processWithDIAS(
  * Process with basic AI client
  */
 async function processWithAIClient(
-  aiClient: any,
+  aiClient: unknown,
   message: string,
   projectName: string,
-  conversationHistory: any[],
-  context: any
+  conversationHistory: unknown[],
+  context: unknown
 ): Promise<OnboardingChatResponse> {
   console.log('🤖 Using basic AI client processing');
   
@@ -217,8 +217,8 @@ async function processWithAIClient(
 function buildContextString(
   message: string,
   projectName: string,
-  conversationHistory: any[],
-  context: any
+  conversationHistory: unknown[],
+  context: unknown
 ): string {
   const stage = context?.stage || 'initial';
   const historyContext = conversationHistory.slice(-5).map(msg => 
@@ -313,7 +313,7 @@ function generateQuickActions(stage?: string): Array<{
   id: string;
   label: string;
   type: 'primary' | 'secondary' | 'suggest' | 'multi-select' | 'danger' | 'info' | 'warning';
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }> {
   const baseActions = [
     {

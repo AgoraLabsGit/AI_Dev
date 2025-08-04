@@ -10,13 +10,13 @@ export interface LogicModuleEvent {
   system: 'AVCA' | 'DIAS' | 'INTEGRATION';
   module: string;
   operation: string;
-  inputs: Record<string, any>;
+  inputs: Record<string, unknown>;
   decision: {
     logic: string;
     confidence?: number;
     alternatives?: string[];
   };
-  outputs: Record<string, any>;
+  outputs: Record<string, unknown>;
   duration: number;
   metadata?: {
     tokenUsage?: number;
@@ -45,7 +45,7 @@ export class LogicMonitor extends EventEmitter {
     system: LogicModuleEvent['system'],
     module: string,
     operation: string,
-    inputs: Record<string, any>,
+    inputs: Record<string, unknown>,
     logic: string
   ): { flowId: string; startTime: number } {
     if (!this.isEnabled) return { flowId: '', startTime: 0 };
@@ -82,7 +82,7 @@ export class LogicMonitor extends EventEmitter {
   completeModule(
     flowId: string,
     startTime: number,
-    outputs: Record<string, any>,
+    outputs: Record<string, unknown>,
     decision?: Partial<LogicModuleEvent['decision']>,
     metadata?: LogicModuleEvent['metadata']
   ) {
@@ -247,7 +247,7 @@ export class LogicMonitor extends EventEmitter {
     return `flow_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
-  private sanitizeInputs(inputs: Record<string, any>): Record<string, any> {
+  private sanitizeInputs(inputs: Record<string, unknown>): Record<string, unknown> {
     // Truncate large inputs for display
     return Object.entries(inputs).reduce((acc, [key, value]) => {
       if (typeof value === 'string' && value.length > 100) {
@@ -260,10 +260,10 @@ export class LogicMonitor extends EventEmitter {
         acc[key] = value;
       }
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, unknown>);
   }
 
-  private sanitizeOutputs(outputs: Record<string, any>): Record<string, any> {
+  private sanitizeOutputs(outputs: Record<string, unknown>): Record<string, unknown> {
     return this.sanitizeInputs(outputs); // Same logic
   }
 

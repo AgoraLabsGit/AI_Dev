@@ -7,9 +7,9 @@ let recentResponses: Array<{
   projectName: string;
   userMessage: string;
   aiResponse: string;
-  extractedInfo: any;
+  extractedInfo: Record<string, unknown>;
   suggestions: string[];
-  quickActions: any[];
+  quickActions: Record<string, unknown>[];
 }> = [];
 
 export async function GET() {

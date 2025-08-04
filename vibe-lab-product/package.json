@@ -8,7 +8,7 @@
     "dev:monitor": "node scripts/ensure-port-3000.js && tsx scripts/dev-with-monitoring.ts && next dev -p 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "npx eslint src --ext .ts,.tsx",
     "check:pwa": "node scripts/pwa-compliance-check.js",
     "check:architecture": "node scripts/component-architecture-check.js",
     "check:design-system": "npm run check:pwa && npm run check:architecture",
@@ -41,12 +41,26 @@
     "demo:pipeline": "tsx scripts/demo-component-pipeline.ts",
     "debug:pipeline": "tsx scripts/debug-pipeline.ts",
     "test:all": "npm run test:microservices && npm run test:ai-client && npm run test:rate-limit-retry && npm run test:cost-optimization && npm run test:context-manager && npm run test:dias-events && npm run test:blueprint-parser && npm run test:component-planner && npm run test:code-generator && npm run test:quality-assurance",
-    "test:watch": "tsx --watch scripts/test-*.ts",
-    "test:ci": "npm run test:all -- --reporter json > test-results.json"
+    "test:watch": "jest --watch",
+    "test:ci": "jest --coverage --watchAll=false",
+    "type-check": "npx tsc --noEmit",
+    "type-check:watch": "npx tsc --noEmit --watch",
+    "lint:fix": "npx eslint src --ext .ts,.tsx --fix",
+    "quality:check": "npm run type-check && npm run lint && npm run test:ci",
+    "quality:fix": "npm run lint:fix && npm audit fix",
+    "quality:report": "node scripts/generate-quality-report.js",
+    "arch:deps": "npx madge --circular --extensions ts,tsx src/",
+    "arch:unused": "npx ts-unused-exports tsconfig.json",
+    "arch:analyze": "npm run arch:deps && npm run arch:unused",
+    "security:audit": "npx audit-ci --config audit-ci.json",
+    "security:check": "npm audit && npx audit-ci",
+    "pre-commit": "npm run quality:check",
+    "validate": "npm run quality:check && npm run arch:analyze && npm run security:check"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.57.0",
     "@dqbd/tiktoken": "^1.0.21",
+    "@octokit/rest": "^22.0.0",
     "@playwright/test": "^1.54.2",
     "@prisma/client": "^6.12.0",
     "@tailwindcss/typography": "^0.5.16",
@@ -66,16 +80,45 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@jest/globals": "^30.0.5",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "audit-ci": "^7.1.0",
     "autoprefixer": "^10.4.14",
-    "eslint": "^9",
-    "eslint-config-next": "15.4.4",
+    "eslint": "^9.32.0",
+    "eslint-config-next": "^15.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "husky": "^9.1.7",
+    "jest": "^30.0.5",
+    "lint-staged": "^16.1.4",
+    "madge": "^8.0.0",
     "postcss": "^8.4.31",
     "prisma": "^6.12.0",
     "tailwindcss": "^3.3.0",
+    "ts-jest": "^29.4.1",
+    "ts-unused-exports": "^11.0.1",
     "tsx": "^4.20.3",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "npx tsc --noEmit",
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{js,jsx,ts,tsx,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run quality:check"
+    }
   }
 }

@@ -1,5 +1,8 @@
 // AI Client types for AVCA system
 
+// Re-export AIRole from services for convenience
+export { AIRole } from '../services/ai-client';
+
 export interface AIResponse {
   response: string;
   extractedInfo?: Record<string, any>;

@@ -238,7 +238,7 @@ export class RateLimiter extends EventEmitter {
   private refillBuckets(): void {
     const now = Date.now();
 
-    this.buckets.forEach((bucket, key) => {
+    this.buckets.forEach((bucket) => {
       const elapsed = now - bucket.lastRefill;
       const tokensToAdd = elapsed * bucket.refillRate;
 

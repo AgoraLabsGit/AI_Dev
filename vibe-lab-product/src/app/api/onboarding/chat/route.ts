@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIClientService, AIRole, EntryPathType, AnalysisRequest } from '../../../../../lib/avca/services/ai-client';
-import { EventBus } from '../../../../../lib/avca/services/event-bus';
-import { EventHandlingSystem } from '../../../../../lib/dias/events/event-handlers';
-import { EventFactory, EventCategory } from '../../../../../lib/dias/events/event-types';
+import { AIClientService, AIRole, EntryPathType, AnalysisRequest } from '@/lib/avca/services/ai-client';
+import { EventBus } from '@/lib/avca/services/event-bus';
+import { EventHandlingSystem } from '@/lib/dias/events/event-handlers';
 import { logicMonitor, AVCA_MODULES, DIAS_MODULES, INTEGRATION_MODULES } from '@/lib/monitoring/logic-monitor';
-import { safeToISOString } from '../../../../../src/utils/date';
+import { safeToISOString } from '@/utils/date';
+import { FlexibleObject, ConversationMessage } from '@/types/development-friendly';
 
 interface OnboardingChatRequest {
   message: string;
@@ -16,7 +16,7 @@ interface OnboardingChatRequest {
   }>;
   context?: {
     stage: 'initial' | 'requirements' | 'features' | 'architecture';
-    extractedInfo?: Record<string, any>;
+    extractedInfo?: Record<string, unknown>;
   };
 }
 
@@ -35,9 +35,9 @@ interface OnboardingChatResponse {
       requiresConfirm?: boolean;
     };
   }>;
-  extractedInfo?: Record<string, any>;
-  projectOverview?: any;
-  buildSpecifications?: any;
+  extractedInfo?: Record<string, unknown>;
+  projectOverview?: Record<string, unknown>;
+  buildSpecifications?: Record<string, unknown>;
   error?: string;
 }
 
@@ -258,7 +258,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function determineEntryPath(history: any[], context: any): EntryPathType {
+function determineEntryPath(history: unknown[], context: unknown): EntryPathType {
   // Check for mentions of existing code, GitHub, or documentation
   const lastMessages = history.slice(-3).map(m => m.content.toLowerCase());
   const allText = lastMessages.join(' ');
@@ -276,7 +276,7 @@ function determineEntryPath(history: any[], context: any): EntryPathType {
   return EntryPathType.FRESH;
 }
 
-function determineConversationStage(history: any[], context: any): string {
+function determineConversationStage(history: unknown[], context: unknown): string {
   const messageCount = history.length;
   const extractedInfo = context?.extractedInfo || {};
   
@@ -300,7 +300,7 @@ Respond with:
 Keep it conversational, encouraging, and under 100 words.`;
 }
 
-function buildConversationPrompt(message: string, history: any[], stage: string): string {
+function buildConversationPrompt(message: string, history: unknown[], stage: string): string {
   const stagePrompts = {
     initial: `Analyze this initial project description and extract:
 1. Project type (web app, mobile app, API, etc.)
@@ -337,7 +337,7 @@ ${history.slice(-3).map(m => `${m.role}: ${m.content}`).join('\n')}
 Provide a structured analysis focusing on the current conversation stage.`;
 }
 
-function buildResponsePrompt(analysisResult: any, stage: string): string {
+function buildResponsePrompt(analysisResult: FlexibleObject, stage: string): string {
   return `Based on the analysis results, generate a conversational response that:
 
 1. Acknowledges what the user has shared
@@ -378,7 +378,7 @@ function extractBasicInfo(message: string, projectName?: string): Record<string,
   return info;
 }
 
-function generateSimpleProjectOverview(extractedInfo: any, projectName?: string): any {
+function generateSimpleProjectOverview(extractedInfo: FlexibleObject, projectName?: string): FlexibleObject {
   return {
     name: projectName || extractedInfo.projectName || 'Your Project',
     description: `A ${extractedInfo.projectType || 'modern application'}`,
@@ -388,7 +388,7 @@ function generateSimpleProjectOverview(extractedInfo: any, projectName?: string)
   };
 }
 
-function extractInformationFromAnalysis(analysisResult: any): Record<string, any> {
+function extractInformationFromAnalysis(analysisResult: unknown): Record<string, unknown> {
   const info: Record<string, any> = {};
   
   // Extract from analysis results
@@ -408,7 +408,7 @@ function extractInformationFromAnalysis(analysisResult: any): Record<string, any
   return info;
 }
 
-function generateQuickActions(context: any, stage: string): Array<{
+function generateQuickActions(context: FlexibleObject, stage: string): Array<{
   id: string;
   label: string;
   type: 'primary' | 'secondary' | 'suggest' | 'multi-select' | 'danger' | 'info' | 'warning';
@@ -574,7 +574,7 @@ function generateQuickActions(context: any, stage: string): Array<{
   return actions;
 }
 
-function shouldGenerateOverview(extractedInfo: any, history: any[]): boolean {
+function shouldGenerateOverview(extractedInfo: FlexibleObject, history: ConversationMessage[]): boolean {
   // Generate overview if we have enough information
   const hasProjectType = extractedInfo.projectType;
   const hasFeatures = extractedInfo.features && extractedInfo.features.length > 0;
@@ -584,7 +584,7 @@ function shouldGenerateOverview(extractedInfo: any, history: any[]): boolean {
   return hasProjectType && hasFeatures && (hasArchitecture || enoughMessages);
 }
 
-function generateProjectOverview(extractedInfo: any, analysisResult: any): any {
+function generateProjectOverview(extractedInfo: FlexibleObject, analysisResult: FlexibleObject): FlexibleObject {
   return {
     name: extractedInfo.projectName || 'Your Project',
     description: extractedInfo.description || `A ${extractedInfo.projectType} application`,

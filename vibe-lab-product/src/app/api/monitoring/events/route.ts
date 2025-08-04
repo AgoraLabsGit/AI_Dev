@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { logicMonitor } from '../../../../../lib/monitoring/logic-monitor';
+import { logicMonitor } from '@/lib/monitoring/logic-monitor';
 
 export async function GET() {
   try {

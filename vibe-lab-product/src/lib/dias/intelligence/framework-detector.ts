@@ -1,4 +1,4 @@
-import { BaseService } from '../../avca/services/base-service';
+import { BaseService } from '@/lib/avca/services/base-service';
 
 export interface Framework {
   name: string;

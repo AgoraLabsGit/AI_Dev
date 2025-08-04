@@ -217,7 +217,7 @@ export interface TemplateUsageHistory {
 export interface CustomizationPattern {
   type: 'color' | 'typography' | 'spacing' | 'component';
   frequency: number;
-  preferences: Record<string, any>;
+  preferences: Record<string, string | number | boolean>;
 }
 
 export interface IndustryStyleAlignment {
@@ -285,7 +285,7 @@ export interface TemplateRecommendationRequest {
   userId: string;
   projectContext?: ProjectContext;
   brandGuidelines?: BrandGuidelines;
-  preferenceOverrides?: Record<string, any>;
+  preferenceOverrides?: Record<string, string | number | boolean>;
 }
 
 export interface ProjectContext {
@@ -301,7 +301,7 @@ export interface ProjectContext {
 export interface ComponentStylingRequest {
   projectId: string;
   componentType: string;
-  componentProps: Record<string, any>;
+  componentProps: Record<string, unknown>;
   inheritFromTemplate: boolean;
   customizations?: ComponentCustomizations;
 }
@@ -334,7 +334,7 @@ export interface StyleRecommendation {
   type: 'improvement' | 'consistency' | 'accessibility' | 'performance';
   message: string;
   impact: 'low' | 'medium' | 'high';
-  suggestedChange: Record<string, any>;
+  suggestedChange: Record<string, string | number>;
   reasoning: string;
 }
 
@@ -361,7 +361,7 @@ export interface StyleSuggestion {
 }
 
 export interface StyleImplementation {
-  changes: Record<string, any>;
+  changes: Record<string, string | number>;
   cssUpdates: string[];
   componentUpdates: string[];
   estimatedEffort: 'minutes' | 'hours' | 'days';
@@ -618,7 +618,7 @@ export interface IStylingService {
   generateProjectCSS(projectId: string, format?: CSSExportFormat): Promise<string>;
   exportProjectTheme(projectId: string, userId: string, format?: CSSExportFormat): Promise<{ content: string; filename: string }>;
   getUserStylingAnalytics(userId: string): Promise<StylingAnalytics>;
-  validateComponentStyle(projectId: string, componentType: string, componentStyle: Record<string, any>): Promise<StyleConsistencyCheck>;
+  validateComponentStyle(projectId: string, componentType: string, componentStyle: Record<string, unknown>): Promise<StyleConsistencyCheck>;
 }
 
 // Event Handler Contracts
@@ -634,7 +634,7 @@ export interface IStylingEventHandler {
 export interface IAVCAStylingEnhancement {
   enhanceContextWithStyling(projectId: string, userId: string): Promise<AVCAStylingContext>;
   generateComponentWithStyling(request: ComponentStylingRequest): Promise<ComponentStylingResponse>;
-  validateStyleConsistency(projectId: string, componentType: string, componentStyle: Record<string, any>): Promise<StyleConsistencyCheck>;
+  validateStyleConsistency(projectId: string, componentType: string, componentStyle: Record<string, unknown>): Promise<StyleConsistencyCheck>;
   suggestStyleOptimizations(projectId: string, componentType: string): Promise<StyleRecommendation[]>;
 }
 

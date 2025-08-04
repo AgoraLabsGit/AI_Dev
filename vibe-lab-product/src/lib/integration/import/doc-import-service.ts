@@ -7,7 +7,7 @@
  * - Structure analysis
  */
 
-import { BaseService } from '../../avca/services/base-service';
+import { BaseService } from '@/lib/avca/services/base-service';
 import { EventBus } from '../../avca/services/event-bus';
 import { promises as fs } from 'fs';
 import * as path from 'path';

@@ -10,7 +10,6 @@
  */
 
 import { EventEmitter } from 'events';
-import { ServiceEvent } from './base-service';
 
 export interface EventBusConfig {
   maxRetries?: number;
@@ -41,7 +40,7 @@ export interface Subscription {
   topic: string;
   subscriber: string;
   handler: (message: Message) => Promise<void>;
-  filter?: (message: Message) => boolean;
+  filter?: ((message: Message) => boolean) | undefined;
 }
 
 export class EventBus extends EventEmitter {
@@ -69,7 +68,7 @@ export class EventBus extends EventEmitter {
     topic: string,
     subscriber: string,
     handler: (message: Message) => Promise<void>,
-    filter?: (message: Message) => boolean
+    filter?: (message: Message) => boolean | undefined
   ): string {
     const subscription: Subscription = {
       id: `sub-${++this.messageCounter}`,

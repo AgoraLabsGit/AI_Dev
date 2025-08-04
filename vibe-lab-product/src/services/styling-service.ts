@@ -93,7 +93,7 @@ interface ProjectStyling {
   id: string;
   projectId: string;
   templateId: string;
-  customizations: Record<string, any>;
+  customizations: Record<string, unknown>;
   appliedAt: Date;
   version: string;
 }
@@ -103,7 +103,7 @@ interface StylingEvent {
   projectId: string;
   templateId: string;
   userId: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   timestamp: Date;
 }
 

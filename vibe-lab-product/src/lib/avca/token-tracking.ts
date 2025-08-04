@@ -188,7 +188,7 @@ export class TokenTracker {
     let totalCost = 0;
     let requestCount = 0;
     
-    for (const [requestId, stages] of this.usage.entries()) {
+    for (const [, stages] of this.usage.entries()) {
       const requestDate = stages[0]?.timestamp.toISOString().split('T')[0];
       if (requestDate === date) {
         requestCount++;

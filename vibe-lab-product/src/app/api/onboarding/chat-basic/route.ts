@@ -11,7 +11,7 @@ interface OnboardingChatRequest {
   }>;
   context?: {
     stage: 'initial' | 'requirements' | 'features' | 'architecture';
-    extractedInfo?: Record<string, any>;
+    extractedInfo?: Record<string, unknown>;
   };
 }
 
@@ -30,9 +30,9 @@ interface OnboardingChatResponse {
       requiresConfirm?: boolean;
     };
   }>;
-  extractedInfo?: Record<string, any>;
-  projectOverview?: any;
-  buildSpecifications?: any;
+  extractedInfo?: Record<string, unknown>;
+  projectOverview?: Record<string, unknown>;
+  buildSpecifications?: Record<string, unknown>;
   _metadata?: {
     processingTime: number;
     mode: string;
