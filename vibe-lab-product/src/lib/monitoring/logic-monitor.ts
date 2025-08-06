@@ -19,9 +19,48 @@ export interface LogicModuleEvent {
   outputs: Record<string, unknown>;
   duration: number;
   metadata?: {
+    // Performance & Resource Usage
     tokenUsage?: number;
     cacheHit?: boolean;
+    memoryUsage?: number;
+    cpuTime?: number;
+    
+    // Error & Quality Tracking
     errors?: string[];
+    warnings?: string[];
+    qualityScore?: number;
+    
+    // Context & Traceability
+    sourcePage?: string;
+    sourceRoute?: string;
+    userAgent?: string;
+    sessionId?: string;
+    userId?: string;
+    
+    // AI-Specific Metrics
+    modelUsed?: string;
+    promptTokens?: number;
+    completionTokens?: number;
+    temperature?: number;
+    maxTokens?: number;
+    
+    // Business Logic
+    inputSize?: number;
+    outputSize?: number;
+    processingSteps?: string[];
+    dependencies?: string[];
+    
+    // Quality & Learning
+    userFeedback?: 'positive' | 'negative' | 'neutral';
+    accuracyScore?: number;
+    learningApplied?: boolean;
+    patternMatches?: number;
+    
+    // System Health
+    retryCount?: number;
+    fallbackUsed?: boolean;
+    serviceVersion?: string;
+    environmentInfo?: string;
   };
 }
 
@@ -46,7 +85,8 @@ export class LogicMonitor extends EventEmitter {
     module: string,
     operation: string,
     inputs: Record<string, unknown>,
-    logic: string
+    logic: string,
+    pageContext?: { sourcePage?: string; sourceRoute?: string; userAgent?: string }
   ): { flowId: string; startTime: number } {
     if (!this.isEnabled) return { flowId: '', startTime: 0 };
 
@@ -59,7 +99,12 @@ export class LogicMonitor extends EventEmitter {
       module,
       operation,
       inputs: this.sanitizeInputs(inputs),
-      decision: { logic }
+      decision: { logic },
+      metadata: pageContext ? {
+        sourcePage: pageContext.sourcePage,
+        sourceRoute: pageContext.sourceRoute,
+        userAgent: pageContext.userAgent
+      } : {}
     };
 
     // Start tracking this flow

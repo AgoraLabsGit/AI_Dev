@@ -73,14 +73,15 @@ export default function MainSidebar({
       style={{ width: width || 320 }}
     >
       {/* Header */}
-      <div className="p-4 border-b border-[#1F1F23]">
+      <div className="p-3 border-b border-[#1F1F23]">
         {/* Logo and Collapse */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#1A1A1C] flex items-center justify-center">
-              <span className="text-sm font-normal text-white">VL</span>
-            </div>
-            <span className="font-normal text-lg text-white">Vibe Lab</span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center">
+            <img 
+              src="/assets/brand/largeLogo.svg" 
+              alt="Vibe Lab Logo"
+              className="w-8 h-8 object-contain"
+            />
           </div>
           <button 
             onClick={() => onCollapse(true)}

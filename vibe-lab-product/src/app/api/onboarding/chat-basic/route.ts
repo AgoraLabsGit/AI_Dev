@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     console.log('🚀 Basic Chat: Starting simple processing...');
     
     const body: OnboardingChatRequest = await request.json();
-    const { message, projectName, conversationHistory, context } = body;
+    const { message, projectName, context } = body;
 
     console.log(`🎯 Basic Chat: Processing "${message.substring(0, 50)}..." for ${projectName}`);
 
@@ -65,8 +65,6 @@ export async function POST(request: NextRequest) {
       suggestions: [],
       quickActions,
       extractedInfo,
-      projectOverview: null,
-      buildSpecifications: null,
       _metadata: {
         processingTime,
         mode: 'basic-fallback',

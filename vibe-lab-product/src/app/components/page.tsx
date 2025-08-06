@@ -1,174 +1,188 @@
-import { Suspense } from 'react';
-import { 
-  LayoutGrid, 
-  Layers, 
-  MousePointerClick,
-  Type,
-  Table2,
-  Bell,
-  Calendar,
-  Info,
-  Menu,
-  ChevronRight
-} from 'lucide-react';
+/**
+ * Component Gallery Page (Final Professional Version)
+ * 
+ * Showcases a rich gallery of components styled with a professional, custom-built
+ * theme provider that correctly maps themes to Shadcn component variables.
+ */
+'use client';
 
-interface ComponentCategory {
-  name: string;
-  icon: React.ElementType;
-  description: string;
-  count: number;
-  components: {
-    name: string;
-    variants: string[];
-    priority: string;
-  }[];
-}
+import { useState, useEffect, useMemo } from 'react';
+import { ComponentService } from '@/lib/avca/services/ComponentService';
+import { themes, Theme } from '@/lib/theme-provider';
+import { ComponentMetadata } from '@/lib/avca/pipeline/component-pipeline/types';
+import { Palette, Sparkles, SlidersHorizontal, Check, X } from 'lucide-react';
 
-const categories: ComponentCategory[] = [
-  {
-    name: "Interactive",
-    icon: MousePointerClick,
-    description: "High-interaction components for user input",
-    count: 294,
-    components: [
-      {
-        name: "Buttons",
-        variants: ["Primary", "Secondary", "Outline", "Ghost", "Loading", "Icon", "Split"],
-        priority: "HIGHEST"
-      },
-      {
-        name: "Inputs",
-        variants: ["Text", "Email", "Password", "Search", "Number", "TextArea", "File"],
-        priority: "HIGHEST"
-      },
-      {
-        name: "Selects",
-        variants: ["Single", "Multi", "Searchable", "Grouped", "AsyncLoad", "Country", "User"],
-        priority: "HIGH"
+// Import all the base components
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { Calendar } from "@/components/ui/calendar";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+
+// --- Main Component ---
+export default function ComponentGalleryPage() {
+  const [components, setComponents] = useState<ComponentMetadata[]>([]);
+  const [selectedTheme, setSelectedTheme] = useState<Theme>(themes[0]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [progress, setProgress] = useState(60);
+
+  const componentService = useMemo(() => new ComponentService(), []);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const componentData = await componentService.getComponents();
+        setComponents(componentData);
+      } catch (error) {
+        console.error("Failed to fetch component data:", error);
+      } finally {
+        setIsLoading(false);
       }
-    ]
-  },
-  {
-    name: "Layout",
-    icon: LayoutGrid,
-    description: "Core layout and structure components",
-    count: 157,
-    components: [
-      {
-        name: "Cards",
-        variants: ["Basic", "WithImage", "WithActions", "Stats", "Product", "User", "Pricing"],
-        priority: "HIGH"
-      },
-      {
-        name: "Accordions",
-        variants: ["Single", "Multiple", "FAQ", "Navigation", "Settings", "Content"],
-        priority: "HIGH"
-      },
-      {
-        name: "Tabs",
-        variants: ["Horizontal", "Vertical", "Pills", "Underline", "Card", "Icon"],
-        priority: "HIGH"
-      }
-    ]
-  },
-  {
-    name: "Data Display",
-    icon: Table2,
-    description: "Components for displaying data and content",
-    count: 55,
-    components: [
-      {
-        name: "Tables",
-        variants: ["Basic", "Sortable", "Filterable", "Paginated", "Editable", "Responsive"],
-        priority: "HIGH"
-      },
-      {
-        name: "Charts",
-        variants: ["Line", "Bar", "Pie", "Area", "Dashboard"],
-        priority: "MEDIUM"
-      }
-    ]
-  },
-  {
-    name: "Feedback",
-    icon: Bell,
-    description: "User feedback and notification components",
-    count: 92,
-    components: [
-      {
-        name: "AI Chats",
-        variants: ["Basic", "Threaded", "Support", "Assistant", "Team", "Bot"],
-        priority: "HIGH"
-      },
-      {
-        name: "Notifications",
-        variants: ["Toast", "Banner", "Badge", "Inbox"],
-        priority: "MEDIUM"
-      },
-      {
-        name: "Modals",
-        variants: ["Confirmation", "Form", "Info", "Image", "Drawer"],
-        priority: "HIGH"
-      }
-    ]
+    }
+    fetchData();
+  }, [componentService]);
+
+  useEffect(() => {
+    if (selectedTheme) {
+      const root = document.documentElement;
+      Object.entries(selectedTheme.variables).forEach(([key, value]) => {
+        root.style.setProperty(key, value);
+      });
+    }
+  }, [selectedTheme]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background text-foreground">
+        <Sparkles className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-4 text-lg font-semibold">Loading Gallery...</span>
+      </div>
+    );
   }
-];
 
-export default function ComponentLibraryPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="container py-6">
-          <h1 className="text-4xl font-bold">Component Library</h1>
-          <p className="mt-2 text-muted-foreground">
-            224 production-ready components across 10 style templates
-          </p>
-        </div>
-      </header>
+    <div className="bg-background text-foreground min-h-screen p-4 sm:p-6 lg:p-12 font-sans">
+      <div className="max-w-7xl mx-auto">
+        
+        <header className="mb-12">
+          <h1 className="text-4xl font-bold tracking-tighter">Component Gallery</h1>
+          <p className="text-lg text-muted-foreground mt-2">An interactive showcase of our new component library.</p>
+        </header>
 
-      <main className="container py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {categories.map((category) => (
-            <div 
-              key={category.name}
-              className="group relative rounded-lg border border-border bg-card p-6 hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-center gap-4">
-                <div className="p-2 rounded-md bg-primary/10 text-primary">
-                  <category.icon className="w-6 h-6" />
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-4 flex items-center"><Palette className="mr-3 text-primary"/>Styling Templates</h2>
+          <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-secondary scrollbar-track-muted">
+            {themes.map((theme) => (
+              <Button 
+                key={theme.name} 
+                variant={selectedTheme.name === theme.name ? 'default' : 'outline'}
+                onClick={() => setSelectedTheme(theme)}
+                className="flex-shrink-0 capitalize"
+              >
+                {theme.name}
+              </Button>
+            ))}
+          </div>
+        </section>
+
+        <main className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          
+          {/* Column 1 */}
+          <div className="col-span-1 lg:col-span-1 space-y-8">
+            <Card className="bg-primary text-primary-foreground">
+              <CardHeader>
+                <CardDescription>March 25th</CardDescription>
+                <CardTitle>Customize every button and chip instance primary color</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-2">
+                   <Avatar>
+                     <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                     <AvatarFallback>LS</AvatarFallback>
+                   </Avatar>
+                   <span className="text-sm">Assigned to Lucas Smith</span>
                 </div>
-                <div>
-                  <h2 className="font-semibold">{category.name}</h2>
-                  <p className="text-sm text-muted-foreground">{category.count} components</p>
-                </div>
-              </div>
-
-              <p className="mt-4 text-sm text-muted-foreground">
-                {category.description}
-              </p>
-
-              <div className="mt-6 space-y-4">
-                {category.components.map((component) => (
-                  <div 
-                    key={component.name}
-                    className="group/item flex items-center justify-between rounded-md p-2 hover:bg-muted/50 transition-colors"
-                  >
-                    <div>
-                      <h3 className="font-medium">{component.name}</h3>
-                      <p className="text-xs text-muted-foreground">
-                        {component.variants.length} variants • {component.priority}
-                      </p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover/item:text-foreground transition-colors" />
+              </CardContent>
+              <CardFooter className="flex flex-col items-start space-y-2">
+                 <Progress value={progress} className="w-full" />
+                 <span className="text-sm self-end">{progress}%</span>
+              </CardFooter>
+            </Card>
+            <Card>
+               <CardContent className="p-0 flex justify-center">
+                 <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md" />
+               </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center space-x-4">
+                  <Avatar>
+                    <AvatarImage src="https://github.com/shadcn.png" alt="Angela Erickson" />
+                    <AvatarFallback>AE</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle>Angela Erickson</CardTitle>
+                    <CardDescription>Incredible discoveries</CardDescription>
                   </div>
-                ))}
-              </div>
+                </div>
+              </CardHeader>
+            </Card>
+          </div>
 
-              <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-            </div>
-          ))}
-        </div>
-      </main>
+          {/* Column 2 */}
+          <div className="col-span-1 lg:col-span-2 space-y-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Install one of our production-ready libraries</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc list-inside space-y-2">
+                  <li>Material UI</li>
+                  <li>MUI Base</li>
+                  <li>Joy UI</li>
+                </ul>
+              </CardContent>
+            </Card>
+            <Tabs defaultValue="joy-ui" className="w-full">
+              <TabsList>
+                <TabsTrigger value="joy-ui">Joy UI</TabsTrigger>
+                <TabsTrigger value="material-ui">Material UI</TabsTrigger>
+                <TabsTrigger value="mui-base">MUI Base</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Card>
+              <CardContent className="p-6">
+                <Slider defaultValue={[25, 50]} max={100} step={1} />
+              </CardContent>
+            </Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="text-right">Size</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>Assets & illustrations</TableCell>
+                  <TableCell className="text-right">21 MB</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Components</TableCell>
+                  <TableCell className="text-right text-primary">11.0 KB</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

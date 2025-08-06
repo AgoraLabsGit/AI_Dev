@@ -1,15 +1,23 @@
 import { NextResponse } from 'next/server';
 import { logicMonitor } from '../../../lib/monitoring/logic-monitor';
+import { captureEnhancedPageContext } from '../../../lib/monitoring/page-context';
 
 export async function POST() {
   try {
+    // Capture page context for monitoring
+    const pageContext = captureEnhancedPageContext({
+      operation: 'monitoring-test',
+      feature: 'system-validation'
+    });
+
     // Simulate some AVCA activity
     const monitor1 = logicMonitor.trackModule(
       'AVCA',
       'test-analyzer',
       'test-analysis',
       { testData: 'sample input' },
-      'Testing monitoring system'
+      'Testing monitoring system',
+      pageContext
     );
 
     // Simulate processing time
@@ -20,7 +28,15 @@ export async function POST() {
       monitor1.startTime,
       { result: 'analysis complete', confidence: 85 },
       { confidence: 85, logic: 'Completed test analysis' },
-      { tokenUsage: 150, cacheHit: false }
+      { 
+        tokenUsage: 150, 
+        cacheHit: false,
+        sourcePage: pageContext.sourcePage,
+        sourceRoute: pageContext.sourceRoute,
+        modelUsed: 'gpt-4',
+        qualityScore: 85,
+        environmentInfo: pageContext.environmentInfo
+      }
     );
 
     // Simulate DIAS activity
@@ -29,7 +45,8 @@ export async function POST() {
       'pattern-recognizer',
       'pattern-analysis',
       { patterns: ['test-pattern'] },
-      'Analyzing patterns for test'
+      'Analyzing patterns for test',
+      pageContext
     );
 
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -39,7 +56,16 @@ export async function POST() {
       monitor2.startTime,
       { patterns: 3, recommendations: 2 },
       { confidence: 92, logic: 'Found 3 patterns with 2 actionable recommendations' },
-      { tokenUsage: 89, cacheHit: false }
+      { 
+        tokenUsage: 89, 
+        cacheHit: false,
+        sourcePage: pageContext.sourcePage,
+        sourceRoute: pageContext.sourceRoute,
+        modelUsed: 'claude-3',
+        qualityScore: 92,
+        patternMatches: 3,
+        learningApplied: true
+      }
     );
 
     // Simulate Integration activity
@@ -48,7 +74,8 @@ export async function POST() {
       'coordinator',
       'sync-systems',
       { systems: ['AVCA', 'DIAS'] },
-      'Coordinating AVCA and DIAS results'
+      'Coordinating AVCA and DIAS results',
+      pageContext
     );
 
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -58,7 +85,15 @@ export async function POST() {
       monitor3.startTime,
       { synced: true, conflicts: 0 },
       { confidence: 100, logic: 'Successfully synchronized systems with no conflicts' },
-      { tokenUsage: 45, cacheHit: false }
+      { 
+        tokenUsage: 45, 
+        cacheHit: false,
+        sourcePage: pageContext.sourcePage,
+        sourceRoute: pageContext.sourceRoute,
+        dependencies: ['AVCA', 'DIAS'],
+        qualityScore: 100,
+        processingSteps: ['validate', 'merge', 'sync', 'verify']
+      }
     );
 
     return NextResponse.json({ 

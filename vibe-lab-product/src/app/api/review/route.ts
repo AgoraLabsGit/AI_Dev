@@ -110,7 +110,7 @@ Please provide:
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   // Get review types and guidance
   return NextResponse.json({
     success: true,

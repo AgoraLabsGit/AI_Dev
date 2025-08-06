@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Bot, ArrowRight, Beaker, FlaskConical, LogOut } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Bot, ArrowRight, Beaker, FlaskConical, LogOut, Brain, Target, HelpCircle, Zap } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { QuickActionBar, QuickAction } from '@/components/chat/QuickActionButton';
@@ -9,16 +9,43 @@ import { formatTime, safeToISOString } from '@/utils/date';
 import LiveDocumentPreview from '@/components/onboarding/LiveDocumentPreview';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { VibeLabLogo } from '@/components/ui/vibe-lab-logo';
+import { useFeatureFlag } from '@/lib/config/feature-flags';
 
 export default function EnhancedOnboardingPage() {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [projectName, setProjectName] = useState('');
   const [chatMessage, setChatMessage] = useState('');
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  // Adjust height whenever chatMessage changes
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [chatMessage]);
   const [hasEnoughInfo, setHasEnoughInfo] = useState(false);
   const [extractedInfo, setExtractedInfo] = useState<any>({});
   const [showUploadInput, setShowUploadInput] = useState(false);
   const [uploadType, setUploadType] = useState<'github' | 'code' | 'docs' | null>(null);
   const [githubUrl, setGithubUrl] = useState('');
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [isSuperClaudeProcessing, setIsSuperClaudeProcessing] = useState(false);
+  const [currentPersona, setCurrentPersona] = useState<string | null>(null);
+  
+  // Feature flags with hydration safety
+  const [isClient, setIsClient] = useState(false);
+  const useSuperClaude = useFeatureFlag('useSuperClaude');
+  const showPersonaInfo = useFeatureFlag('showPersonaInfo');
+  const showSuperClaudeIndicators = useFeatureFlag('showSuperClaudeIndicators');
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   
   // Zustand store for document sections
@@ -40,12 +67,20 @@ export default function EnhancedOnboardingPage() {
     sender: 'assistant' | 'user';
     timestamp: Date;
     quickActions?: QuickAction[];
+    persona?: string;
+    superClaudeUsed?: boolean;
+    metadata?: {
+      tokensUsed?: number;
+      cost?: number;
+      duration?: number;
+      confidence?: number;
+    };
   };
 
   const [messages, setMessages] = useState<MessageType[]>([
     {
       id: '1',
-      content: "Welcome to Vibe Lab! In just a few minutes, I'll help you create a Project Overview that captures your vision and Build Specifications that show exactly how to build it. You can start fresh or import from GitHub, upload existing code, or bring in documentation. What are you envisioning?",
+      content: "Welcome to Vibe Lab! I'm your AI development assistant. I'll help transform your app idea into production-ready code using our AVCA pipeline and specialized AI agents. Whether you're building a web app, mobile app, or any digital product, I'll guide you from concept to deployment. What would you like to build?",
       sender: 'assistant',
       timestamp: new Date(),
       quickActions: [] // Will be populated after component initialization
@@ -54,54 +89,160 @@ export default function EnhancedOnboardingPage() {
 
   // Initialize quick actions after component mounts
   useEffect(() => {
+    const baseActions = [
+      {
+        id: 'fresh-start',
+        label: 'Start New App',
+        type: 'primary' as const,
+        action: () => handleQuickAction({ id: 'fresh-start', label: 'Start New App' }),
+        metadata: {
+          icon: 'Sparkles',
+          description: 'Build from scratch with AI guidance'
+        }
+      },
+      {
+        id: 'github-import',
+        label: 'Import from GitHub',
+        type: 'secondary' as const,
+        action: () => handleQuickAction({ id: 'github-import', label: 'Import from GitHub' }),
+        metadata: {
+          icon: 'GitBranch',
+          description: 'Enhance existing repository'
+        }
+      },
+      {
+        id: 'code-upload',
+        label: 'Upload Codebase',
+        type: 'secondary' as const,
+        action: () => handleQuickAction({ id: 'code-upload', label: 'Upload Codebase' }),
+        metadata: {
+          icon: 'Upload',
+          description: 'Improve existing code'
+        }
+      },
+      {
+        id: 'docs-import',
+        label: 'Import Requirements',
+        type: 'secondary' as const,
+        action: () => handleQuickAction({ id: 'docs-import', label: 'Import Requirements' }),
+        metadata: {
+          icon: 'FileText',
+          description: 'Build from documentation'
+        }
+      }
+    ];
+
+    // Add SuperClaude actions if enabled (only on client)
+    const superClaudeActions = (isClient && useSuperClaude) ? [
+      {
+        id: 'plan-project',
+        label: 'Strategic Plan',
+        type: 'info' as const,
+        action: () => handleSuperClaudeAction('plan', 'Help me create a strategic plan for my project'),
+        metadata: {
+          icon: 'Target',
+          description: 'AI Architect: Strategic planning and system design'
+        }
+      },
+      {
+        id: 'get-help',
+        label: 'Get Guidance',
+        type: 'info' as const,
+        action: () => handleSuperClaudeAction('help', 'I need guidance on best practices and approach'),
+        metadata: {
+          icon: 'HelpCircle',
+          description: 'AI Mentor: Expert guidance and best practices'
+        }
+      }
+    ] : [];
+
     setMessages(prev => prev.map(msg => 
       msg.id === '1' ? {
         ...msg,
-        quickActions: [
-                  {
-          id: 'fresh-start',
-          label: 'New Project',
-          type: 'primary' as const,
-          action: () => handleQuickAction({ id: 'fresh-start', label: 'New Project' }),
-          metadata: {
-            icon: 'Sparkles',
-            description: 'Start from scratch with AI guidance'
-          }
-        },
-        {
-          id: 'github-import',
-          label: 'GitHub Import',
-          type: 'secondary' as const,
-          action: () => handleQuickAction({ id: 'github-import', label: 'GitHub Import' }),
-          metadata: {
-            icon: 'GitBranch',
-            description: 'Import existing repository'
-          }
-        },
-        {
-          id: 'code-upload',
-          label: 'Upload Code',
-          type: 'secondary' as const,
-          action: () => handleQuickAction({ id: 'code-upload', label: 'Upload Code' }),
-          metadata: {
-            icon: 'Upload',
-            description: 'Upload local codebase'
-          }
-        },
-        {
-          id: 'docs-import',
-          label: 'Import Docs',
-          type: 'secondary' as const,
-          action: () => handleQuickAction({ id: 'docs-import', label: 'Import Docs' }),
-          metadata: {
-            icon: 'FileText',
-            description: 'Import from documentation'
-          }
-        }
-        ]
+        quickActions: [...baseActions, ...superClaudeActions]
       } : msg
     ));
-  }, []);
+  }, [useSuperClaude, isClient]);
+
+  // Handle SuperClaude-specific actions
+  const handleSuperClaudeAction = async (endpoint: 'plan' | 'review' | 'help', prompt: string) => {
+    setIsSuperClaudeProcessing(true);
+    setCurrentPersona(endpoint === 'plan' ? 'architect' : endpoint === 'help' ? 'mentor' : 'qa');
+
+    const userMessage: MessageType = {
+      id: Date.now().toString(),
+      content: prompt,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+
+    // Show enhanced typing indicator
+    const typingMessage: MessageType = {
+      id: 'typing-superclaude',
+      content: `${currentPersona} is analyzing your request...`,
+      sender: 'assistant',
+      timestamp: new Date(),
+      superClaudeUsed: true
+    };
+    setMessages(prev => [...prev, typingMessage]);
+
+    try {
+      const apiEndpoint = `/api/${endpoint}`;
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          context: {
+            projectName,
+            extractedInfo,
+            stage: 'onboarding'
+          },
+          metadata: {
+            feature: 'onboarding-integration',
+            userAction: `superclaude-${endpoint}`
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`${endpoint} API call failed`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        const aiResponse: MessageType = {
+          id: Date.now().toString(),
+          content: data.data[endpoint === 'plan' ? 'plan' : endpoint === 'help' ? 'guidance' : 'review'] || data.data.content,
+          sender: 'assistant',
+          timestamp: new Date(),
+          persona: data.data.persona,
+          superClaudeUsed: data.data.superClaudeUsed,
+          metadata: data.data.metadata
+        };
+        
+        setMessages(prev => prev.filter(m => m.id !== 'typing-superclaude').concat(aiResponse));
+      } else {
+        throw new Error(data.error || `${endpoint} request failed`);
+      }
+    } catch (error) {
+      console.error(`SuperClaude ${endpoint} error:`, error);
+      setMessages(prev => prev.filter(m => m.id !== 'typing-superclaude').concat({
+        id: Date.now().toString(),
+        content: `I apologize, but I'm having trouble with the ${endpoint} request right now. Please try again or use the regular chat.`,
+        sender: 'assistant',
+        timestamp: new Date()
+      }));
+    } finally {
+      setIsSuperClaudeProcessing(false);
+      setCurrentPersona(null);
+    }
+  };
 
   const handleQuickAction = async (action: any) => {
     console.log('Quick action clicked:', action);
@@ -181,7 +322,7 @@ export default function EnhancedOnboardingPage() {
     setMessages(prev => [...prev, typingMessage]);
 
     try {
-      const response = await fetch('/api/onboarding/chat-basic', {
+      const response = await fetch('/api/onboarding/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -295,14 +436,47 @@ export default function EnhancedOnboardingPage() {
           <div data-testid="onboarding-chat" className="bg-[#111113] rounded-lg border border-[#1F1F23] flex flex-col h-[600px] w-full">
             {/* Chat Header */}
             <div className="flex-shrink-0 px-4 py-3 border-b border-[#1F1F23]">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-full bg-[#8B5CF6] flex items-center justify-center">
-                  <Beaker className="w-4 h-4 text-white" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center",
+                    isSuperClaudeProcessing ? "bg-gradient-to-r from-[#8B5CF6] to-[#2563EB]" : "bg-[#8B5CF6]"
+                  )}>
+                    {isSuperClaudeProcessing ? (
+                      <Brain className="w-4 h-4 text-white animate-pulse" />
+                    ) : (
+                      <Beaker className="w-4 h-4 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-medium text-white">Project Set-Up</h3>
+                      {isClient && useSuperClaude && showSuperClaudeIndicators && (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-900/50 text-yellow-300 border border-yellow-700/50">
+                          <Zap className="w-2.5 h-2.5" />
+                          SuperClaude
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-[#6B7280]">
+                      {isSuperClaudeProcessing 
+                        ? `AI ${currentPersona} is processing...` 
+                        : "Phase 1: Foundation & Context"
+                      }
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-medium text-white">Project Set-Up</h3>
-                  <p className="text-xs text-[#6B7280]">Phase 1: Foundation & Context</p>
-                </div>
+                
+                {/* Processing indicator */}
+                {isSuperClaudeProcessing && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex space-x-1">
+                      <div className="w-1.5 h-1.5 bg-[#8B5CF6] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-1.5 h-1.5 bg-[#8B5CF6] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-1.5 h-1.5 bg-[#8B5CF6] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -318,22 +492,65 @@ export default function EnhancedOnboardingPage() {
                 >
                   <div className={cn(
                     "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0",
-                    message.sender === 'user' ? 'bg-[#374151]' : 'bg-[#2563EB]'
+                    message.sender === 'user' 
+                      ? 'bg-[#374151]' 
+                      : message.superClaudeUsed 
+                        ? 'bg-gradient-to-r from-[#8B5CF6] to-[#2563EB]'
+                        : 'bg-[#2563EB]'
                   )}>
-                    <Bot className="w-3 h-3 text-white" />
+                    {message.sender === 'user' ? (
+                      <Bot className="w-3 h-3 text-white" />
+                    ) : message.superClaudeUsed ? (
+                      <Brain className="w-3 h-3 text-white" />
+                    ) : (
+                      <Beaker className="w-3 h-3 text-white" />
+                    )}
                   </div>
                   <div className={cn(
                     "flex-1 max-w-[85%]",
                     message.sender === 'user' ? 'flex flex-col items-end' : ''
                   )}>
+                    {/* Persona indicator */}
+                    {isClient && message.persona && showPersonaInfo && (
+                      <div className="mb-1">
+                        <span className={cn(
+                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium",
+                          message.persona === 'architect' && "bg-purple-900/50 text-purple-300 border border-purple-700/50",
+                          message.persona === 'mentor' && "bg-blue-900/50 text-blue-300 border border-blue-700/50",
+                          message.persona === 'qa' && "bg-green-900/50 text-green-300 border border-green-700/50"
+                        )}>
+                          {message.persona === 'architect' && <Target className="w-3 h-3" />}
+                          {message.persona === 'mentor' && <HelpCircle className="w-3 h-3" />}
+                          {message.persona === 'qa' && <Beaker className="w-3 h-3" />}
+                          AI {message.persona === 'architect' ? 'Architect' : message.persona === 'mentor' ? 'Mentor' : 'QA'}
+                        </span>
+                      </div>
+                    )}
+                    
                     <div className={cn(
-                      "px-3 py-2 rounded-lg text-sm",
+                      "px-3 py-2 rounded-lg text-sm relative",
                       message.sender === 'user'
                         ? 'bg-[#2563EB] text-white'
                         : 'bg-[#1A1A1C] text-[#E5E7EB] border border-[#2F2F33]'
                     )}>
                       {message.content}
+                      
+                      {/* SuperClaude indicator */}
+                      {isClient && message.superClaudeUsed && showSuperClaudeIndicators && (
+                        <div className="absolute -top-1 -right-1">
+                          <Zap className="w-3 h-3 text-yellow-400" />
+                        </div>
+                      )}
                     </div>
+                    
+                    {/* Metadata */}
+                    {isClient && message.metadata && showPersonaInfo && (
+                      <div className="mt-1 text-xs text-[#6B7280] space-x-2">
+                        {message.metadata.tokensUsed && <span>~{message.metadata.tokensUsed} tokens</span>}
+                        {message.metadata.duration && <span>• {message.metadata.duration}ms</span>}
+                        {message.metadata.confidence && <span>• {Math.round(message.metadata.confidence * 100)}% confidence</span>}
+                      </div>
+                    )}
                     
                     {/* Quick Actions */}
                     {message.quickActions && message.quickActions.length > 0 && (
@@ -507,25 +724,34 @@ export default function EnhancedOnboardingPage() {
             {!showUploadInput && (
               <div className="flex-shrink-0 p-4 border-t border-[#1F1F23]">
                 <div className="flex space-x-2">
-                  <input
-                    type="text"
+                  <textarea
+                    ref={textareaRef}
                     value={chatMessage}
                     onChange={(e) => setChatMessage(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                    placeholder=""
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!isSuperClaudeProcessing) handleSendMessage();
+                      }
+                    }}
+                    placeholder={isSuperClaudeProcessing ? `AI ${currentPersona} is processing...` : ""}
+                    disabled={isSuperClaudeProcessing}
+                    rows={1}
                     className={cn(
                       "flex-1 px-3 py-2 bg-[#1A1A1C] border border-[#2F2F33] rounded-lg",
                       "text-white placeholder-[#6B7280] text-sm",
-                      "focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50 focus:border-[#2563EB]"
+                      "focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50 focus:border-[#2563EB]",
+                      "resize-none overflow-hidden min-h-[40px]",
+                      isSuperClaudeProcessing && "opacity-50 cursor-not-allowed"
                     )}
                   />
                   <button
                     data-testid="send-message-button"
                     onClick={handleSendMessage}
-                    disabled={!chatMessage.trim()}
+                    disabled={!chatMessage.trim() || isSuperClaudeProcessing}
                     className={cn(
                       "px-3 py-2 rounded-lg transition-colors",
-                      chatMessage.trim()
+                      chatMessage.trim() && !isSuperClaudeProcessing
                         ? "bg-[#2563EB] hover:bg-[#1D4ED8] text-white"
                         : "bg-[#374151] text-[#6B7280] cursor-not-allowed"
                     )}
@@ -761,16 +987,23 @@ export default function EnhancedOnboardingPage() {
           {!showUploadInput && (
             <div className="flex-shrink-0 px-6 py-4 border-t border-[#1F1F23]">
             <div className="flex space-x-3">
-              <input
-                type="text"
+              <textarea
+                ref={textareaRef}
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
                 placeholder=""
+                rows={1}
                 className={cn(
                   "flex-1 px-4 py-3 bg-[#1A1A1C] border border-[#2F2F33] rounded-lg",
                   "text-white placeholder-[#6B7280] text-sm",
-                  "focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50 focus:border-[#2563EB]"
+                  "focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50 focus:border-[#2563EB]",
+                  "resize-none overflow-hidden min-h-[40px]"
                 )}
               />
               <button

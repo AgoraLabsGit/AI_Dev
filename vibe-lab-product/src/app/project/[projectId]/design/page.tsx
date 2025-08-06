@@ -10,9 +10,9 @@ import {
 } from 'lucide-react';
 
 interface ProjectDesignProps {
-  params: Promise<{
+  params: {
     projectId: string;
-  }>;
+  };
 }
 
 // Mock AVCA Stages 1-4 data
@@ -56,8 +56,8 @@ const designStages = [
   }
 ];
 
-export default async function ProjectDesign({ params }: ProjectDesignProps) {
-  const { projectId } = await params;
+export default function ProjectDesign({ params }: ProjectDesignProps) {
+  const { projectId } = params;
 
   const getStatusIcon = (status: string) => {
     switch (status) {

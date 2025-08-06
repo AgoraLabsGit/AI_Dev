@@ -8,6 +8,7 @@ import { personaMapper } from '@/lib/integration/persona-mapper';
 import { createEnhancedAIClient } from '@/lib/integration/enhanced-ai-client';
 import { EventBus } from '@/lib/avca/services/event-bus';
 import { AIRole } from '@/lib/avca/services/ai-client';
+import { SuperClaudeCommand } from '@/lib/dias/services/types';
 
 const eventBus = new EventBus();
 const aiClient = createEnhancedAIClient(eventBus, true); // Enable SuperClaude
@@ -104,7 +105,7 @@ Please provide helpful, detailed guidance while being concise and actionable.`;
     // Create enhanced AI request with SuperClaude integration
     const aiRequest = {
       role: AIRole.ROUTER, // Will be mapped to mentor persona
-      command: '/help' as string,
+      command: '/help' as SuperClaudeCommand,
       prompt: helpPrompt,
       context: JSON.stringify(HELP_TOPICS), // Provide system knowledge as context
       useSuperClaude: true,

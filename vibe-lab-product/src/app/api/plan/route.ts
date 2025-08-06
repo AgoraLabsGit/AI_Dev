@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   // Get planning templates and guidance
   return NextResponse.json({
     success: true,

@@ -34,8 +34,13 @@ export default function AppHeader({
       `}
       role="banner"
     >
-      {/* Start Section: Avatars + Title */}
+      {/* Start Section: Logo + Title */}
       <div className="flex items-center gap-3 min-w-0">
+        <img 
+          src="/assets/brand/largeLogo.svg"
+          alt="Vibe Lab Logo" 
+          className="w-6 h-6 object-contain"
+        />
         {startContent}
         <div className="min-w-0 flex-1">
           <h1 className="text-sm font-medium text-white truncate">

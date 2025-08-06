@@ -6,6 +6,8 @@ import AppHeader from './ui/AppHeader';
 import AgentAvatars from './ui/AgentAvatars';
 import ActionButton from './ui/ActionButton';
 import StatusIndicator from './ui/StatusIndicator';
+import SuperClaudeAIChat from './chat/SuperClaudeAIChat';
+import { useFeatureFlag } from '@/lib/config/feature-flags';
 import { Send, Sparkles, Bot, RotateCcw, Copy, Check, Shield } from 'lucide-react';
 
 interface Message {
@@ -17,18 +19,19 @@ interface Message {
 }
 
 export default function DualClaudeChat() {
+  const useSuperClaude = useFeatureFlag('useSuperClaude');
+  
+  // If SuperClaude is enabled, use the new component
+  if (useSuperClaude) {
+    return <SuperClaudeAIChat />;
+  }
+  
+  // Otherwise, use legacy dual-chat with single AI approach
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       agent: 'developer',
-      message: '👋 Hello! I\'m **Claude Developer**. I\'m here to help you build your project efficiently and follow best practices. What would you like to create today?',
-      timestamp: '2 min ago',
-      status: 'complete'
-    },
-    {
-      id: '2',
-      agent: 'auditor',
-      message: '🔍 I\'m **Claude Auditor**. I\'ll review all code for security vulnerabilities, performance optimization, and industry best practices. Let\'s build something production-ready together!',
+      message: '👋 Hello! I\'m your **AI Assistant**. I\'ll adapt my expertise based on what you\'re working on - whether it\'s design, development, or quality assurance. What would you like to create today?',
       timestamp: '2 min ago',
       status: 'complete'
     }
@@ -38,9 +41,9 @@ export default function DualClaudeChat() {
   const [isThinking, setIsThinking] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [activeAgent, setActiveAgent] = useState<'developer' | 'auditor' | null>(null);
+  const [currentPersona, setCurrentPersona] = useState<'developer' | 'auditor'>('developer');
   const [agentActivity, setAgentActivity] = useState({
-    developer: { status: 'idle' as 'active' | 'thinking' | 'idle', lastSeen: '2 min ago' },
-    auditor: { status: 'idle' as 'active' | 'thinking' | 'idle', lastSeen: '2 min ago' }
+    developer: { status: 'idle' as 'active' | 'thinking' | 'idle', lastSeen: '2 min ago' }
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -51,6 +54,21 @@ export default function DualClaudeChat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Detect appropriate persona based on message content
+  const detectPersona = (message: string): 'developer' | 'auditor' => {
+    const msgLower = message.toLowerCase();
+    
+    // QA/Audit keywords trigger auditor
+    if (msgLower.includes('review') || msgLower.includes('audit') || 
+        msgLower.includes('security') || msgLower.includes('test') ||
+        msgLower.includes('quality') || msgLower.includes('vulnerability')) {
+      return 'auditor';
+    }
+    
+    // Default to developer for building/creating
+    return 'developer';
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isThinking) return;
@@ -64,20 +82,22 @@ export default function DualClaudeChat() {
     };
 
     const userInput = input;
+    const detectedPersona = detectPersona(userInput);
+    
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsThinking(true);
-    setActiveAgent('developer');
+    setActiveAgent(detectedPersona);
+    setCurrentPersona(detectedPersona);
     
     // Update agent activity
     setAgentActivity(prev => ({
-      ...prev,
       developer: { status: 'thinking', lastSeen: 'now' }
     }));
 
     try {
-      // Get developer response
-      const developerResponse = await fetch('/api/v1/chat', {
+      // Get AI response using detected persona
+      const aiResponse = await fetch('/api/v1/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,54 +117,54 @@ export default function DualClaudeChat() {
               content: userInput
             }
           ],
-          agent: 'developer',
+          agent: detectedPersona,
           projectContext: {
             name: 'Vibe Lab Project',
-            description: 'AI-powered development environment with dual-agent system',
+            description: 'AI-powered development environment with intelligent persona routing',
             techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Anthropic Claude'],
-            complexity: 0.7
+            complexity: 0.7,
+            phase: detectedPersona === 'auditor' ? 'qa' : 'development'
           }
         })
       });
 
-      if (!developerResponse.ok) {
-        throw new Error('Developer API call failed');
+      if (!aiResponse.ok) {
+        throw new Error('AI API call failed');
       }
 
-      const developerData = await developerResponse.json();
+      const aiData = await aiResponse.json();
       
-      if (!developerData.success) {
+      if (!aiData.success) {
         // Handle insufficient credits gracefully
-        if (developerData.error === 'INSUFFICIENT_CREDITS') {
-          const developerMessage: Message = {
+        if (aiData.error === 'INSUFFICIENT_CREDITS') {
+          const aiMessage: Message = {
             id: (Date.now() + 1).toString(),
-            agent: 'developer',
-            message: developerData.message.content,
+            agent: detectedPersona,
+            message: aiData.message.content,
             timestamp: 'Just now',
             status: 'complete'
           };
           
-          setMessages(prev => [...prev, developerMessage]);
+          setMessages(prev => [...prev, aiMessage]);
           setIsThinking(false);
           setActiveAgent(null);
           setAgentActivity(prev => ({
-            developer: { status: 'idle', lastSeen: 'now' },
-            auditor: { status: 'idle', lastSeen: 'now' }
+            developer: { status: 'idle', lastSeen: 'now' }
           }));
           return;
         }
-        throw new Error(developerData.error || 'Developer response failed');
+        throw new Error(aiData.error || 'AI response failed');
       }
 
-      const developerMessage: Message = {
+      const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        agent: 'developer',
-        message: developerData.message.content,
+        agent: detectedPersona,
+        message: aiData.message.content,
         timestamp: 'Just now',
         status: 'complete'
       };
       
-      setMessages(prev => [...prev, developerMessage]);
+      setMessages(prev => [...prev, aiMessage]);
       
     } catch (error) {
       console.error('Chat error:', error);
@@ -152,7 +172,7 @@ export default function DualClaudeChat() {
       // Fallback error message
       const errorMessage: Message = {
         id: (Date.now() + 3).toString(),
-        agent: 'developer',
+        agent: detectedPersona,
         message: '⚠️ I encountered an issue connecting to the AI service. Please check your API configuration and try again.',
         timestamp: 'Just now',
         status: 'error'
@@ -163,8 +183,7 @@ export default function DualClaudeChat() {
       setIsThinking(false);
       setActiveAgent(null);
       setAgentActivity(prev => ({
-        developer: { status: 'idle', lastSeen: 'now' },
-        auditor: { status: 'idle', lastSeen: prev.auditor.lastSeen }
+        developer: { status: 'idle', lastSeen: 'now' }
       }));
     }
   };
@@ -193,118 +212,49 @@ export default function DualClaudeChat() {
     // Get the last few messages for context
     const recentMessages = messages.slice(-4);
     const lastUserMessage = recentMessages.findLast(msg => msg.agent === 'user');
-    const lastDeveloperMessage = recentMessages.findLast(msg => msg.agent === 'developer');
+    const lastAIMessage = recentMessages.findLast(msg => msg.agent === 'developer' || msg.agent === 'auditor');
 
-    if (!lastUserMessage || !lastDeveloperMessage) {
-      alert('Need both user request and developer response to call auditor');
+    if (!lastUserMessage || !lastAIMessage) {
+      alert('Need both user request and AI response to call auditor for review');
       return;
     }
 
-    setIsThinking(true);
-    setActiveAgent('auditor');
-    setAgentActivity(prev => ({
-      ...prev,
-      auditor: { status: 'thinking', lastSeen: 'now' }
-    }));
-
-    try {
-      const auditorResponse = await fetch('/api/v1/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages: [
-            { 
-              role: 'user', 
-              content: `Please review this development solution:
+    // Force auditor review by sending as auditor request
+    const auditorPrompt = `Please review this development solution:
 
 User Request: ${lastUserMessage.message}
 
-Developer Solution: ${lastDeveloperMessage.message}
+AI Solution: ${lastAIMessage.message}
 
-Provide your quality assurance review and recommendations.`
-            }
-          ],
-          agent: 'auditor',
-          projectContext: {
-            name: 'Vibe Lab Project',
-            description: 'AI-powered development environment with dual-agent system',
-            techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Anthropic Claude'],
-            complexity: 0.7
-          }
-        })
-      });
+Provide your quality assurance review and recommendations.`;
 
-      if (!auditorResponse.ok) {
-        throw new Error('Auditor API call failed');
-      }
-
-      const auditorData = await auditorResponse.json();
-      
-      if (!auditorData.success) {
-        // Handle insufficient credits gracefully
-        if (auditorData.error === 'INSUFFICIENT_CREDITS') {
-          const auditorMessage: Message = {
-            id: Date.now().toString(),
-            agent: 'auditor',
-            message: auditorData.message.content,
-            timestamp: 'Just now',
-            status: 'complete'
-          };
-          
-          setMessages(prev => [...prev, auditorMessage]);
-          return;
-        }
-        throw new Error(auditorData.error || 'Auditor response failed');
-      }
-
-      const auditorMessage: Message = {
-        id: Date.now().toString(),
-        agent: 'auditor',
-        message: auditorData.message.content,
-        timestamp: 'Just now',
-        status: 'complete'
-      };
-      
-      setMessages(prev => [...prev, auditorMessage]);
-      
-    } catch (error) {
-      console.error('Auditor error:', error);
-      
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        agent: 'auditor',
-        message: '⚠️ I encountered an issue during the review. Please try again.',
-        timestamp: 'Just now',
-        status: 'error'
-      };
-      
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsThinking(false);
-      setActiveAgent(null);
-      setAgentActivity(prev => ({
-        ...prev,
-        auditor: { status: 'idle', lastSeen: 'now' }
-      }));
-    }
+    // Trigger a new message with auditor persona
+    setInput(auditorPrompt);
+    setCurrentPersona('auditor');
+    
+    // Let the regular handleSend process it
+    setTimeout(() => {
+      const syntheticEvent = new KeyboardEvent('keypress', { key: 'Enter' });
+      handleSend();
+    }, 100);
   };
 
   return (
     <div className="flex flex-col h-full">
       <AppHeader
-        title="Dual-Claude Chat"
+        title="AI Assistant"
         subtitle={
-          activeAgent === 'developer' ? '🚀 Developer thinking...' :
-          activeAgent === 'auditor' ? '🔍 Auditor reviewing...' :
-          'Developer + Auditor Mode'
+          activeAgent === 'developer' ? '🚀 Development mode active...' :
+          activeAgent === 'auditor' ? '🔍 Quality review mode active...' :
+          `${currentPersona === 'developer' ? '🚀 Development' : '🔍 QA'} Assistant Ready`
         }
         startContent={
-          <AgentAvatars
-            developer={agentActivity.developer}
-            auditor={agentActivity.auditor}
-          />
+          <div className="flex items-center gap-2">
+            <div className={`w-3 h-3 rounded-full ${currentPersona === 'developer' ? 'bg-blue-400' : 'bg-purple-400'}`} />
+            <span className="text-sm text-gray-400">
+              {currentPersona === 'developer' ? 'Developer' : 'QA Auditor'} Mode
+            </span>
+          </div>
         }
         endContent={
           <>
@@ -312,7 +262,7 @@ Provide your quality assurance review and recommendations.`
             <ActionButton
               onClick={callAuditor}
               disabled={isThinking || messages.length === 0}
-              title="Call auditor to review last response"
+              title="Request quality review of last response"
               size="md"
             >
               <Shield className="w-4 h-4" />
@@ -358,16 +308,16 @@ Provide your quality assurance review and recommendations.`
         {activeAgent && (
           <div className="flex items-start gap-3 mb-4">
             <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-              activeAgent === 'developer' ? 'bg-emerald-500' : 'bg-purple-500'
+              activeAgent === 'developer' ? 'bg-blue-500' : 'bg-purple-500'
             }`}>
               <Bot className="w-3 h-3 text-white" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-medium text-gray-200">
-                  {activeAgent === 'developer' ? 'Claude Developer' : 'Claude Auditor'}
+                  AI Assistant ({activeAgent === 'developer' ? 'Developer' : 'QA Auditor'} mode)
                 </span>
-                <span className="text-xs text-gray-500">is typing...</span>
+                <span className="text-xs text-gray-500">is thinking...</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -412,7 +362,9 @@ Provide your quality assurance review and recommendations.`
         <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
           <span>Shift+Enter for new line</span>
           <span>•</span>
-          <span>Dual-Claude analyzes & validates in real-time</span>
+          <span>Intelligent AI adapts to development and QA needs</span>
+          <span>•</span>
+          <span>Use Shield button for manual quality reviews</span>
         </div>
       </div>
     </div>

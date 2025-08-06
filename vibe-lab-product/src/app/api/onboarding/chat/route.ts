@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AIClientService, AIRole, EntryPathType, AnalysisRequest } from '@/lib/avca/services/ai-client';
 import { EventBus } from '@/lib/avca/services/event-bus';
 import { EventHandlingSystem } from '@/lib/dias/events/event-handlers';
-import { logicMonitor, AVCA_MODULES, DIAS_MODULES, INTEGRATION_MODULES } from '@/lib/monitoring/logic-monitor';
+import { logicMonitor, AVCA_MODULES, INTEGRATION_MODULES } from '@/lib/monitoring/logic-monitor';
 import { safeToISOString } from '@/utils/date';
-import { FlexibleObject, ConversationMessage } from '@/types/development-friendly';
+import { FlexibleObject } from '@/types/development-friendly';
 
 interface OnboardingChatRequest {
   message: string;
@@ -127,22 +127,27 @@ export async function POST(request: NextRequest) {
     );
     */
 
+    // Generate stage-specific information extraction first
+    const extractedInfo = extractBasicInfo(message, projectName);
+    
     // Determine conversation stage and entry path
     const entryPath = determineEntryPath(sanitizedHistory, context);
     const conversationStage = determineConversationStage(sanitizedHistory, context);
 
-    // Simplified analysis for faster response
+    // Stage-specific analysis with focused goals
     const analysisRequest: AnalysisRequest = {
-      role: AIRole.DEVELOPER, // Use faster role
-      prompt: buildSimpleConversationPrompt(message, conversationStage),
+      role: AIRole.ANALYZER, // Use analyzer for better planning
+      prompt: getStageSpecificPrompt(conversationStage, message, extractedInfo),
       context: JSON.stringify({
         projectName,
         stage: conversationStage,
-        historyLength: sanitizedHistory.length
+        historyLength: sanitizedHistory.length,
+        extractedInfo: extractedInfo,
+        conversationHistory: sanitizedHistory.slice(-3)
       }),
       entryPath,
       temperature: 0.7,
-      maxTokens: 500 // Limit for faster response
+      maxTokens: 150 // Keep responses short and focused
     };
 
     // Track AVCA analysis
@@ -180,28 +185,36 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Generate quick actions and basic extraction
-    const extractedInfo = extractBasicInfo(message, projectName);
-    const quickActions = generateQuickActions({ content: aiResponse.content }, conversationStage);
+    // Generate stage-specific quick actions
+    const quickActions = generateStageSpecificQuickActions(conversationStage, extractedInfo);
     const suggestions: string[] = [];
 
-    // Check if we have enough information to generate project overview
+    // Check if we have enough information to generate both documents
     let projectOverview;
     let buildSpecifications;
     
-    // Skip complex blueprint generation for now (faster response)
-    if (sanitizedHistory.length >= 3) {
-      projectOverview = generateSimpleProjectOverview(extractedInfo, projectName);
+    // Generate both foundational documents when we have sufficient info
+    if (sanitizedHistory.length >= 3 && extractedInfo.projectType) {
+      projectOverview = generateProjectOverview(extractedInfo, projectName, sanitizedHistory);
+      buildSpecifications = generateBuildSpecifications(extractedInfo, projectOverview);
     }
 
-    const response: OnboardingChatResponse = {
+    const responseData: any = {
       response: aiResponse.content,
       suggestions,
       quickActions,
-      extractedInfo,
-      projectOverview,
-      buildSpecifications
+      extractedInfo
     };
+    
+    if (projectOverview) {
+      responseData.projectOverview = projectOverview;
+    }
+    
+    if (buildSpecifications) {
+      responseData.buildSpecifications = buildSpecifications;
+    }
+    
+    const response: OnboardingChatResponse = responseData;
 
     // Complete the overall chat flow monitoring
     logicMonitor.completeModule(
@@ -258,9 +271,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function determineEntryPath(history: unknown[], context: unknown): EntryPathType {
+function determineEntryPath(history: unknown[], _context: unknown): EntryPathType {
   // Check for mentions of existing code, GitHub, or documentation
-  const lastMessages = history.slice(-3).map(m => m.content.toLowerCase());
+  const lastMessages = history.slice(-3).map((m: any) => m.content.toLowerCase());
   const allText = lastMessages.join(' ');
   
   if (allText.includes('github') || allText.includes('repository') || allText.includes('repo')) {
@@ -276,7 +289,7 @@ function determineEntryPath(history: unknown[], context: unknown): EntryPathType
   return EntryPathType.FRESH;
 }
 
-function determineConversationStage(history: unknown[], context: unknown): string {
+function determineConversationStage(history: unknown[], context: any): string {
   const messageCount = history.length;
   const extractedInfo = context?.extractedInfo || {};
   
@@ -286,77 +299,74 @@ function determineConversationStage(history: unknown[], context: unknown): strin
   return 'architecture';
 }
 
-function buildSimpleConversationPrompt(message: string, stage: string): string {
-  return `You are an expert product architect helping someone build their app idea.
+function getStageSpecificPrompt(stage: string, message: string, extractedInfo: any, existingDocs?: any): string {
+  const hasExistingDocs = existingDocs?.projectOverview || existingDocs?.buildSpecifications;
+  
+  if (hasExistingDocs) {
+    // ITERATION MODE: Single Source of Truth document management
+    return `You are managing the SINGLE SOURCE OF TRUTH for this AVCA project.
+
+CURRENT PROJECT OVERVIEW (drives all development): ${JSON.stringify(existingDocs.projectOverview || {})}
+CURRENT BUILD SPECIFICATIONS (defines system architecture): ${JSON.stringify(existingDocs.buildSpecifications || {})}
 
 User message: "${message}"
-Stage: ${stage}
+Current context: ${JSON.stringify(extractedInfo)}
 
-Respond with:
-1. Brief acknowledgment (1-2 sentences)
-2. One key insight about their idea
-3. One focused follow-up question
+CRITICAL UNDERSTANDING:
+These documents are the foundation for ALL code generation through the AVCA pipeline:
+- Project Overview → Defines WHAT to build (features, users, problems)
+- Build Specifications → Defines HOW to build it (tech stack, architecture, components)
+- ALL AVCA code generation flows from these documents
+- Changes here cascade through the entire system
 
-Keep it conversational, encouraging, and under 100 words.`;
-}
+Your task:
+1. Determine if this request requires updating the Single Source of Truth documents
+2. If YES: Propose specific document updates and explain the downstream impact
+3. If NO: Provide guidance based on EXISTING documents without changes
 
-function buildConversationPrompt(message: string, history: unknown[], stage: string): string {
-  const stagePrompts = {
-    initial: `Analyze this initial project description and extract:
-1. Project type (web app, mobile app, API, etc.)
-2. Primary purpose and target users
-3. Key features mentioned
-4. Technical complexity indicators`,
-    
-    requirements: `Based on the ongoing conversation, extract:
-1. Additional features and requirements
-2. Technical constraints or preferences
-3. Scale and performance needs
-4. Integration requirements`,
-    
-    features: `Focus on feature analysis:
-1. Core features vs nice-to-have
-2. User flows and interactions
-3. Data requirements
-4. Third-party integrations`,
-    
-    architecture: `Analyze architectural needs:
-1. Scalability requirements
-2. Performance considerations
-3. Technology stack preferences
-4. Deployment and hosting needs`
+UPDATE ONLY IF:
+- Fundamental project scope change (new features, different users, pivot)
+- Architectural requirements change (scale, tech stack, integrations)  
+- Core problem or solution evolution
+
+MAINTAIN CONSISTENCY: All responses must align with current documents unless updating them.`;
+  }
+
+  // INITIAL MODE: No documents exist yet
+  const prompts = {
+    'initial': `Project creation mode. Need: project name, type, target users, key features.
+
+Message: "${message}"
+Info: ${JSON.stringify(extractedInfo)}
+
+Ask ONE focused question. Keep it short.`,
+
+    'requirements': `Defining features and requirements.
+
+Message: "${message}"
+Info: ${JSON.stringify(extractedInfo)}
+
+Ask about missing features or user workflows. Keep it brief.`,
+
+    'features': `Technical planning mode. Need tech stack and architecture decisions.
+
+Message: "${message}"
+Info: ${JSON.stringify(extractedInfo)}
+
+Suggest tech stack or ask about scale/complexity. Be concise.`,
+
+    'architecture': `Final tech choices needed for Build Specifications.
+
+Message: "${message}"
+Info: ${JSON.stringify(extractedInfo)}
+
+Finalize tech stack. Keep recommendations short.`
   };
 
-  return `${stagePrompts[stage as keyof typeof stagePrompts] || stagePrompts.initial}
-
-Current message: "${message}"
-
-Context from conversation:
-${history.slice(-3).map(m => `${m.role}: ${m.content}`).join('\n')}
-
-Provide a structured analysis focusing on the current conversation stage.`;
+  return prompts[stage as keyof typeof prompts] || prompts.initial;
 }
 
-function buildResponsePrompt(analysisResult: FlexibleObject, stage: string): string {
-  return `Based on the analysis results, generate a conversational response that:
 
-1. Acknowledges what the user has shared
-2. Extracts 2-3 key insights from their message
-3. Asks 1 focused follow-up question to gather missing critical information
-4. Maintains an encouraging, expert tone
-
-Analysis Results:
-${JSON.stringify(analysisResult.results, null, 2)}
-
-Current Stage: ${stage}
-
-Guidelines:
-- Keep response under 100 words
-- Focus on moving the conversation forward
-- Show understanding of technical requirements
-- Be specific rather than generic
-- Sound like an experienced software architect who understands the user's vision`;
-}
 
 function extractBasicInfo(message: string, projectName?: string): Record<string, any> {
   const info: Record<string, any> = {};
@@ -365,50 +375,251 @@ function extractBasicInfo(message: string, projectName?: string): Record<string,
     info.projectName = projectName;
   }
   
-  // Simple keyword extraction
   const lowerMessage = message.toLowerCase();
+  
+  // Project type detection
   if (lowerMessage.includes('web app') || lowerMessage.includes('website')) {
     info.projectType = 'web application';
   } else if (lowerMessage.includes('mobile') || lowerMessage.includes('app')) {
     info.projectType = 'mobile application';
   } else if (lowerMessage.includes('api') || lowerMessage.includes('service')) {
     info.projectType = 'API service';
+  } else if (lowerMessage.includes('marketplace')) {
+    info.projectType = 'marketplace';
+  } else if (lowerMessage.includes('social')) {
+    info.projectType = 'social platform';
+  }
+  
+  // Target users extraction
+  const userPatterns = [
+    /for ([a-zA-Z\s]+) who/g,
+    /help ([a-zA-Z\s]+) to/g,
+    /([a-zA-Z\s]+) can use/g
+  ];
+  
+  for (const pattern of userPatterns) {
+    const match = lowerMessage.match(pattern);
+    if (match) {
+      info.targetUsers = match[1].trim();
+      break;
+    }
+  }
+  
+  // Problem/solution extraction
+  if (lowerMessage.includes('problem') || lowerMessage.includes('solve')) {
+    info.hasProblemStatement = true;
+  }
+  
+  // Feature mentions
+  const features = [];
+  if (lowerMessage.includes('auth') || lowerMessage.includes('login')) features.push('authentication');
+  if (lowerMessage.includes('payment') || lowerMessage.includes('buy')) features.push('payments');
+  if (lowerMessage.includes('chat') || lowerMessage.includes('message')) features.push('messaging');
+  if (lowerMessage.includes('real-time') || lowerMessage.includes('live')) features.push('real-time');
+  
+  if (features.length > 0) {
+    info.mentionedFeatures = features;
   }
   
   return info;
 }
 
-function generateSimpleProjectOverview(extractedInfo: FlexibleObject, projectName?: string): FlexibleObject {
+function generateProjectOverview(extractedInfo: FlexibleObject, projectName?: string, conversationHistory?: any[]): FlexibleObject {
+  // Extract more detailed information from conversation history
+  const allMessages = conversationHistory?.map((msg: any) => msg.content.toLowerCase()).join(' ') || '';
+  
+  // Extract key features from conversation
+  const features = [];
+  if (allMessages.includes('auth') || allMessages.includes('login') || allMessages.includes('user')) features.push('User Authentication');
+  if (allMessages.includes('payment') || allMessages.includes('buy') || allMessages.includes('purchase')) features.push('Payment Processing');
+  if (allMessages.includes('chat') || allMessages.includes('message') || allMessages.includes('communicate')) features.push('Messaging System');
+  if (allMessages.includes('search') || allMessages.includes('find') || allMessages.includes('discover')) features.push('Search Functionality');
+  if (allMessages.includes('admin') || allMessages.includes('manage') || allMessages.includes('dashboard')) features.push('Admin Dashboard');
+  if (allMessages.includes('mobile') || allMessages.includes('responsive')) features.push('Mobile Responsive Design');
+  if (allMessages.includes('real-time') || allMessages.includes('live') || allMessages.includes('instant')) features.push('Real-time Updates');
+  
+  // Add project-type specific features
+  if (extractedInfo.projectType === 'marketplace') {
+    features.push('Product Listings', 'Vendor Management', 'Order Management');
+  } else if (extractedInfo.projectType === 'social platform') {
+    features.push('User Profiles', 'Content Feed', 'Social Interactions');
+  } else if (extractedInfo.projectType === 'web application') {
+    features.push('User Dashboard', 'Data Management', 'Analytics');
+  }
+  
+  // Extract target users more intelligently
+  let targetUsers = extractedInfo.targetUsers || 'General Users';
+  if (allMessages.includes('business') || allMessages.includes('company')) targetUsers = 'Business Users';
+  if (allMessages.includes('developer') || allMessages.includes('programmer')) targetUsers = 'Developers';
+  if (allMessages.includes('student') || allMessages.includes('education')) targetUsers = 'Students';
+  if (allMessages.includes('consumer') || allMessages.includes('customer')) targetUsers = 'Consumers';
+  
+  // Generate problem statement
+  let problemSolved = 'Addresses user needs efficiently';
+  if (extractedInfo.projectType === 'marketplace') {
+    problemSolved = 'Connects buyers and sellers in a streamlined digital marketplace';
+  } else if (extractedInfo.projectType === 'social platform') {
+    problemSolved = 'Facilitates meaningful connections and content sharing between users';
+  } else if (extractedInfo.projectType === 'web application') {
+    problemSolved = 'Provides an efficient digital solution for user workflows and data management';
+  }
+
   return {
     name: projectName || extractedInfo.projectName || 'Your Project',
-    description: `A ${extractedInfo.projectType || 'modern application'}`,
-    targetUsers: 'Users',
-    keyFeatures: [],
-    problemSolved: 'Addresses user needs efficiently'
+    description: `A comprehensive ${extractedInfo.projectType || 'modern application'} designed to ${problemSolved.toLowerCase()}`,
+    targetUsers,
+    keyFeatures: features.length > 0 ? features : ['Core Functionality', 'User Management', 'Data Processing'],
+    problemSolved,
+    successMetrics: [
+      'User engagement and retention',
+      'System performance and reliability',
+      'Business goals achievement'
+    ],
+    userJourneys: [
+      'User registration and onboarding',
+      'Core feature utilization',
+      'Account management and settings'
+    ]
   };
 }
 
-function extractInformationFromAnalysis(analysisResult: unknown): Record<string, unknown> {
-  const info: Record<string, any> = {};
+function generateBuildSpecifications(extractedInfo: FlexibleObject, projectOverview: FlexibleObject): FlexibleObject {
+  const projectType = extractedInfo.projectType || 'web application';
+  const features = projectOverview.keyFeatures || [];
   
-  // Extract from analysis results
-  if (analysisResult.results.project_type) {
-    info.projectType = analysisResult.results.project_type;
-  }
-  if (analysisResult.results.features) {
-    info.features = analysisResult.results.features;
-  }
-  if (analysisResult.results.complexity) {
-    info.complexity = analysisResult.results.complexity;
-  }
-  if (analysisResult.results.architecture) {
-    info.architecture = analysisResult.results.architecture;
+  // Determine tech stack based on project type and features
+  let techStack = {
+    frontend: 'React with TypeScript',
+    backend: 'Node.js with Express',
+    database: 'PostgreSQL',
+    styling: 'Tailwind CSS',
+    authentication: 'NextAuth.js',
+    deployment: 'Vercel'
+  };
+  
+  // Adjust tech stack based on project type
+  if (projectType === 'mobile application') {
+    techStack.frontend = 'React Native with TypeScript';
+    techStack.deployment = 'App Store / Google Play';
+  } else if (projectType === 'API service') {
+    techStack.frontend = 'Admin Dashboard (React)';
+    techStack.backend = 'Node.js with Fastify';
   }
   
-  return info;
+  // Add integrations based on features
+  const integrations = [];
+  if (features.some((f: string) => f.toLowerCase().includes('payment'))) {
+    integrations.push('Stripe Payment Processing');
+  }
+  if (features.some((f: string) => f.toLowerCase().includes('email'))) {
+    integrations.push('SendGrid Email Service');
+  }
+  if (features.some((f: string) => f.toLowerCase().includes('storage'))) {
+    integrations.push('AWS S3 File Storage');
+  }
+  if (features.some((f: string) => f.toLowerCase().includes('analytics'))) {
+    integrations.push('Google Analytics');
+  }
+  
+  // Determine architecture pattern
+  let architecturePattern = 'Monolithic';
+  if (features.length > 6 || projectType === 'marketplace') {
+    architecturePattern = 'Microservices';
+  } else if (features.length > 3) {
+    architecturePattern = 'Modular Monolith';
+  }
+  
+  // Generate data models based on project type
+  const dataModels = [];
+  if (features.some((f: string) => f.toLowerCase().includes('user'))) {
+    dataModels.push('User', 'UserProfile', 'UserSession');
+  }
+  if (projectType === 'marketplace') {
+    dataModels.push('Product', 'Order', 'Vendor', 'Category');
+  } else if (projectType === 'social platform') {
+    dataModels.push('Post', 'Comment', 'Follow', 'Like');
+  } else {
+    dataModels.push('Item', 'Category', 'Activity');
+  }
+  
+  return {
+    techStack,
+    architecture: {
+      pattern: architecturePattern,
+      description: `${architecturePattern} architecture for ${projectType} with scalable component design`
+    },
+    dataModels,
+    integrations,
+    securityRequirements: [
+      'HTTPS encryption',
+      'Input validation and sanitization',
+      'Authentication and authorization',
+      'Data privacy compliance (GDPR)',
+      'API rate limiting'
+    ],
+    performanceTargets: {
+      pageLoadTime: '< 3 seconds',
+      apiResponseTime: '< 200ms',
+      uptime: '99.9%',
+      concurrentUsers: projectType === 'marketplace' ? '10,000+' : '1,000+'
+    },
+    scalingStrategy: architecturePattern === 'Microservices' ? 
+      'Horizontal scaling with containerized services' :
+      'Vertical scaling with load balancing',
+    testingStrategy: [
+      'Unit testing (Jest)',
+      'Integration testing',
+      'End-to-end testing (Playwright)',
+      'Performance testing'
+    ]
+  };
 }
 
-function generateQuickActions(context: FlexibleObject, stage: string): Array<{
+
+function detectDocumentUpdateNeeds(message: string, existingDocs: any): {
+  needsProjectOverviewUpdate: boolean;
+  needsBuildSpecsUpdate: boolean;
+  updateReasons: string[];
+} {
+  const lowerMessage = message.toLowerCase();
+  const updateReasons: string[] = [];
+  let needsProjectOverviewUpdate = false;
+  let needsBuildSpecsUpdate = false;
+  
+  // Project Overview update triggers
+  const overviewTriggers = [
+    { pattern: /add.*feature|new.*feature|also want|need.*to/, reason: "New feature addition" },
+    { pattern: /change.*target|different.*users|now.*for/, reason: "Target audience change" },
+    { pattern: /pivot|different.*problem|solve.*instead/, reason: "Problem/solution pivot" },
+    { pattern: /rebrand|rename|call.*it/, reason: "Project name/branding change" }
+  ];
+  
+  for (const trigger of overviewTriggers) {
+    if (trigger.pattern.test(lowerMessage)) {
+      needsProjectOverviewUpdate = true;
+      updateReasons.push(trigger.reason);
+    }
+  }
+  
+  // Build Specifications update triggers
+  const specsTriggers = [
+    { pattern: /switch.*to|use.*instead|migrate.*to/, reason: "Tech stack change" },
+    { pattern: /scale.*to|handle.*users|performance/, reason: "Scalability requirements change" },
+    { pattern: /add.*integration|connect.*to|api/, reason: "New integration requirements" },
+    { pattern: /security.*require|compliance|audit/, reason: "Security/compliance requirements" }
+  ];
+  
+  for (const trigger of specsTriggers) {
+    if (trigger.pattern.test(lowerMessage)) {
+      needsBuildSpecsUpdate = true;
+      updateReasons.push(trigger.reason);
+    }
+  }
+  
+  return { needsProjectOverviewUpdate, needsBuildSpecsUpdate, updateReasons };
+}
+
+function generateStageSpecificQuickActions(stage: string, extractedInfo: any, existingDocs?: any): Array<{
   id: string;
   label: string;
   type: 'primary' | 'secondary' | 'suggest' | 'multi-select' | 'danger' | 'info' | 'warning';
@@ -416,181 +627,129 @@ function generateQuickActions(context: FlexibleObject, stage: string): Array<{
     icon?: string;
     description?: string;
     keyboard?: string;
-    dangerous?: boolean;
-    requiresConfirm?: boolean;
   };
 }> {
   const actions = [];
+  const hasExistingDocs = existingDocs?.projectOverview || existingDocs?.buildSpecifications;
   
-  // Stage-specific quick actions
-  if (stage === 'initial') {
+  if (hasExistingDocs) {
+    // ITERATION MODE: Show document management actions
     actions.push(
       { 
-        id: 'web-app', 
-        label: 'Web Application', 
-        type: 'suggest' as const,
-        metadata: {
-          icon: '🌐',
-          description: 'Build a modern web application',
-          keyboard: '1'
-        }
-      },
-      { 
-        id: 'mobile-app', 
-        label: 'Mobile App', 
-        type: 'suggest' as const,
-        metadata: {
-          icon: '📱',
-          description: 'Create a mobile application',
-          keyboard: '2'
-        }
-      },
-      { 
-        id: 'api-service', 
-        label: 'API Service', 
-        type: 'suggest' as const,
-        metadata: {
-          icon: '🔌',
-          description: 'Build a backend API service',
-          keyboard: '3'
-        }
-      }
-    );
-  } else if (stage === 'features') {
-    actions.push(
-      { 
-        id: 'user-auth', 
-        label: 'User Authentication', 
-        type: 'multi-select' as const,
-        metadata: {
-          icon: '🔐',
-          description: 'Add user login and registration',
-          keyboard: '1'
-        }
-      },
-      { 
-        id: 'real-time', 
-        label: 'Real-time Features', 
-        type: 'multi-select' as const,
-        metadata: {
-          icon: '⚡',
-          description: 'Live updates and notifications',
-          keyboard: '2'
-        }
-      },
-      { 
-        id: 'file-upload', 
-        label: 'File Upload', 
-        type: 'multi-select' as const,
-        metadata: {
-          icon: '📁',
-          description: 'Allow users to upload files',
-          keyboard: '3'
-        }
-      },
-      { 
-        id: 'payments', 
-        label: 'Payment System', 
-        type: 'multi-select' as const,
-        metadata: {
-          icon: '💳',
-          description: 'Integrate payment processing',
-          keyboard: '4'
-        }
-      }
-    );
-  } else if (stage === 'architecture') {
-    actions.push(
-      { 
-        id: 'react-nextjs', 
-        label: 'React + Next.js', 
-        type: 'suggest' as const,
-        metadata: {
-          icon: '⚛️',
-          description: 'Modern React framework with SSR',
-          keyboard: '1'
-        }
-      },
-      { 
-        id: 'node-express', 
-        label: 'Node.js + Express', 
-        type: 'suggest' as const,
-        metadata: {
-          icon: '🟢',
-          description: 'Fast backend with Express',
-          keyboard: '2'
-        }
-      },
-      { 
-        id: 'postgresql', 
-        label: 'PostgreSQL', 
-        type: 'suggest' as const,
-        metadata: {
-          icon: '🐘',
-          description: 'Reliable relational database',
-          keyboard: '3'
-        }
-      }
-    );
-  } else if (stage === 'requirements') {
-    actions.push(
-      { 
-        id: 'continue-chat', 
-        label: 'Continue Conversation', 
+        id: 'update-overview', 
+        label: 'Update Project Overview', 
         type: 'primary' as const,
-        metadata: {
-          icon: '💬',
-          description: 'Keep discussing your project',
-          keyboard: '1'
-        }
+        metadata: { icon: '📝', description: 'Modify project vision and goals' }
       },
       { 
-        id: 'skip-to-build', 
-        label: 'Skip to Build Phase', 
-        type: 'secondary' as const,
-        metadata: {
-          icon: '🏗️',
-          description: 'Start building with current info',
-          keyboard: '2'
-        }
+        id: 'update-build-specs', 
+        label: 'Update Build Specifications', 
+        type: 'primary' as const,
+        metadata: { icon: '🔧', description: 'Change technical requirements' }
+      },
+      { 
+        id: 'generate-docs', 
+        label: 'Generate Documents', 
+        type: 'primary' as const,
+        metadata: { icon: '📄', description: 'Create project documents' }
       }
     );
+  } else {
+    // CREATION MODE: Generate comprehensive feature selection buttons
+    switch (stage) {
+      case 'initial':
+        if (!extractedInfo.projectType) {
+          actions.push(
+            { id: 'web-app', label: 'Web App', type: 'suggest' as const, metadata: { icon: '🌐' }},
+            { id: 'mobile-app', label: 'Mobile App', type: 'suggest' as const, metadata: { icon: '📱' }},
+            { id: 'marketplace', label: 'Marketplace', type: 'suggest' as const, metadata: { icon: '🛒' }},
+            { id: 'social-app', label: 'Social Platform', type: 'suggest' as const, metadata: { icon: '👥' }}
+          );
+        }
+        break;
+
+      case 'requirements':
+        // Generate project-specific feature buttons
+        const projectType = extractedInfo.projectType;
+        
+        if (projectType === 'web app' || projectType === 'web application') {
+          // Todo app features example
+          actions.push(
+            // Core Features
+            { id: 'task-management', label: 'Task Management', type: 'primary' as const, metadata: { icon: '✅', description: 'Add, edit, delete tasks' }},
+            { id: 'task-properties', label: 'Due Dates & Priority', type: 'primary' as const, metadata: { icon: '📅', description: 'Task scheduling' }},
+            
+            // Standard Features  
+            { id: 'organization', label: 'Categories & Lists', type: 'suggest' as const, metadata: { icon: '📁', description: 'Organize tasks' }},
+            { id: 'search-filter', label: 'Search & Filter', type: 'suggest' as const, metadata: { icon: '🔍', description: 'Find tasks easily' }},
+            { id: 'data-persistence', label: 'Save Data', type: 'suggest' as const, metadata: { icon: '💾', description: 'Keep your tasks safe' }},
+            
+            // Advanced Features
+            { id: 'subtasks', label: 'Subtasks', type: 'secondary' as const, metadata: { icon: '📝', description: 'Break down complex tasks' }},
+            { id: 'notifications', label: 'Reminders', type: 'secondary' as const, metadata: { icon: '🔔', description: 'Never miss a deadline' }},
+            { id: 'themes', label: 'Dark/Light Theme', type: 'secondary' as const, metadata: { icon: '🎨', description: 'Customize appearance' }}
+          );
+        } else if (projectType === 'marketplace') {
+          actions.push(
+            // Core marketplace features
+            { id: 'product-listings', label: 'Product Listings', type: 'primary' as const, metadata: { icon: '🏪', description: 'Display products' }},
+            { id: 'user-accounts', label: 'User Accounts', type: 'primary' as const, metadata: { icon: '👤', description: 'Buyers and sellers' }},
+            { id: 'payment-system', label: 'Payment Processing', type: 'primary' as const, metadata: { icon: '💳', description: 'Secure transactions' }},
+            
+            // Standard features
+            { id: 'search-browse', label: 'Search & Browse', type: 'suggest' as const, metadata: { icon: '🔍', description: 'Find products easily' }},
+            { id: 'reviews-ratings', label: 'Reviews & Ratings', type: 'suggest' as const, metadata: { icon: '⭐', description: 'Build trust' }},
+            { id: 'order-management', label: 'Order Tracking', type: 'suggest' as const, metadata: { icon: '📦', description: 'Track purchases' }},
+            
+            // Advanced features
+            { id: 'vendor-dashboard', label: 'Vendor Dashboard', type: 'secondary' as const, metadata: { icon: '📊', description: 'Seller analytics' }},
+            { id: 'messaging-system', label: 'Buyer-Seller Chat', type: 'secondary' as const, metadata: { icon: '💬', description: 'Direct communication' }}
+          );
+        } else if (projectType === 'social platform' || projectType === 'social app') {
+          actions.push(
+            // Core social features
+            { id: 'user-profiles', label: 'User Profiles', type: 'primary' as const, metadata: { icon: '👤', description: 'Personal profiles' }},
+            { id: 'content-feed', label: 'Activity Feed', type: 'primary' as const, metadata: { icon: '📱', description: 'Content stream' }},
+            { id: 'social-interactions', label: 'Like & Share', type: 'primary' as const, metadata: { icon: '👍', description: 'Engage with content' }},
+            
+            // Standard features
+            { id: 'messaging', label: 'Direct Messages', type: 'suggest' as const, metadata: { icon: '💬', description: 'Private chat' }},
+            { id: 'friend-system', label: 'Follow/Friends', type: 'suggest' as const, metadata: { icon: '👥', description: 'Build connections' }},
+            { id: 'content-creation', label: 'Post Creation', type: 'suggest' as const, metadata: { icon: '✏️', description: 'Share content' }},
+            
+            // Advanced features
+            { id: 'groups-communities', label: 'Groups/Communities', type: 'secondary' as const, metadata: { icon: '👥', description: 'Interest-based groups' }},
+            { id: 'live-features', label: 'Live Streaming', type: 'secondary' as const, metadata: { icon: '📹', description: 'Real-time content' }}
+          );
+        } else {
+          // Generic app features
+          actions.push(
+            { id: 'user-auth', label: 'User Accounts', type: 'primary' as const, metadata: { icon: '👤', description: 'Login system' }},
+            { id: 'data-management', label: 'Data Storage', type: 'primary' as const, metadata: { icon: '💾', description: 'Save user data' }},
+            { id: 'admin-panel', label: 'Admin Dashboard', type: 'suggest' as const, metadata: { icon: '🔧', description: 'Manage content' }},
+            { id: 'search-functionality', label: 'Search', type: 'suggest' as const, metadata: { icon: '🔍', description: 'Find content' }},
+            { id: 'notifications', label: 'Notifications', type: 'secondary' as const, metadata: { icon: '🔔', description: 'Keep users informed' }}
+          );
+        }
+        
+        // Add focus options
+        actions.push(
+          { id: 'focus-simple', label: 'Keep It Simple', type: 'info' as const, metadata: { icon: '🎯', description: 'Minimal features, fast launch' }},
+          { id: 'focus-comprehensive', label: 'Full-Featured', type: 'info' as const, metadata: { icon: '🚀', description: 'Complete solution' }}
+        );
+        break;
+
+      case 'features':
+      case 'architecture':
+        actions.push(
+          { id: 'recommend-stack', label: 'Recommend Tech Stack', type: 'primary' as const, metadata: { icon: '🔧' }},
+          { id: 'generate-docs', label: 'Generate Documents', type: 'primary' as const, metadata: { icon: '📄' }}
+        );
+        break;
+    }
   }
 
-  // Always add helpful universal actions
-  actions.push(
-    { 
-      id: 'get-examples', 
-      label: 'Show Examples', 
-      type: 'info' as const,
-      metadata: {
-        icon: '💡',
-        description: 'See similar project examples',
-        keyboard: 'E'
-      }
-    }
-  );
-  
   return actions;
 }
 
-function shouldGenerateOverview(extractedInfo: FlexibleObject, history: ConversationMessage[]): boolean {
-  // Generate overview if we have enough information
-  const hasProjectType = extractedInfo.projectType;
-  const hasFeatures = extractedInfo.features && extractedInfo.features.length > 0;
-  const hasArchitecture = extractedInfo.architecture;
-  const enoughMessages = history.length >= 6;
-  
-  return hasProjectType && hasFeatures && (hasArchitecture || enoughMessages);
-}
 
-function generateProjectOverview(extractedInfo: FlexibleObject, analysisResult: FlexibleObject): FlexibleObject {
-  return {
-    name: extractedInfo.projectName || 'Your Project',
-    description: extractedInfo.description || `A ${extractedInfo.projectType} application`,
-    targetUsers: extractedInfo.targetUsers || 'End users',
-    keyFeatures: extractedInfo.features || [],
-    problemSolved: extractedInfo.problemSolved || 'Addresses user needs efficiently',
-    successMetrics: extractedInfo.successMetrics || ['User adoption', 'Performance', 'Reliability']
-  };
-}

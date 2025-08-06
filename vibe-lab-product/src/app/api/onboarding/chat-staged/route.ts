@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     console.log('📊 System Status:', {
       basicReady: systemStatus.basicReady,
       enhancedReady: systemStatus.enhancedReady,
-      readyServices: systemStatus.services.filter(s => s.status === 'ready').map(s => s.name)
+      readyServices: systemStatus.services.filter((s: any) => s.status === 'ready').map((s: any) => s.name)
     });
 
     // Route request based on available services
@@ -79,12 +79,12 @@ export async function POST(request: NextRequest) {
       
       // If we have DIAS, use enhanced processing
       if (service.constructor.name === 'DIAS') {
-        return await processWithDIAS(service, message, projectName, sanitizedHistory, context);
+        return await processWithDIAS(service, message, projectName || 'Vibe Lab Project', sanitizedHistory, context);
       }
       
       // If we have AI Client, use basic processing
       if (service.constructor.name === 'AIClientService') {
-        return await processWithAIClient(service, message, projectName, sanitizedHistory, context);
+        return await processWithAIClient(service, message, projectName || 'Vibe Lab Project', sanitizedHistory, context);
       }
       
       // Fallback
@@ -144,12 +144,15 @@ async function processWithDIAS(
   message: string, 
   projectName: string, 
   conversationHistory: unknown[], 
-  context: unknown
+  context?: {
+    stage: 'initial' | 'requirements' | 'features' | 'architecture';
+    extractedInfo?: Record<string, unknown>;
+  }
 ): Promise<OnboardingChatResponse> {
   console.log('🧠 Using enhanced DIAS processing');
   
   try {
-    const response = await dias.processUserInput({
+    const response = await (dias as any).processUserInput({
       message,
       projectName,
       context: {
@@ -182,14 +185,17 @@ async function processWithAIClient(
   message: string,
   projectName: string,
   conversationHistory: unknown[],
-  context: unknown
+  context?: {
+    stage: 'initial' | 'requirements' | 'features' | 'architecture';
+    extractedInfo?: Record<string, unknown>;
+  }
 ): Promise<OnboardingChatResponse> {
   console.log('🤖 Using basic AI client processing');
   
   // Build context for AI
   const contextString = buildContextString(message, projectName, conversationHistory, context);
   
-  const aiResponse = await aiClient.process({
+  const aiResponse = await (aiClient as any).process({
     role: AIRole.DEVELOPER,
     prompt: contextString,
     context: JSON.stringify({ 
@@ -205,9 +211,7 @@ async function processWithAIClient(
     response: aiResponse.content + "\n\n*Note: Enhanced features are initializing and will be available shortly.*",
     suggestions: generateSuggestions(message, context?.stage),
     quickActions: generateQuickActions(context?.stage),
-    extractedInfo: extractBasicInfo(message, aiResponse.content),
-    projectOverview: null, // Enhanced feature
-    buildSpecifications: null // Enhanced feature
+    extractedInfo: extractBasicInfo(message, aiResponse.content)
   };
 }
 
@@ -218,10 +222,13 @@ function buildContextString(
   message: string,
   projectName: string,
   conversationHistory: unknown[],
-  context: unknown
+  context?: {
+    stage: 'initial' | 'requirements' | 'features' | 'architecture';
+    extractedInfo?: Record<string, unknown>;
+  }
 ): string {
   const stage = context?.stage || 'initial';
-  const historyContext = conversationHistory.slice(-5).map(msg => 
+  const historyContext = conversationHistory.slice(-5).map((msg: any) => 
     `${msg.role}: ${msg.content}`
   ).join('\n');
 
@@ -269,7 +276,7 @@ function extractBasicInfo(message: string, response: string): Record<string, any
 /**
  * Generate contextual suggestions
  */
-function generateSuggestions(message: string, stage?: string): string[] {
+function generateSuggestions(_message: string, stage?: string): string[] {
   const baseSuggestions = [
     "Tell me more about your project goals",
     "What features are most important to you?",

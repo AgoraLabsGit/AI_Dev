@@ -50,15 +50,15 @@ export async function POST(request: NextRequest) {
 
     // Create AI request
     const aiRequest: AIRequest = {
-      command,
-      args: Array.isArray(args) ? args : [],
-      flags: flags as SuperClaudeFlags,
-      context: typeof context === 'string' ? context : undefined,
-      sessionId: typeof sessionId === 'string' ? sessionId : undefined
+      command: command as SuperClaudeCommand,
+      ...(Array.isArray(args) && args.length > 0 && { args }),
+      ...(flags && Object.keys(flags).length > 0 && { flags: flags as SuperClaudeFlags }),
+      ...(typeof context === 'string' && { context }),
+      ...(typeof sessionId === 'string' && { sessionId })
     };
 
     // Execute command
-    const result = await diasServices.executeAICommand(aiRequest);
+    const result = await diasServices.process(aiRequest);
 
     // Return response
     return NextResponse.json(result);

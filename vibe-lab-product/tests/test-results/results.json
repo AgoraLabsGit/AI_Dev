@@ -1,0 +1,310 @@
+{
+  "config": {
+    "configFile": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/onboarding-test-suite.config.ts",
+    "rootDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/global-setup.ts",
+    "globalTeardown": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "testSuite": "Onboarding Comprehensive Test Suite",
+      "version": "1.0.0",
+      "environment": "test",
+      "baseUrl": "http://localhost:3000",
+      "timestamp": "2025-08-05T02:41:26.642Z"
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "test-results/html-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/junit.xml"
+        }
+      ],
+      [
+        "line",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "unit-tests",
+        "name": "unit-tests",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/unit/**/*.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "api-tests",
+        "name": "api-tests",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/api/**/*.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "integration-chrome",
+        "name": "integration-chrome",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/integration/**/*.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "e2e-chrome",
+        "name": "e2e-chrome",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/e2e/**/*.spec.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "e2e-firefox",
+        "name": "e2e-firefox",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/e2e/**/*.spec.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "e2e-safari",
+        "name": "e2e-safari",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/e2e/**/*.spec.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "mobile-chrome",
+        "name": "mobile-chrome",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/e2e/onboarding-flow.spec.ts",
+          "**/integration/document-generation.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "mobile-safari",
+        "name": "mobile-safari",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/e2e/onboarding-flow.spec.ts",
+          "**/integration/document-generation.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "performance",
+        "name": "performance",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/performance/**/*.test.ts"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "accessibility",
+        "name": "accessibility",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/accessibility/**/*.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/test-results/playwright-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "testSuite": "Onboarding Comprehensive Test Suite",
+          "version": "1.0.0",
+          "environment": "test",
+          "baseUrl": "http://localhost:3000",
+          "timestamp": "2025-08-05T02:41:26.642Z"
+        },
+        "id": "superclaude",
+        "name": "superclaude",
+        "testDir": "/Users/mike/Desktop/Vibe_Lab_V.1/vibe-lab-product/tests/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/superclaude-integration.test.ts"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.54.2",
+    "workers": 8,
+    "webServer": {
+      "command": "npm run dev",
+      "port": 3000,
+      "reuseExistingServer": true,
+      "timeout": 120000,
+      "env": {
+        "NODE_ENV": "test",
+        "NEXT_PUBLIC_TEST_MODE": "true",
+        "NEXT_PUBLIC_USE_SUPERCLAUDE": "true",
+        "NEXT_PUBLIC_SHOW_PERSONA_INFO": "true",
+        "NEXT_PUBLIC_SHOW_SUPERCLAUDE_INDICATORS": "true",
+        "NEXT_PUBLIC_ENABLE_CONTEXT7": "true",
+        "NEXT_PUBLIC_VERBOSE_LOGGING": "false"
+      }
+    }
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
+      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
+    }
+  ],
+  "stats": {
+    "startTime": "2025-08-05T02:41:26.648Z",
+    "duration": 9983.942,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -52,12 +52,8 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        // Default system fonts
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-mono)', 'monospace'],
-        // Template fonts will be added dynamically
-        inter: ['Inter', 'sans-serif'],
-        jetbrains: ['JetBrains Mono', 'monospace'],
+        sans: "var(--font-sans)",
+        mono: "var(--font-mono)",
       },
       keyframes: {
         'accordion-down': {

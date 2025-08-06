@@ -158,6 +158,73 @@ export class DIASServiceIntegrator extends BaseService {
       data: results as Record<MCPServerType, boolean>
     };
   }
+
+  // TaskMaster delegation methods
+  async getNextTask(): Promise<ServiceResponse<Task | null>> {
+    try {
+      return await this.taskMaster.getNextTask();
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get next task'
+      };
+    }
+  }
+
+  async listTasks(status?: string, withSubtasks = false): Promise<ServiceResponse<Task[]>> {
+    try {
+      return await this.taskMaster.listTasks(status, withSubtasks);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to list tasks'
+      };
+    }
+  }
+
+  async createTasksFromRoadmap(filePath: string, numTasks?: number): Promise<ServiceResponse<Task[]>> {
+    try {
+      return await this.taskMaster.createTasksFromRoadmap(filePath, numTasks);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to create tasks from roadmap'
+      };
+    }
+  }
+
+  async initializeProject(projectName: string, description?: string): Promise<ServiceResponse<boolean>> {
+    try {
+      return await this.taskMaster.initializeProject(projectName, description);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to initialize project'
+      };
+    }
+  }
+
+  async analyzeTaskComplexity(useResearch = false): Promise<ServiceResponse<ComplexityReport>> {
+    try {
+      return await this.taskMaster.analyzeTaskComplexity(useResearch);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to analyze task complexity'
+      };
+    }
+  }
+
+  async updateTaskStatus(taskId: string, status: string): Promise<ServiceResponse<Task>> {
+    try {
+      return await this.taskMaster.updateTaskStatus(taskId, status);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update task status'
+      };
+    }
+  }
 }
 
 export const createDefaultDIASConfig = (): DIASServiceConfig => ({

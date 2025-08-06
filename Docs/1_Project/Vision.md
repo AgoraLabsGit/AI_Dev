@@ -4,16 +4,17 @@
 
 To create an intelligent, multi-agent development platform that transforms high-level concepts into production-ready software. Our goal is to provide a seamless, efficient, and AI-powered lifecycle: **Design → Build → Iterate**.
 
-The platform's intelligence is driven by a **three-agent AI system**:
+The platform's intelligence is driven by a **hybrid AI architecture** that combines three specialized systems:
 
-*   **Router AI**: The entry point that intelligently understands and classifies user requests.
-*   **Developer AI**: The core engine that executes development tasks, from generating code to implementing features, guided by the AVCA pipeline.
-*   **Auditor AI**: The quality assurance agent that independently reviews code, enforces standards, and ensures security and performance.
+*   **AVCA (AI-Verified Component Architecture)**: The execution engine for structured development tasks with a proven 4-stage pipeline (Blueprint → Architecture → Generation → Verification)
+*   **DIAS (Dynamic Intelligence & Adaptation System)**: The orchestration layer providing intelligent routing, context management, and continuous learning
+*   **SuperClaude Framework**: The intelligence enhancement layer with 11 specialized personas, 4 MCP servers, and advanced orchestration capabilities
 
-This multi-agent system works in concert with two foundational technologies:
+This hybrid architecture creates a powerful synergy:
 
-*   **AVCA (AI-Verified Component Architecture):** The engine that takes project requirements and generates high-quality, production-ready code.
-*   **DIAS (Dynamic Intelligence & Adaptation System):** The intelligence layer that continuously learns from, adapts to, and improves your codebase in real-time.
+*   **Domain-Specific Workflows**: AVCA provides proven component development pipelines optimized for software generation
+*   **Intelligent Orchestration**: DIAS manages context, routing, and adaptation with event-driven architecture
+*   **Enhanced Intelligence**: SuperClaude powers each operation with advanced AI capabilities, making the system 10x more intelligent
 
 ## 2. The Philosophy
 
@@ -25,9 +26,11 @@ Our goal is to transform software development from a rigid, manual process into 
 
 Vibe Lab will be a comprehensive SaaS platform where the primary user experience is a **multi-path onboarding system**. This system is the practical application of AVCA and DIAS, allowing users to:
 
-- **Design**: Initiate projects from multiple entry points (new idea, existing repo, etc.) to craft a comprehensive application blueprint.
-- **Build**: Leverage the AI agents and AVCA pipeline to generate high-quality, secure, and compliant code.
-- **Iterate**: Use the AI-powered tools to refactor, add features, and ensure quality in a continuous improvement loop. This includes a full in-app code preview and one-click push to GitHub for local development and testing.
-*   **Monitor & Log**: Gain deep insights into the development process through comprehensive logging and self-monitoring capabilities, ensuring transparency and continuous improvement.
+- **Plan**: Create comprehensive project blueprints through conversational AI, capturing vision, architecture, and technical specifications
+- **Design**: Define styling, themes, pages, and component libraries with visual tools and AI assistance
+- **Build**: Execute the AVCA pipeline with DIAS orchestration to generate production-ready code
+- **Preview**: Live preview environments with multi-device testing and real-time updates
+- **Deploy**: One-click deployment to Vercel and other platforms with CI/CD integration
+- **Iterate**: Continuous improvement through AI-powered refactoring, feature additions, and quality enhancements
 
 This vision will guide the development of every feature and component within Vibe Lab.

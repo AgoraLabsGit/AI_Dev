@@ -1,0 +1,5 @@
+# Vibe Lab Directory Marker
+type: build
+description: "Example files demonstrating the marking system - not part of core product"
+include: "**/*"
+note: "These are demonstration files for the code marking system"

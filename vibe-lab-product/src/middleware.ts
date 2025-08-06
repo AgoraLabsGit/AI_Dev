@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
   const isAuthPage = request.nextUrl.pathname === '/sign-in' || request.nextUrl.pathname === '/auth/signin';
   const isOnboardingPage = request.nextUrl.pathname.startsWith('/onboarding');
-  const isDevPage = request.nextUrl.pathname.startsWith('/dev');
+  const isDevPage = request.nextUrl.pathname.startsWith('/dev') || request.nextUrl.pathname.startsWith('/experimental/dev');
 
   if (isAuthPage) {
     if (token) {

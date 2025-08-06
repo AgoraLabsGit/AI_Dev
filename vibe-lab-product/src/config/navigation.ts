@@ -39,7 +39,7 @@ export const navConfig = [
     id: 'build',
     label: 'Build',
     icon: GanttChart,
-    href: '/build/roadmap',
+    href: '/build',
     description: 'Development and progress'
   },
   {
